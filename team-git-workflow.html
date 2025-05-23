@@ -1,0 +1,151 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Team Git Workflow</title>
+  <style>
+    body {
+      background-color: #121212;
+      color: #e0e0e0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 2rem;
+      line-height: 1.6;
+    }
+    h1, h2, h3 {
+      color: #90caf9;
+    }
+    code {
+      background-color: #1e1e1e;
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.95em;
+    }
+    pre {
+      background-color: #1e1e1e;
+      padding: 1rem;
+      border-radius: 6px;
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+    }
+    table th, table td {
+      padding: 0.6rem;
+      border: 1px solid #333;
+      text-align: left;
+    }
+    table th {
+      background-color: #212121;
+      color: #ffcc80;
+    }
+    table td {
+      background-color: #1e1e1e;
+    }
+    a {
+      color: #80cbc4;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    .note {
+      color: #b0bec5;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🚀 Team Git Workflow – 4 Developers, 1 Project</h1>
+  <p>
+    A professional Git branching strategy for clean, collaborative development.<br>
+    👥 Designed for teams of 4 developers working on a single project.
+  </p>
+
+  <h2>🌳 Branching Strategy</h2>
+  <pre><code>main        → 🚀 Production-ready only
+dev         → 🧪 Shared development
+feature/*   → 👨‍💻 Individual feature branches</code></pre>
+
+  <h2>🗂️ Branch Roles</h2>
+  <h3>🔹 main</h3>
+  <ul>
+    <li>✅ Always deployable</li>
+    <li>🔒 Protected</li>
+    <li>🔁 Only merged via Pull Requests (PRs) from <code>dev</code></li>
+  </ul>
+
+  <h3>🔹 dev</h3>
+  <ul>
+    <li>🧪 Main development branch</li>
+    <li>🧵 All features get merged here before <code>main</code></li>
+  </ul>
+
+  <h3>🔹 feature/your-name-task</h3>
+  <ul>
+    <li>👨‍🔧 One per developer per feature</li>
+    <li>🌱 Created from <code>dev</code></li>
+    <li>🔀 Merged into <code>dev</code> via PR</li>
+  </ul>
+
+  <h2>🔁 Daily Workflow</h2>
+  <h3>🆕 Step 1: Create your feature branch</h3>
+  <pre><code>git checkout dev
+git pull origin dev
+git checkout -b feature/your-name-task</code></pre>
+
+  <h3>💻 Step 2: Do your work, then commit and push</h3>
+  <pre><code>git add .
+git commit -m "Added [feature name]"
+git push -u origin feature/your-name-task</code></pre>
+
+  <h3>🔄 Step 3: Keep your branch updated with <code>dev</code></h3>
+  <pre><code>git checkout dev
+git pull origin dev
+
+git checkout feature/your-name-task
+git merge dev</code></pre>
+
+  <h3>✅ Step 4: Open a Pull Request to merge into <code>dev</code></h3>
+
+  <h2>🚀 Merging to <code>main</code></h2>
+  <ul>
+    <li>All features are merged into <code>dev</code></li>
+    <li>Code is tested and reviewed</li>
+    <li>CI tests pass</li>
+  </ul>
+  <p>Then open a PR from <code>dev</code> → <code>main</code> on GitHub</p>
+
+  <h2>🔐 Branch Protection Rules</h2>
+  <table>
+    <tr><th>Branch</th><th>Protection Settings</th></tr>
+    <tr><td>main</td><td>✅ Require PRs, reviews, CI tests</td></tr>
+    <tr><td>dev</td><td>⚠️ PRs preferred, soft rules</td></tr>
+    <tr><td>feature/*</td><td>💻 Developer-controlled</td></tr>
+  </table>
+
+  <h2>🛠 Recommended VS Code Extensions</h2>
+  <table>
+    <tr><th>Extension</th><th>Purpose</th></tr>
+    <tr><td><a href="https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens">GitLens</a></td><td>Git history and blame</td></tr>
+    <tr><td><a href="https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode">Prettier</a></td><td>Code formatting</td></tr>
+    <tr><td><a href="https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint">ESLint</a></td><td>JS/TS linting</td></tr>
+  </table>
+
+  <h2>🖤 Dark Mode Friendly</h2>
+  <p>This guide is designed to look great in dark-themed editors and browsers 🌓</p>
+
+  <h2>🙌 Final Notes</h2>
+  <ul>
+    <li>Stay in your feature branch</li>
+    <li>PR into <code>dev</code>, not <code>main</code></li>
+    <li>Keep <code>main</code> clean and deployable</li>
+  </ul>
+  <p class="note">"Good branching keeps bugs in check and devs sane."</p>
+
+</body>
+</html>
