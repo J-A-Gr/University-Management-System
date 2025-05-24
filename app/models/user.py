@@ -11,14 +11,24 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(64), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128))
+
     first_name = db.Column(db.String(64))
     last_name = db.Column(db.String(64))
-    is_active = db.Column(db.Boolean, default=True)
+    birthday = db.Column(db.DateTime)
+
+    # pridėtas identifikatorius user. (gali būti kaip pvz dėstytojas ir admin.)
+    is_student = db.Column(db.Boolean, default=False)
+    is_teacher = db.Column(db.Boolean, default=False)
     is_admin = db.Column(db.Boolean, default=False)
+
+    is_active = db.Column(db.Boolean, default=True)
     last_login = db.Column(db.DateTime)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    birthday = db.Column(db.DateTime)
+
+    # pridėti ryšiai su student_info / teacher_info lentelėmis.
+    student_info = db.relationship('StudentInfo', back_populates='user', uselist=False) # uselist=False užtikrina one-to-one ryšį.
+    teacher_info = db.relationship('TeacherInfo', back_populates='user', uselist=False)
 
     @property
     def full_name(self):
