@@ -31,7 +31,7 @@ def profile():
 
 
 @bp.route('/dashboard')
-@admin_required
+@login_required
 def dashboard():
     """User dashboard"""
     return render_template('dashboard.html', title='Dashboard')

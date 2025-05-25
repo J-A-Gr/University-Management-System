@@ -9,5 +9,5 @@ class StudentInfo(db.Model):
     program_id = db.Column(db.Integer, db.ForeignKey('study_programs.id'))
 
     user = db.relationship('User', back_populates='student_info')
-    program = db.relationship('Program', back_populates='students')
+    program = db.relationship('StudyProgram', back_populates='students')
     group = db.relationship('Group', back_populates='students')

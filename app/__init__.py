@@ -2,6 +2,7 @@ from flask import Flask
 from app.extensions import db, migrate, login_manager, csrf
 from app.config import Config
 from app.models.user import User
+from app.utils.seed import create_hardcoded_admin
 
 def create_app(config_class=Config):
     app = Flask(__name__)
@@ -27,5 +28,9 @@ def create_app(config_class=Config):
     
     from app.views.api import bp as api_bp
     app.register_blueprint(api_bp, url_prefix='/api')
+
+    # hardcoded admin
+    with app.app_context():
+        create_hardcoded_admin()
     
     return app
