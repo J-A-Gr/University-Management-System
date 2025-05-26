@@ -24,7 +24,7 @@ def admin_panel():
         query = query.filter( db.func.lower(User.email).like(search_pattern)) # WHERE LOWER(email) LIKE '%email@...@%'
 
     # Adminai viršuje, paprasti useriai sekantys.
-    users = query.order_by(User.is_admin.desc(), User.username.asc()).all()
+    users = query.order_by(User.is_admin.desc(), User.email.asc()).all()
 
     return render_template('admin/panel.html', title='Admin Panel', users=users, search=search, form=form)
 
@@ -37,11 +37,11 @@ def promote_user(user_id):
         user = User.query.get_or_404(user_id)
 
         if user.is_admin:
-            flash(f"User '{user.username}' is already an admin.", "error")
+            flash(f"User '{user.email}' is already an admin.", "error")
         else:
             user.is_admin = True
             db.session.commit()
-            flash(f"User '{user.username}' has been promoted to admin.", "success")
+            flash(f"User '{user.email}' has been promoted to admin.", "success")
 
     return redirect(url_for('admin.admin_panel'))
 
@@ -58,10 +58,10 @@ def demote_user(user_id):
             return redirect(url_for('admin.admin_panel'))
         
         if not user.is_admin:
-            flash(f"User '{user.username}' is not an admin.", "error")
+            flash(f"User '{user.email}' is not an admin.", "error")
         else:
             user.is_admin = False
             db.session.commit()
-            flash(f"User '{user.username}' has been demoted from admin.", "success")
+            flash(f"User '{user.email}' has been demoted from admin.", "success")
 
     return redirect(url_for('admin.admin_panel'))
