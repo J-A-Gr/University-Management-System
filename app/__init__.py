@@ -31,6 +31,7 @@ def create_app(config_class=Config):
 
     # hardcoded admin
     with app.app_context():
-        create_hardcoded_admin()
+    #     create_hardcoded_admin()
     
-    return app
+        return app 
+    
