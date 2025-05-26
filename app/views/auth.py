@@ -3,6 +3,7 @@ from flask_login import login_user, logout_user, current_user, login_required
 from app.forms.auth import LoginForm, RegistrationForm, PasswordResetRequestForm, PasswordResetForm
 from app.models import User
 from app.extensions import db
+from datetime import datetime, timedelta
 
 bp = Blueprint('auth', __name__)
 
@@ -15,22 +16,48 @@ def login():
     
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
-        
-        if user and user.check_password(form.password.data):
-            if not user.is_active:
-                flash('Account is deactivated. Contact support.', 'error')
+        user = User.query.filter_by(email=form.email.data).first()
+
+        if user:
+            # Patikrinam ar vartotojas yra užrakintas
+            if user.is_locked():
+                flash('Account is locked due to too many failed login attempts. Try again later.', 'error')
                 return redirect(url_for('auth.login'))
-            
-            login_user(user, remember=form.remember_me.data)
-            next_page = request.args.get('next')
-            flash(f'Welcome back, {user.full_name}!', 'success')
-            return redirect(next_page or url_for('main.dashboard'))
+
+            # Tikrinam slaptažodį
+            if user.check_password(form.password.data):
+                if not user.is_active:
+                    flash('Account is deactivated. Contact support.', 'error')
+                    return redirect(url_for('auth.login'))
+
+                # Login sėkmingas – resetinam skaitiklį
+                user.failed_login_attempts = 0
+                user.locked_until = None
+                user.last_login = datetime.utcnow()
+                db.session.commit()
+
+                login_user(user, remember=form.remember_me.data)
+                next_page = request.args.get('next')
+                flash(f'Welcome back, {user.first_name}!', 'success')
+                return redirect(next_page or url_for('main.dashboard'))
+            else:
+                # užtikrinam, kad skaitiklis niekad nėra None, kitaip gausim TypeError...
+                if user.failed_login_attempts is None:
+                    user.failed_login_attempts = 0
+                # Netinkamas slaptažodis – didinam skaitiklį
+                user.failed_login_attempts += 1
+                if user.failed_login_attempts >= 3:
+                    user.locked_until = datetime.utcnow() + timedelta(minutes=5)
+                    flash('Account locked due to 3 failed login attempts. Try again in 5 minutes.', 'error')
+                else:
+                    flash('Invalid email or password', 'error')
+                db.session.commit()
+                return redirect(url_for('auth.login'))
         
-        flash('Invalid username or password', 'error')
+        # Jei user neegzistuoja
+        flash('Invalid email or password', 'error')
     
     return render_template('auth/login.html', title='Sign In', form=form)
-
 
 @bp.route('/register', methods=['GET', 'POST'])
 def register():
@@ -41,7 +68,6 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         user = User(
-            username=form.username.data,
             email=form.email.data,
             first_name=form.first_name.data,
             last_name=form.last_name.data

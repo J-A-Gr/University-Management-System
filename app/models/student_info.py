@@ -21,7 +21,7 @@ class StudentInfo(db.Model):
     group = db.relationship('Group', back_populates='students')
     
     # Ryšiai su moduliais ir pažymiais
-    module_enrollments = db.relationship('ModuleEnrollment', back_populates='student', cascade='all, delete-orphan')
+    # module_enrollments = db.relationship('ModuleEnrollment', back_populates='student', cascade='all, delete-orphan')  # TODO atkomentuoti nepamiršti
     
     
     @property
