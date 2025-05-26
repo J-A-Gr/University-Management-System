@@ -36,3 +36,6 @@ htmlcov/
 
 # Jupyter Notebooks
 .ipynb_checkpoints/ 
+
+# Sensitive files
+.env
