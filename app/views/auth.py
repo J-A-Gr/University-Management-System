@@ -67,10 +67,15 @@ def register():
     
     form = RegistrationForm()
     if form.validate_on_submit():
+        role = form.role.data
         user = User(
+            is_student=(role == 'student'),
+            is_teacher=(role == 'teacher'),
             email=form.email.data,
             first_name=form.first_name.data,
-            last_name=form.last_name.data
+            last_name=form.last_name.data,
+            birthday = form.birthday.data,
+            profile_picture = form.profile_picture.data
         )
         user.set_password(form.password.data)
         
