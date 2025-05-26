@@ -29,6 +29,9 @@ def create_app(config_class=Config):
     from app.views.api import bp as api_bp
     app.register_blueprint(api_bp, url_prefix='/api')
 
+    from app.views.admin import bp as admin_bp
+    app.register_blueprint(admin_bp, url_prefix='/admin')
+
     # hardcoded admin
     with app.app_context():
     #     create_hardcoded_admin()
