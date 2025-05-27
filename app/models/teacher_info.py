@@ -6,12 +6,12 @@ class TeacherInfo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
-    faculty_id = db.Column(db.Integer, db.ForeignKey('faculties.id'))
+    # faculty_id = db.Column(db.Integer, db.ForeignKey('faculties.id'))  # TODO: grąžinti ForeignKey kai bus sukurtas Faculty modelis
 
     user = db.relationship('User', back_populates='teacher_info')
-    faculty = db.relationship('Faculty', back_populates='teachers') 
+    # faculty = db.relationship('Faculty', back_populates='teachers')  # TODO
 
-    taught_modules = db.relationship('Module', back_populates='teacher')  #Dėstytojai gali kurti ir redaguoti modulius, turi matyti savo modelius, 
+    # taught_modules = db.relationship('Module', back_populates='teacher')  # TODO Dėstytojai gali kurti ir redaguoti modulius, turi matyti savo modelius, 
 
 
 

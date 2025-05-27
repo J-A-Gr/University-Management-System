@@ -7,7 +7,7 @@ class StrongPassword:
     
     def __init__(self, message=None):
         if not message:
-            message = 'Password must contain at least one uppercase letter, one lowercase letter, and one number.'
+            message = 'Password must contain at least one uppercase letter, lowercase letter, number and symbol.'
         self.message = message
     
     def __call__(self, form, field):
@@ -18,6 +18,8 @@ class StrongPassword:
         if not re.search(r'[a-z]', password):
             raise ValidationError(self.message)
         if not re.search(r'\d', password):
+            raise ValidationError(self.message)
+        if not re.search(r'[!@#$%^&*(),.?":{}|<>+=\-]', password):
             raise ValidationError(self.message)
 
 

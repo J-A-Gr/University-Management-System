@@ -1,39 +1,37 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms import (StringField, PasswordField, BooleanField, SubmitField, EmailField,
+RadioField, DateField, FileField)
 from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError
 from app.models.user import User
+from app.utils.validators import StrongPassword
 
 
 class LoginForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
+    email = EmailField('Email address', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
     remember_me = BooleanField('Remember Me')
     submit = SubmitField('Sign In')
 
 
 class RegistrationForm(FlaskForm):
-    username = StringField('Username', validators=[
-        DataRequired(), 
-        Length(min=4, max=25)
-    ])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    first_name = StringField('First Name', validators=[Length(max=50)])
-    last_name = StringField('Last Name', validators=[Length(max=50)])
-    password = PasswordField('Password', validators=[DataRequired()])
+    role = RadioField('Role', choices=[
+                        ('student', 'Student'), ('teacher', 'Teacher')], validators=[DataRequired()])
+    email = EmailField('Email Address', validators=[DataRequired(), Email()])
+    first_name = StringField('First Name', validators=[DataRequired(), Length(max=50)])
+    last_name = StringField('Last Name', validators=[DataRequired(), Length(max=50)])
+    birthday = DateField('Birth date', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired(), StrongPassword()])
     password2 = PasswordField('Repeat Password', validators=[
-        DataRequired(), 
+        DataRequired(), StrongPassword(), 
         EqualTo('password', message='Passwords must match')
     ])
+    profile_picture = FileField('Profile Photo')
     submit = SubmitField('Register')
     
 
     # Flask-WTF automatically calls custom validators during form.validate_on_submit()
     # Any method named validate_<fieldname> gets executed after built-in validators pass
     # If ValidationError is raised, form validation fails and error shows in template
-    def validate_username(self, username):
-        user = User.query.filter_by(username=username.data).first()
-        if user:
-            raise ValidationError('Username already exists.')
     
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()

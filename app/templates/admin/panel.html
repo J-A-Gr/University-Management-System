@@ -1,0 +1,56 @@
+{% extends "base.html" %} {% block content %}
+<div class="admin-panel">
+  <h1>Admin Panel</h1>
+
+  <!-- Search Form -->
+  <form method="GET" action="{{ url_for('admin.admin_panel') }}">
+    <input
+      type="text"
+      name="search"
+      placeholder="Search by email"
+      value="{{ search }}"
+    />
+    <button type="submit">Search</button>
+  </form>
+
+  <!-- Users Table -->
+  <table>
+    <thead>
+      <tr>
+        <th>Email</th>
+        <th>Role</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in users %}
+      <tr>
+        <td>{{ user.email }}</td>
+        <td>{{ "Admin" if user.is_admin else "User" }}</td>
+        <td>
+          {% if user.email == "admin@example.com" %}
+          <button disabled>Super Admin</button>
+          {% elif user.is_admin %}
+          <form
+            method="POST"
+            action="{{ url_for('admin.demote_user', user_id=user.id) }}"
+          >
+            {{ form.csrf_token() }}
+            <button type="submit">Remove Admin</button>
+          </form>
+          {% else %}
+          <form
+            method="POST"
+            action="{{ url_for('admin.promote_user', user_id=user.id) }}"
+          >
+            {{ form.csrf_token() }}
+            <button type="submit">Make Admin</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

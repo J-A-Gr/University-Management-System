@@ -6,9 +6,8 @@
       {{ form.hidden_tag() }}
 
       <div class="form-group">
-        {{ form.username.label(class="form-label") }} {{
-        form.username(class="form-input") }} {% for error in
-        form.username.errors %}
+        {{ form.email.label(class="form-label") }} {{
+        form.email(class="form-input") }} {% for error in form.email.errors %}
         <div class="form-error">{{ error }}</div>
         {% endfor %}
       </div>
@@ -33,7 +32,8 @@
 
     <div class="auth-links">
       <p>
-        New user? <a href="{{ url_for('auth.register') }}">Register here</a>
+        New user?
+        <a href="{{ url_for('auth.register') }}">Register here</a>
       </p>
     </div>
   </div>
