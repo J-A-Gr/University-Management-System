@@ -6,17 +6,26 @@
       method="POST"
       action="{{ url_for('auth.register') }}"
       class="auth-form"
+      enctype="multipart/form-data"
     >
       {{ form.hidden_tag() }}
 
+      <!-- Role selection -->
       <div class="form-group">
-        {{ form.username.label(class="form-label") }} {{
-        form.username(class="form-input") }} {% for error in
-        form.username.errors %}
+        {{ form.role.label(class="form-label") }}
+        <div class="form-radio-group">
+          {% for subfield in form.role %}
+          <label class="form-radio">
+            {{ subfield() }} {{ subfield.label.text }}
+          </label>
+          {% endfor %}
+        </div>
+        {% for error in form.role.errors %}
         <div class="form-error">{{ error }}</div>
         {% endfor %}
       </div>
 
+      <!-- Email -->
       <div class="form-group">
         {{ form.email.label(class="form-label") }} {{
         form.email(class="form-input") }} {% for error in form.email.errors %}
@@ -24,6 +33,7 @@
         {% endfor %}
       </div>
 
+      <!-- First and Last name -->
       <div class="form-row">
         <div class="form-group">
           {{ form.first_name.label(class="form-label") }} {{
@@ -41,6 +51,16 @@
         </div>
       </div>
 
+      <!-- Birthday -->
+      <div class="form-group">
+        {{ form.birthday.label(class="form-label") }} {{
+        form.birthday(class="form-input") }} {% for error in
+        form.birthday.errors %}
+        <div class="form-error">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <!-- Passwords -->
       <div class="form-group">
         {{ form.password.label(class="form-label") }} {{
         form.password(class="form-input") }} {% for error in
@@ -57,6 +77,15 @@
         {% endfor %}
       </div>
 
+      <!-- Profile picture -->
+      <div class="form-group">
+        {{ form.profile_picture.label(class="form-label") }} {{
+        form.profile_picture(class="form-input") }} {% for error in
+        form.profile_picture.errors %}
+        <div class="form-error">{{ error }}</div>
+        {% endfor %}
+      </div>
+      <!-- Submit -->
       <div class="form-actions">
         {{ form.submit(class="btn btn-primary btn-full") }}
       </div>

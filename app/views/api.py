@@ -13,7 +13,6 @@ def get_user(user_id):
     user = User.query.get_or_404(user_id)
     return jsonify({
         'id': user.id,
-        'username': user.username,
         'email': user.email,
         'full_name': user.full_name,
         'created_at': user.created_at.isoformat()

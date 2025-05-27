@@ -23,8 +23,8 @@ class User(UserMixin, db.Model):
 
     is_active = db.Column(db.Boolean, default=True)
     
-    # failed_login_attempts = db.Column(db.Integer, default=0)
-    # locked_until = db.Column(db.DateTime)
+    failed_login_attempts = db.Column(db.Integer, default=0)
+    locked_until = db.Column(db.DateTime)
 
 
     last_login = db.Column(db.DateTime)
@@ -38,7 +38,7 @@ class User(UserMixin, db.Model):
     @property
     def full_name(self):
         """Get user's full name"""
-        return f"{self.first_name or ''} {self.last_name or ''}".strip() or self.username
+        return f"{self.first_name or ''} {self.last_name or ''}".strip()
 
 
     # pasitikrinam kokia user rolė
@@ -63,6 +63,9 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         """Check user's password"""
         return bcrypt.check_password_hash(self.password_hash, password)
+    
+    def is_locked(self):
+        return self.locked_until and self.locked_until > datetime.utcnow()
 
 
     #•	5.2 Vartotojų Administravimas
