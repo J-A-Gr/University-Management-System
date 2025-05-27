@@ -1,5 +1,6 @@
 from urllib.parse import urlparse
 from flask import request
+from app import Config
 
 
 def get_safe_redirect(target):
@@ -33,3 +34,7 @@ def truncate_text(text, length=100, suffix='...'):
     if text and len(text) > length:
         return text[:length].rstrip() + suffix
     return text or ''
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in Config.ALLOWED_EXTENSIONS

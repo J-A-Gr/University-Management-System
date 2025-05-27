@@ -15,7 +15,7 @@ class User(UserMixin, db.Model):
     last_name = db.Column(db.String(64))
     birthday = db.Column(db.DateTime)
 
-    profile_picture = db.Column(db.String(255))  # kažkaip reiks pridėti kelią kur yra saugoma foto :D
+    profile_picture = db.Column(db.String(255), default='default.png') 
     # pridėtas identifikatorius user. (gali būti kaip pvz dėstytojas ir admin.)
     is_student = db.Column(db.Boolean, default=False)
     is_teacher = db.Column(db.Boolean, default=False)
