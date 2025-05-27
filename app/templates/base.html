@@ -30,6 +30,13 @@
               >Dashboard</a
             >
           </li>
+          {% if current_user.is_admin %}
+          <li>
+            <a href="{{ url_for('admin.admin_panel') }}" class="nav-link"
+              >Admin Panel</a
+            >
+          </li>
+          {% endif %}
           <li>
             <a href="{{ url_for('main.profile') }}" class="nav-link">Profile</a>
           </li>

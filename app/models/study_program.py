@@ -7,4 +7,4 @@ class StudyProgram(db.Model):
     faculty = db.Column(db.String(100), nullable=False)
 
     groups = db.relationship('Group', back_populates='program')
-    students = db.relationship('StudentInfo', back_populates='program')
+    students = db.relationship('StudentInfo', back_populates='study_program')
