@@ -2,8 +2,9 @@ from flask import Blueprint, render_template, flash, redirect, url_for, request
 from flask_login import login_user, logout_user, current_user, login_required
 from app.forms.auth import LoginForm, RegistrationForm, PasswordResetRequestForm, PasswordResetForm
 from app.models import User
-from app.extensions import db
+from app.extensions import db, bcrypt
 from datetime import datetime, timedelta
+import os
 
 bp = Blueprint('auth', __name__)
 
@@ -75,7 +76,8 @@ def register():
             first_name=form.first_name.data,
             last_name=form.last_name.data,
             birthday = form.birthday.data,
-            profile_picture = form.profile_picture.data
+            profile_picture = form.profile_picture.data, # į db keliauja pavadinimas nuotraukos
+         
         )
         user.set_password(form.password.data)
         
