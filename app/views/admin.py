@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, flash, redirect, url_for, request
+from flask import Blueprint, render_template, flash, redirect, url_for, request, abort
 from flask_login import current_user
 from app.extensions import db
 from app.utils.decorators import admin_required
@@ -9,10 +9,13 @@ from app.forms.admin import EmptyForm
 bp = Blueprint('admin', __name__)
 
 
-@bp.route('/admin/panel')
+@bp.route('/dashboard')
 @admin_required
-def admin_panel():
+def admin_dashboard():
     """Admin dashboard"""
+    if not current_user.role == 'admin':
+        abort(403)
+
     form = EmptyForm()
     search = request.args.get('search', '').strip()  # paieškos laukui naudojama, (Kai forma siunčiama su GET)
 
@@ -26,7 +29,7 @@ def admin_panel():
     # Adminai viršuje, paprasti useriai sekantys.
     users = query.order_by(User.is_admin.desc(), User.email.asc()).all()
 
-    return render_template('admin/panel.html', title='Admin Panel', users=users, search=search, form=form)
+    return render_template('admin/dashboard.html', title='Admin Panel', users=users, search=search, form=form)
 
 
 @bp.route('/promote/<int:user_id>', methods=['POST'])
