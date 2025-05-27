@@ -2,7 +2,8 @@
 <div class="profile-container">
   <h1>Edit Profile</h1>
 
-  <form method="POST" class="profile-form">
+  <!-- Must include enctype for file uploads -->
+  <form method="POST" enctype="multipart/form-data" class="profile-form">
     {{ form.hidden_tag() }}
 
     <div class="form-row">
@@ -13,6 +14,7 @@
         <div class="form-error">{{ error }}</div>
         {% endfor %}
       </div>
+
       <div class="form-group">
         {{ form.last_name.label(class="form-label") }} {{
         form.last_name(class="form-input") }} {% for error in
@@ -22,11 +24,38 @@
       </div>
     </div>
 
+    <div class="form-group">
+      {{ form.email.label(class="form-label") }} {{
+      form.email(class="form-input") }} {% for error in form.email.errors %}
+      <div class="form-error">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="form-group">
+      {{ form.profile_picture.label(class="form-label") }} {{
+      form.profile_picture(class="form-input") }} {% for error in
+      form.profile_picture.errors %}
+      <div class="form-error">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    {% if current_user.profile_picture %}
+    <div class="form-group">
+      <label>Current Picture:</label>
+      <br />
+      <img
+        src="{{ url_for('static', filename='profile_pics/' + current_user.profile_picture) }}"
+        alt="Profile Picture"
+        style="width: 150px; height: auto; border-radius: 8px"
+      />
+    </div>
+    {% endif %}
+
     <div class="form-actions">
       {{ form.submit(class="btn btn-primary") }}
-      <a href="{{ url_for('main.dashboard') }}" class="btn btn-secondary"
-        >Cancel</a
-      >
+      <a href="{{ url_for('main.dashboard') }}" class="btn btn-secondary">
+        Cancel
+      </a>
     </div>
   </form>
 </div>
