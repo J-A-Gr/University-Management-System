@@ -6,10 +6,6 @@ class StudyProgram(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> dev
     name = db.Column(db.String(100), nullable=False, unique=True)  # "Informatikos inžinerija"
     code = db.Column(db.String(10), nullable=False, unique=True)   # “IN” – informatikos programa “IFIN” – informatikos fako informatikos progr”
 
@@ -95,10 +91,3 @@ class StudyProgram(db.Model):
     # db.Column('study_program_id', db.Integer, db.ForeignKey('study_programs.id'), primary_key=True),
     # db.Column('module_id', db.Integer, db.ForeignKey('modules.id'), primary_key=True)
 # )
-<<<<<<< HEAD
-=======
-    groups = db.relationship('Group', back_populates='program')
-    students = db.relationship('StudentInfo', back_populates='study_program')
->>>>>>> dev
-=======
->>>>>>> dev
