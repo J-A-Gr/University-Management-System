@@ -17,11 +17,23 @@ content %}
     {% endif %}
     <h3>{{ current_user.first_name }} {{ current_user.last_name }}</h3>
     <ul class="profile-list">
-      <li><b>Rolė:</b> {{ current_user.role|capitalize }}</li>
-      <li><b>El. paštas:</b> {{ current_user.email }}</li>
+      <li>
+        <b>Rolė:</b>
+        {{ current_user.role|capitalize }}
+      </li>
+      <li>
+        <b>El. paštas:</b>
+        {{ current_user.email }}
+      </li>
       {% if current_user.role == 'student' %}
-      <li><b>Studijų programa:</b> {{ current_user.study_program_name }}</li>
-      <li><b>Grupė:</b> {{ current_user.group }}</li>
+      <li>
+        <b>Studijų programa:</b>
+        {{ current_user.study_program_name }}
+      </li>
+      <li>
+        <b>Grupė:</b>
+        {{ current_user.group }}
+      </li>
       {% endif %}
     </ul>
   </div>
@@ -47,9 +59,9 @@ content %}
       <li>Nėra dėstomų dalykų.</li>
       {% endif %}
     </ul>
-    <a href="{{ url_for('main.add_module') }}" class="big-button mt-2"
-      >Pridėti naują modulį</a
-    >
+    <a href="{{ url_for('main.add_module') }}" class="big-button mt-2">
+      Pridėti naują modulį
+    </a>
   </div>
   {% endif %}
 </div>

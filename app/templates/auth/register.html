@@ -80,9 +80,9 @@ content %}
         <span class="input-icon"><i data-lucide="book-open"></i></span>
         {{ form.study_program(class="input", id="study_program", required=True)
         }}
-        <label for="study_program"
-          >Studijų programos trumpinys (pvz., IFIN)</label
-        >
+        <label for="study_program">
+          Studijų programos trumpinys (pvz., IFIN)
+        </label>
         {% for error in form.study_program.errors %}
         <div class="invalid-feedback d-block">{{ error }}</div>
         {% endfor %}
