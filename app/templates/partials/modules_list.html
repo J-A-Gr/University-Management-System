@@ -1,0 +1,38 @@
+{% if modules %}
+<ul class="list-group mb-4">
+  {% for module in modules %}
+  <li class="list-group-item d-flex justify-content-between align-items-center">
+    <div>
+      <strong>{{ module.name }}</strong>
+      <br />
+      <small>{{ module.description }}</small>
+      <br />
+      <span class="badge bg-info">Kreditai: {{ module.credits }}</span>
+      <span class="badge bg-secondary">Semestras: {{ module.semester }}</span>
+    </div>
+    <div>
+      {% if current_user.role == 'teacher' %}
+      <a
+        href="{{ url_for('main.edit_module', id=module.id) }}"
+        class="btn btn-warning btn-sm"
+        >Redaguoti</a
+      >
+      <a
+        href="{{ url_for('main.delete_module', id=module.id) }}"
+        class="btn btn-danger btn-sm"
+        onclick="return confirm('Ar tikrai ištrinti?');"
+        >Ištrinti</a
+      >
+      {% endif %}
+      <a
+        href="{{ url_for('main.view_module', id=module.id) }}"
+        class="btn btn-primary btn-sm"
+        >Peržiūrėti</a
+      >
+    </div>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p>Nėra priskirtų modulių.</p>
+{% endif %}

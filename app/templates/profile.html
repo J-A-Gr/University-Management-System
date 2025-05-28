@@ -1,33 +1,56 @@
-{% extends "base.html" %} {% block content %}
-<div class="profile-container">
-  <h1>Edit Profile</h1>
-
-  <form method="POST" class="profile-form">
-    {{ form.hidden_tag() }}
-
-    <div class="form-row">
-      <div class="form-group">
-        {{ form.first_name.label(class="form-label") }} {{
-        form.first_name(class="form-input") }} {% for error in
-        form.first_name.errors %}
-        <div class="form-error">{{ error }}</div>
-        {% endfor %}
-      </div>
-      <div class="form-group">
-        {{ form.last_name.label(class="form-label") }} {{
-        form.last_name(class="form-input") }} {% for error in
-        form.last_name.errors %}
-        <div class="form-error">{{ error }}</div>
-        {% endfor %}
-      </div>
-    </div>
-
-    <div class="form-actions">
-      {{ form.submit(class="btn btn-primary") }}
-      <a href="{{ url_for('main.dashboard') }}" class="btn btn-secondary"
-        >Cancel</a
-      >
-    </div>
-  </form>
+{% extends "base.html" %} {% block title %}Profilis{% endblock %} {% block
+content %}
+<div class="main-content glass-card">
+  <div class="center-text">
+    {% if current_user.profile_picture_url %}
+    <img
+      src="{{ url_for('static', filename='uploads/' ~ current_user.profile_picture_url) }}"
+      class="avatar"
+      alt="Profilio nuotrauka"
+    />
+    {% else %}
+    <img
+      src="{{ url_for('static', filename='img/default-profile.png') }}"
+      class="avatar"
+      alt="Profilio nuotrauka"
+    />
+    {% endif %}
+    <h3>{{ current_user.first_name }} {{ current_user.last_name }}</h3>
+    <ul class="profile-list">
+      <li><b>Rolė:</b> {{ current_user.role|capitalize }}</li>
+      <li><b>El. paštas:</b> {{ current_user.email }}</li>
+      {% if current_user.role == 'student' %}
+      <li><b>Studijų programa:</b> {{ current_user.study_program_name }}</li>
+      <li><b>Grupė:</b> {{ current_user.group }}</li>
+      {% endif %}
+    </ul>
+  </div>
+  {% if current_user.role == 'student' %}
+  <div class="glass-card mt-3">
+    <h5>Mano pasirinkti dalykai</h5>
+    <ul>
+      {% if current_user.modules %} {% for module in current_user.modules %}
+      <li>{{ module.title }} ({{ module.teacher_name }})</li>
+      {% endfor %} {% else %}
+      <li>Dar nepasirinkote dalykų.</li>
+      {% endif %}
+    </ul>
+  </div>
+  {% elif current_user.role == 'teacher' %}
+  <div class="glass-card mt-3">
+    <h5>Mano dėstomi dalykai</h5>
+    <ul>
+      {% if current_user.teaching_modules %} {% for module in
+      current_user.teaching_modules %}
+      <li>{{ module.title }} ({{ module.semester }})</li>
+      {% endfor %} {% else %}
+      <li>Nėra dėstomų dalykų.</li>
+      {% endif %}
+    </ul>
+    <a href="{{ url_for('main.add_module') }}" class="big-button mt-2"
+      >Pridėti naują modulį</a
+    >
+  </div>
+  {% endif %}
 </div>
 {% endblock %}
