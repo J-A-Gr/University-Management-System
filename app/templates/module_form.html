@@ -1,0 +1,41 @@
+{% extends "base.html" %} {% block title %}Modulio forma{% endblock %} {% block
+content %}
+<div class="main-content glass-card">
+  <h2 class="center-text mb-4">Pridėti naują dalyką</h2>
+  <form method="POST">
+    {{ form.hidden_tag() }}
+    <div class="floating-label">
+      {{ form.title(class="input", id="title", placeholder=" ", required=True)
+      }}
+      <label for="title">Pavadinimas</label>
+      {% for error in form.title.errors %}
+      <div class="invalid-feedback d-block">{{ error }}</div>
+      {% endfor %}
+    </div>
+    <div class="floating-label">
+      {{ form.credit(class="input", id="credit", placeholder=" ", required=True)
+      }}
+      <label for="credit">Kreditai</label>
+      {% for error in form.credit.errors %}
+      <div class="invalid-feedback d-block">{{ error }}</div>
+      {% endfor %}
+    </div>
+    <div class="floating-label">
+      {{ form.semester(class="input", id="semester", placeholder=" ",
+      required=True) }}
+      <label for="semester">Semestras</label>
+      {% for error in form.semester.errors %}
+      <div class="invalid-feedback d-block">{{ error }}</div>
+      {% endfor %}
+    </div>
+    <div class="floating-label">
+      {{ form.time(class="input", id="time", placeholder=" ", required=True) }}
+      <label for="time">Laikas</label>
+      {% for error in form.time.errors %}
+      <div class="invalid-feedback d-block">{{ error }}</div>
+      {% endfor %}
+    </div>
+    <button type="submit" class="big-button w-100">Išsaugoti</button>
+  </form>
+</div>
+{% endblock %}
