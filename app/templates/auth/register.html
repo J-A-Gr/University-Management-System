@@ -91,10 +91,10 @@ content %}
       <!-- ĮSTOJIMO/KURSO METAI -->
       <div class="floating-label">
         <span class="input-icon"><i data-lucide="calendar"></i></span>
-        {{ form.entry_year(class="input", id="entry_year", placeholder=" ",
-        required=True) }}
-        <label for="entry_year">Įstojimo/Kurso metai (pvz., 18)</label>
-        {% for error in form.entry_year.errors %}
+        {{ form.admission_year(class="input", id="admission_year", placeholder="
+        ", required=True) }}
+        <label for="admission_year">Įstojimo/Kurso metai (pvz., 2023)</label>
+        {% for error in form.admission_year.errors %}
         <div class="invalid-feedback d-block">{{ error }}</div>
         {% endfor %}
       </div>
