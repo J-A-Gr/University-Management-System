@@ -44,7 +44,10 @@ class Module(db.Model):
             # 'created_by_name': f"{self.created_by.first_name} {self.created_by.last_name}" if self.created_by else None,
             # 'created_at': self.created_at.isoformat() if self.created_at else None
         }
-    
+       
+
+
+       
     @staticmethod
     def get_active_modules(): #cia gal adminui reiks :D is tikruju tai padariau def get_modules_by_program(program_id): is suabejojau ar sito bereikia :D
         """Return all active modules"""
