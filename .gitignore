@@ -13,7 +13,7 @@ ENV/
 
 # Flask/Migrations
 instance/
-# migrations/versions/
+migrations/versions/
 app.db
 
 # VSCode and other editors

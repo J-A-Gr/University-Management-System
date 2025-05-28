@@ -22,7 +22,9 @@ class Module(db.Model):
     created_by_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False) 
     
     study_program = db.relationship('StudyProgram', backref='modules') # sito reiks. . . visur :D
-    created_by = db.relationship('User', backref='created_modules')  # sito reikia, kad zinotume kas ir ka sukure
+    created_by = db.relationship('User', back_populates='created_modules')  # sito reikia, kad zinotume kas ir ka sukure
+    
+
     
     def __repr__(self):
         return f'<Module {self.name}>'
