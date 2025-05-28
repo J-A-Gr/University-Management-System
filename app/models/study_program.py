@@ -12,9 +12,11 @@ class StudyProgram(db.Model):
     faculty_id = db.Column(db.Integer, db.ForeignKey('faculties.id'))  # programa priklauso fakui
     
     # Ryšiai
-    faculty = db.relationship('Faculty', back_populates='study_programs') #back_populates = 'study_programs' reiškia, kad Faculty modelyje bus ryšys su studijų programomis
+
+    #faculty = db.relationship('Faculty', back_populates='study_programs') #back_populates = 'study_programs' reiškia, kad Faculty modelyje bus ryšys su studijų programomis
+
     students = db.relationship('StudentInfo', back_populates='study_program')
-    groups = db.relationship('Group', back_populates='study_program')
+    # groups = db.relationship('Group', back_populates='study_program') # TODO čia kažkokia klaidą meta
     # many to many su moduliais, nes viena programa gali turėti daug modulių, o vienas modulis gali priklausyti daugeliui programų
     # modules = db.relationship('Module', #TODO: atkurti ryšį su moduliais, kai bus sukurta Module model
     #                          secondary='program_modules', 

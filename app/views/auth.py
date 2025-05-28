@@ -4,7 +4,11 @@ from app.forms.auth import LoginForm, RegistrationForm, PasswordResetRequestForm
 from app.models import User
 from app.extensions import db, bcrypt
 from datetime import datetime, timedelta
+from werkzeug.utils import secure_filename
 import os
+import uuid
+from app.config import Config
+from app.utils.helpers import allowed_file
 
 bp = Blueprint('auth', __name__)
 
@@ -65,9 +69,20 @@ def register():
     """User registration"""
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
-    
+
     form = RegistrationForm()
     if form.validate_on_submit():
+
+        profile_filename = 'default.png' # apsauga nuo sulūžimo (jeigu neįkeltų failo(image))
+        file = form.profile_picture.data
+
+        if file and allowed_file(file.filename):  # tikrinam ar įkeltas failas (none ar ne) ir jo formatą 
+            filename = secure_filename(file.filename)
+            unique_filename = f"{uuid.uuid4().hex}_{filename}"  # uuid sugeneruoja unikalų string (apsauga nuo pasikartojančio pav.)
+            file_path = os.path.join(Config.UPLOAD_FOLDER, unique_filename)
+            file.save(file_path)
+            profile_filename = unique_filename 
+
         role = form.role.data
         user = User(
             is_student=(role == 'student'),
@@ -76,7 +91,7 @@ def register():
             first_name=form.first_name.data,
             last_name=form.last_name.data,
             birthday = form.birthday.data,
-            profile_picture = form.profile_picture.data, # į db keliauja pavadinimas nuotraukos
+            profile_picture = profile_filename # į db keliauja pavadinimas nuotraukos
          
         )
         user.set_password(form.password.data)
@@ -149,3 +164,8 @@ def logout():
     logout_user()
     flash('You have been logged out.', 'info')
     return redirect(url_for('main.index'))
+
+
+@bp.route('/unauthorized')
+def unauthorized():
+    return render_template('unauthorized.html'), 403

@@ -9,9 +9,37 @@
     <div class="dashboard-card">
       <h3>Profile</h3>
       <p>Manage your account settings and personal information.</p>
-      <a href="{{ url_for('main.profile') }}" class="btn btn-primary"
-        >Edit Profile</a
-      >
+      <a href="{{ url_for('main.profile') }}" class="btn btn-primary"></a>
+        Edit Profile
+      </a>
+    </div>
+
+    <div class="card">
+      <h3>Academic Overview</h3>
+      <p>
+        <strong>Study Program:</strong>
+        {{ student.study_program.name }}
+      </p>
+      <p>
+        <strong>Group:</strong>
+        {{ student.group.name }}
+      </p>
+      <p>
+        <strong>Admission Year:</strong>
+        {{ student.admission_year }}
+      </p>
+      <p>
+        <strong>Current Semester:</strong>
+        {{ student.current_semester }}
+      </p>
+      <p>
+        <strong>Completed Credits:</strong>
+        {{ student.completed_credits }}
+      </p>
+      <p>
+        <strong>GPA:</strong>
+        {{ gpa }}
+      </p>
     </div>
 
     <div class="dashboard-card">
@@ -45,9 +73,9 @@
       <div class="info-item">
         <strong>Last Updated:</strong>
         {% if current_user.updated_at %}
-        <span
-          >{{ current_user.updated_at.strftime('%B %d, %Y at %I:%M %p') }}</span
-        >
+        <span>
+          {{ current_user.updated_at.strftime('%B %d, %Y at %I:%M %p') }}
+        </span>
         {% else %}
         <span>Never updated</span>
         {% endif %}
