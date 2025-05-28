@@ -2,6 +2,28 @@
 <div class="admin-panel">
   <h1>Admin Panel</h1>
 
+  <!-- Statistics Summary -->
+  <div class="stats">
+    <h2>System Statistics</h2>
+    <ul>
+      <li>Users: {{ user_count }}</li>
+      <li>Modules: {{ module_count }}</li>
+      <li>Study Programs: {{ program_count }}</li>
+      <li>Groups: {{ group_count }}</li>
+    </ul>
+  </div>
+
+  <!-- nukreipimas į userių managementa -->
+
+  <div class="admin-nav d-flex flex-column gap-2">
+    <a
+      href="{{ url_for('admin.manage_users') }}"
+      class="btn btn-outline-primary"
+    >
+      Vartotojų valdymas
+    </a>
+  </div>
+
   <!-- Search Form -->
   <form method="GET" action="{{ url_for('admin.admin_dashboard') }}">
     <input
@@ -35,7 +57,7 @@
             method="POST"
             action="{{ url_for('admin.demote_user', user_id=user.id) }}"
           >
-            {{ form.csrf_token() }}
+            {{ form.hidden_tag() }}
             <button type="submit">Remove Admin</button>
           </form>
           {% else %}
@@ -43,7 +65,7 @@
             method="POST"
             action="{{ url_for('admin.promote_user', user_id=user.id) }}"
           >
-            {{ form.csrf_token() }}
+            {{ form.hidden_tag() }}
             <button type="submit">Make Admin</button>
           </form>
           {% endif %}

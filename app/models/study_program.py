@@ -13,14 +13,14 @@ class StudyProgram(db.Model):
     
     # Ryšiai
 
-    #faculty = db.relationship('Faculty', back_populates='study_programs') #back_populates = 'study_programs' reiškia, kad Faculty modelyje bus ryšys su studijų programomis
+    faculty = db.relationship('Faculty', back_populates='study_programs') #back_populates = 'study_programs' reiškia, kad Faculty modelyje bus ryšys su studijų programomis
 
     students = db.relationship('StudentInfo', back_populates='study_program')
-    # groups = db.relationship('Group', back_populates='study_program') # TODO čia kažkokia klaidą meta
-    # many to many su moduliais, nes viena programa gali turėti daug modulių, o vienas modulis gali priklausyti daugeliui programų
-    # modules = db.relationship('Module', #TODO: atkurti ryšį su moduliais, kai bus sukurta Module model
-    #                          secondary='program_modules', 
-    #                          back_populates='study_programs')
+    groups = db.relationship('Group', back_populates='study_program')
+    # logiskiau manau butu many to many su moduliais, nes viena programa gali turėti daug modulių, o vienas modulis gali priklausyti daugeliui programų
+    # bet dabar pasilikim prie vienai studiju programai priklauso daug moduliu.
+    modules = db.relationship('Module', back_populates='study_program')
+
 
     @property
     def student_count(self):

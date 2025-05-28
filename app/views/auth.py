@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, flash, redirect, url_for, request
 from flask_login import login_user, logout_user, current_user, login_required
 from app.forms.auth import LoginForm, RegistrationForm, PasswordResetRequestForm, PasswordResetForm
-from app.models import User
+from app.models import User, StudyProgram, Group
 from app.extensions import db, bcrypt
 from datetime import datetime, timedelta
 from werkzeug.utils import secure_filename
@@ -71,6 +71,7 @@ def register():
         return redirect(url_for('main.index'))
 
     form = RegistrationForm()
+    form.study_program.choices = [(p.id, p.name) for p in StudyProgram.query.all()]
     if form.validate_on_submit():
 
         profile_filename = 'default.png' # apsauga nuo sulūžimo (jeigu neįkeltų failo(image))
@@ -95,7 +96,33 @@ def register():
          
         )
         user.set_password(form.password.data)
-        
+
+        if user.is_student:
+            user.ensure_student_info() # įsitikinam, kad jis turi StudentInfo
+            user.student_info.study_program_id = form.study_program.data # Priskiriam studijų programa
+            user.student_info.admission_year = form.admission_year.data # įrašom įstojimo metus
+         
+            # Surandam ar tokia grupė egzistuoja
+            group = Group.query.filter_by(
+                study_program_id=form.study_program.data,
+                admission_year=form.admission_year.data,
+                group_letter=form.group_letter.data.upper()
+            ).first()
+
+            # Jei neradom – sukuriam naują
+            if not group:
+                group_name = f"AUTO-{form.admission_year.data}-{form.group_letter.data.upper()}"  # gali būti generuojama kaip reikia
+                group = Group(
+                    name=group_name,
+                    admission_year=form.admission_year.data,
+                    group_letter=form.group_letter.data.upper(),
+                    study_program_id=form.study_program.data
+                )
+                db.session.add(group)
+
+            user.student_info.group = group
+
+
         db.session.add(user)
         db.session.commit()
         
@@ -164,8 +191,3 @@ def logout():
     logout_user()
     flash('You have been logged out.', 'info')
     return redirect(url_for('main.index'))
-
-
-@bp.route('/unauthorized')
-def unauthorized():
-    return render_template('unauthorized.html'), 403

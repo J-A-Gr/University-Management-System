@@ -20,3 +20,4 @@ def student_dashboard():
     # gpa = student_info.calculate_gpa()
 
     return render_template('student/dashboard.html', student=current_user) # student=student_info, modules=modules, gpa=gpa)
+

@@ -1,0 +1,59 @@
+{% extends "base.html" %} {% block title %}Vartotojų valdymas{% endblock %} {%
+block content %}
+<div class="container mt-4">
+  <h2>Vartotojų sąrašas</h2>
+  <table class="table table-bordered table-hover mt-3">
+    <thead>
+      <tr>
+        <th>Vardas</th>
+        <th>El. paštas</th>
+        <th>Rolė</th>
+        <th>Aktyvus</th>
+        <th>Veiksmai</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in users %}
+      <tr>
+        <td>{{ user.full_name }}</td>
+        <td>{{ user.email }}</td>
+        <td>
+          {% if user.is_admin %}Admin{% elif user.is_teacher %}Dėstytojas{% elif
+          user.is_student %}Studentas{% else %}–{% endif %}
+        </td>
+        <td>{{ 'Taip' if user.is_active else 'Ne' }}</td>
+        <td class="d-flex gap-2">
+          <a
+            href="{{ url_for('admin.edit_user', user_id=user.id) }}"
+            class="btn btn-sm btn-primary"
+          >
+            Redaguoti
+          </a>
+
+          <form
+            method="POST"
+            action="{{ url_for('admin.deactivate_user', user_id=user.id) }}"
+          >
+            {{ form.hidden_tag() }}
+            <button type="submit" class="btn btn-sm btn-warning">
+              Deaktyvuoti
+            </button>
+          </form>
+
+          <form
+            method="POST"
+            action="{{ url_for('admin.delete_user', user_id=user.id) }}"
+            onsubmit="return confirm('Ar tikrai norite ištrinti?');"
+          >
+            {{ form.hidden_tag() }}
+            <button type="submit" class="btn btn-sm btn-danger">
+              Ištrinti
+            </button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -1,9 +1,14 @@
-{% extends "base.html" %}
-
-{% block content %}
-<div class="error-page">
-    <h1>500 - Server Error</h1>
-    <p>Something went wrong on our end. Please try again later.</p>
-    <a href="{{ url_for('main.index') }}" class="btn btn-primary">Go Home</a>
+<!-- app/templates/errors/500.html -->
+{% extends "base.html" %} {% block title %}Klaida{% endblock %} {% block content
+%}
+<div class="text-center mt-5">
+  <h1 class="display-3">Klaida</h1>
+  <p class="lead">
+    Įvyko nenumatyta klaida. Bandykite dar kartą arba kreipkitės į
+    administratorių.
+  </p>
+  <a href="{{ url_for('main.index') }}" class="btn btn-primary">
+    Grįžti į pradžią
+  </a>
 </div>
-{% endblock %>
+{% endblock %}
