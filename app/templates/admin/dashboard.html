@@ -2,8 +2,19 @@
 <div class="admin-panel">
   <h1>Admin Panel</h1>
 
+  <!-- Statistics Summary -->
+  <div class="stats">
+    <h2>System Statistics</h2>
+    <ul>
+      <li>Users: {{ user_count }}</li>
+      <li>Modules: {{ module_count }}</li>
+      <li>Study Programs: {{ program_count }}</li>
+      <li>Groups: {{ group_count }}</li>
+    </ul>
+  </div>
+
   <!-- Search Form -->
-  <form method="GET" action="{{ url_for('admin.admin_panel') }}">
+  <form method="GET" action="{{ url_for('admin.admin_dashboard') }}">
     <input
       type="text"
       name="search"

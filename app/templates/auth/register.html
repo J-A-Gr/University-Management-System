@@ -1,102 +1,166 @@
-{% extends "base.html" %} {% block content %}
-<div class="auth-container">
-  <div class="auth-card">
-    <h2>Create Account</h2>
-    <form
-      method="POST"
-      action="{{ url_for('auth.register') }}"
-      class="auth-form"
-      enctype="multipart/form-data"
-    >
-      {{ form.hidden_tag() }}
+{% extends "base.html" %} {% block title %}Registracija{% endblock %} {% block
+content %}
+<div class="main-content glass-card">
+  <h2 class="center-text mb-4">Registracija</h2>
 
-      <!-- Role selection -->
-      <div class="form-group">
-        {{ form.role.label(class="form-label") }}
-        <div class="form-radio-group">
-          {% for subfield in form.role %}
-          <label class="form-radio">
-            {{ subfield() }} {{ subfield.label.text }}
-          </label>
-          {% endfor %}
-        </div>
-        {% for error in form.role.errors %}
-        <div class="form-error">{{ error }}</div>
-        {% endfor %}
-      </div>
+  <!-- FLASH ŽINUTĖS -->
+  {% with messages = get_flashed_messages(with_categories=true) %} {% if
+  messages %} {% for category, message in messages %}
+  <div class="alert alert-{{ category }} mt-3">{{ message }}</div>
+  {% endfor %} {% endif %} {% endwith %}
 
-      <!-- Email -->
-      <div class="form-group">
-        {{ form.email.label(class="form-label") }} {{
-        form.email(class="form-input") }} {% for error in form.email.errors %}
-        <div class="form-error">{{ error }}</div>
-        {% endfor %}
-      </div>
+  <form method="POST" enctype="multipart/form-data" novalidate>
+    {{ form.hidden_tag() }}
 
-      <!-- First and Last name -->
-      <div class="form-row">
-        <div class="form-group">
-          {{ form.first_name.label(class="form-label") }} {{
-          form.first_name(class="form-input") }} {% for error in
-          form.first_name.errors %}
-          <div class="form-error">{{ error }}</div>
-          {% endfor %}
-        </div>
-        <div class="form-group">
-          {{ form.last_name.label(class="form-label") }} {{
-          form.last_name(class="form-input") }} {% for error in
-          form.last_name.errors %}
-          <div class="form-error">{{ error }}</div>
-          {% endfor %}
-        </div>
-      </div>
-
-      <!-- Birthday -->
-      <div class="form-group">
-        {{ form.birthday.label(class="form-label") }} {{
-        form.birthday(class="form-input") }} {% for error in
-        form.birthday.errors %}
-        <div class="form-error">{{ error }}</div>
-        {% endfor %}
-      </div>
-
-      <!-- Passwords -->
-      <div class="form-group">
-        {{ form.password.label(class="form-label") }} {{
-        form.password(class="form-input") }} {% for error in
-        form.password.errors %}
-        <div class="form-error">{{ error }}</div>
-        {% endfor %}
-      </div>
-
-      <div class="form-group">
-        {{ form.password2.label(class="form-label") }} {{
-        form.password2(class="form-input") }} {% for error in
-        form.password2.errors %}
-        <div class="form-error">{{ error }}</div>
-        {% endfor %}
-      </div>
-
-      <!-- Profile picture -->
-      <div class="form-group">
-        {{ form.profile_picture.label(class="form-label") }} {{
-        form.profile_picture(class="form-input") }} {% for error in
-        form.profile_picture.errors %}
-        <div class="form-error">{{ error }}</div>
-        {% endfor %}
-      </div>
-      <!-- Submit -->
-      <div class="form-actions">
-        {{ form.submit(class="btn btn-primary btn-full") }}
-      </div>
-    </form>
-
-    <div class="auth-links">
-      <p>
-        Already have an account?
-        <a href="{{ url_for('auth.login') }}">Sign in here</a>
-      </p>
+    <div class="floating-label">
+      <span class="input-icon"><i data-lucide="mail"></i></span>
+      {{ form.email(class="input", id="email", placeholder=" ", required=True)
+      }}
+      <label for="email">El. paštas</label>
+      {% for error in form.email.errors %}
+      <div class="invalid-feedback d-block">{{ error }}</div>
+      {% endfor %}
     </div>
+
+    <div class="floating-label">
+      <span class="input-icon"><i data-lucide="user"></i></span>
+      {{ form.first_name(class="input", id="first_name", placeholder=" ",
+      required=True) }}
+      <label for="first_name">Vardas</label>
+      {% for error in form.first_name.errors %}
+      <div class="invalid-feedback d-block">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="floating-label">
+      <span class="input-icon"><i data-lucide="user"></i></span>
+      {{ form.last_name(class="input", id="last_name", placeholder=" ",
+      required=True) }}
+      <label for="last_name">Pavardė</label>
+      {% for error in form.last_name.errors %}
+      <div class="invalid-feedback d-block">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <!-- SLAPTAŽODIS -->
+    <div class="floating-label">
+      <span class="input-icon"><i data-lucide="lock"></i></span>
+      {{ form.password(class="input", id="password", type="password",
+      placeholder=" ", required=True) }}
+      <label for="password">Slaptažodis</label>
+      {% for error in form.password.errors %}
+      <div class="invalid-feedback d-block">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="floating-label">
+      <span class="input-icon"><i data-lucide="lock"></i></span>
+      {{ form.password2(class="input", id="password2", type="password",
+      placeholder=" ", required=True) }}
+      <label for="password2">Pakartokite slaptažodį</label>
+      {% for error in form.password2.errors %}
+      <div class="invalid-feedback d-block">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <!-- ROLĖ -->
+    <div class="floating-label">
+      <span class="input-icon"><i data-lucide="user-check"></i></span>
+      {{ form.role(class="input", id="role", required=True,
+      onchange="toggleStudentFields()") }}
+      <label for="role">Vaidmuo</label>
+      {% for error in form.role.errors %}
+      <div class="invalid-feedback d-block">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <div id="student-fields">
+      <!-- STUDIJŲ PROGRAMA -->
+      <div class="floating-label">
+        <span class="input-icon"><i data-lucide="book-open"></i></span>
+        {{ form.study_program(class="input", id="study_program", required=True)
+        }}
+        <label for="study_program">
+          Studijų programos trumpinys (pvz., IFIN)
+        </label>
+        {% for error in form.study_program.errors %}
+        <div class="invalid-feedback d-block">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <!-- ĮSTOJIMO/KURSO METAI -->
+      <div class="floating-label">
+        <span class="input-icon"><i data-lucide="calendar"></i></span>
+        {{ form.entry_year(class="input", id="entry_year", placeholder=" ",
+        required=True) }}
+        <label for="entry_year">Įstojimo/Kurso metai (pvz., 18)</label>
+        {% for error in form.entry_year.errors %}
+        <div class="invalid-feedback d-block">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <!-- GRUPĖS RAIDĖ -->
+      <div class="floating-label">
+        <span class="input-icon"><i data-lucide="tag"></i></span>
+        {{ form.group_letter(class="input", id="group_letter", required=True) }}
+        <label for="group_letter">Grupės raidė (pvz., A, B, C)</label>
+        {% for error in form.group_letter.errors %}
+        <div class="invalid-feedback d-block">{{ error }}</div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- PROFILIO NUOTRAUKA (optional) -->
+    <div class="floating-label">
+      <span class="input-icon"><i data-lucide="image"></i></span>
+      {{ form.profile_picture(class="input", id="profile_picture") }}
+      <label for="profile_picture">Profilio nuotrauka (neprivaloma)</label>
+      {% for error in form.profile_picture.errors %}
+      <div class="invalid-feedback d-block">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <button type="submit" class="big-button w-100 mt-3">
+      {{ form.submit.label.text }}
+    </button>
+  </form>
+  <div class="mt-3 center-text">
+    <span style="font-size: 0.9em; color: var(--accent)">
+      Jau turi paskyrą?
+      <a
+        href="{{ url_for('auth.login') }}"
+        style="color: var(--accent); text-decoration: underline"
+      >
+        Prisijunk
+      </a>
+    </span>
   </div>
 </div>
+<script>
+  function toggleStudentFields() {
+    var role = document.getElementById("role").value;
+    var studentFields = document.getElementById("student-fields");
+    if (role === "student") {
+      studentFields.style.display = "block";
+      document
+        .getElementById("study_program")
+        .setAttribute("required", "required");
+      document
+        .getElementById("entry_year")
+        .setAttribute("required", "required");
+      document
+        .getElementById("group_letter")
+        .setAttribute("required", "required");
+    } else {
+      studentFields.style.display = "none";
+      document.getElementById("study_program").removeAttribute("required");
+      document.getElementById("entry_year").removeAttribute("required");
+      document.getElementById("group_letter").removeAttribute("required");
+    }
+  }
+  // Paleisti funkciją iškart, kai užkraunama (kad teisingai paslėptų laukus po reload ar validacijos)
+  window.addEventListener("DOMContentLoaded", function () {
+    toggleStudentFields();
+  });
+</script>
 {% endblock %}
