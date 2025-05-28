@@ -5,6 +5,7 @@ class TeacherInfo(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
     faculty_id = db.Column(db.Integer, db.ForeignKey('faculties.id'), nullable=True)  # TODO: grąžinti ForeignKey kai bus sukurtas Faculty modelis
     
     user = db.relationship('User', back_populates='teacher_info')

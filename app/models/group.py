@@ -89,3 +89,5 @@ class Group(db.Model):
     # TODO atsizymeti veliau :D
     # def __repr__(self):
     #     return f'<Group {self.name} - {self.study_program.name} - {self.student_count} students>'
+
+    # program = db.relationship('StudyProgram', back_populates='groups') # TODO patikrinti ryšį
