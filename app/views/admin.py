@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, flash, redirect, url_for, request,
 from flask_login import current_user
 from app.extensions import db
 from app.utils.decorators import admin_required
-from app.models import User
+from app.models import User, Module, StudyProgram, Group
 from sqlalchemy import func
 from app.forms.admin import EmptyForm
 
@@ -29,7 +29,26 @@ def admin_dashboard():
     # Adminai viršuje, paprasti useriai sekantys.
     users = query.order_by(User.is_admin.desc(), User.email.asc()).all()
 
-    return render_template('admin/dashboard.html', title='Admin Panel', users=users, search=search, form=form)
+    # statistinė informacija
+     
+    try:
+        user_count = User.query.count()
+        module_count = Module.query.count()
+        program_count = StudyProgram.query.count()
+        group_count = Group.query.count()
+    except Exception as e:
+        flash(f"Error counting statistics: {str(e)}", "error")
+        user_count = module_count = program_count = group_count = 0
+
+
+    return render_template('admin/dashboard.html', 
+                            title='Admin Panel', 
+                            users=users, 
+                            search=search, 
+                            form=form,
+                            module_count=module_count,
+                            program_count=program_count,
+                            group_count=group_count)
 
 
 @bp.route('/promote/<int:user_id>', methods=['POST'])
@@ -46,7 +65,7 @@ def promote_user(user_id):
             db.session.commit()
             flash(f"User '{user.email}' has been promoted to admin.", "success")
 
-    return redirect(url_for('admin.admin_panel'))
+    return redirect(url_for('admin.admin_dashboard'))
 
 @bp.route('/demote/<int:user_id>', methods=['POST'])
 @admin_required
@@ -58,7 +77,7 @@ def demote_user(user_id):
         # Apsauga nuo hardcodinto admino pašalinimo.
         if user.email == "admin@example.com":
             flash("Cannot demote the 'super' admin.", "error") 
-            return redirect(url_for('admin.admin_panel'))
+            return redirect(url_for('admin.admin_dashboard'))
         
         if not user.is_admin:
             flash(f"User '{user.email}' is not an admin.", "error")
@@ -67,4 +86,82 @@ def demote_user(user_id):
             db.session.commit()
             flash(f"User '{user.email}' has been demoted from admin.", "success")
 
-    return redirect(url_for('admin.admin_panel'))
+    return redirect(url_for('admin.admin_dashboard'))
+
+
+
+@bp.route('/users')
+@admin_required
+def manage_users():
+    """Admin: Manage users"""
+    form = EmptyForm()
+    users = User.query.order_by(User.email.asc()).all()
+    programs = StudyProgram.query.order_by(StudyProgram.name.asc()).all()
+    return render_template('admin/manage_users.html', users=users, programs=programs, form=form)
+
+@bp.route('/users/<int:user_id>/edit', methods=['GET', 'POST'])
+@admin_required
+def edit_user(user_id):
+    user = User.query.get_or_404(user_id)
+    programs = StudyProgram.query.all()
+    form = EmptyForm()
+
+    if request.method == 'POST' and form.validate_on_submit():
+        try:
+            new_role = request.form.get('role')
+
+            # Jei ne admin@example.com – leidžiam keisti rolę
+            if not user.is_admin and new_role in ['student', 'teacher']:
+                user.set_role(new_role)
+
+            # Užtikrinam, kad atitinkami info objektai egzistuoja
+            user.ensure_student_info()
+            user.ensure_teacher_info()
+
+            # Atnaujinam aktyvumą
+            user.is_active = 'is_active' in request.form
+
+            # Jei studentas – atnaujinam studijų programą
+            if user.is_student and user.student_info:
+                new_program_id = request.form.get('program_id')
+                if new_program_id:
+                    user.change_study_program(new_program_id)
+
+            db.session.commit()
+            flash("User updated successfully", "success")
+            return redirect(url_for('admin.manage_users'))
+
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Error while updating user: {e}", "error")
+
+    return render_template('admin/edit_user.html', user=user, programs=programs, form=form)
+
+
+@bp.route('/users/<int:user_id>/deactivate', methods=['POST'])
+@admin_required
+def deactivate_user(user_id):
+    form = EmptyForm()
+    if form.validate_on_submit():
+        user = User.query.get_or_404(user_id)
+        if user.email == "admin@example.com":
+            flash("Can't deactivate super admin", "danger")
+            return redirect(url_for('admin.manage_users'))
+        user.is_active = False
+        db.session.commit()
+        flash("User deactivated", "info")
+    return redirect(url_for('admin.manage_users'))
+
+@bp.route('/users/<int:user_id>/delete', methods=['POST'])
+@admin_required
+def delete_user(user_id):
+    form = EmptyForm()
+    if form.validate_on_submit():
+        user = User.query.get_or_404(user_id)
+        if user.email == "admin@example.com":
+            flash("Can't delete super admin.", "danger")
+            return redirect(url_for('admin.manage_users'))
+        db.session.delete(user)
+        db.session.commit()
+        flash("User deleted", "warning")
+    return redirect(url_for('admin.manage_users'))

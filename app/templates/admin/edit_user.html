@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Edit user: {{ user.full_name }}</h2>
+
+<form method="POST">
+  {{ form.csrf_token() }}
+
+  {% if not user.is_admin %}
+  <label for="role">Role:</label>
+  <select name="role" id="role">
+    <option value="student" {% if user.is_student %}selected{% endif %}>Student</option>
+    <option value="teacher" {% if user.is_teacher %}selected{% endif %}>Teacher</option>
+  </select>
+  <br><br>
+  {% else %}
+  <p><strong>Role:</strong>
+    {% if user.is_teacher %}Teacher (Admin){% else %}Admin{% endif %}
+  </p>
+  {% endif %}
+
+  {% if user.is_student and user.student_info %}
+  <label for="program_id">Study program:</label>
+  <select name="program_id" id="program_id">
+    {% for program in programs %}
+      <option value="{{ program.id }}" {% if user.student_info.study_program_id == program.id %}selected{% endif %}>
+        {{ program.name }}
+      </option>
+    {% endfor %}
+  </select>
+  <br><br>
+  {% endif %}
+
+  <label>
+    <input type="checkbox" name="is_active" {% if user.is_active %}checked{% endif %}>
+    Account active
+  </label>
+
+  <br><br>
+  <button type="submit">Save</button>
+  <a href="{{ url_for('admin.manage_users') }}">Back</a>
+</form>
+{% endblock %}
