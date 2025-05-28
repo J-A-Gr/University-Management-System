@@ -13,3 +13,7 @@ def internal_error(e):
 @bp.app_errorhandler(413)
 def file_too_large(e):
     return render_template('errors/413.html'), 413
+
+@bp.route('/unauthorized')
+def unauthorized():
+    return render_template('unauthorized.html'), 403
