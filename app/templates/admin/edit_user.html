@@ -1,42 +1,37 @@
 {% extends "base.html" %}
+{% block title %}Redaguoti vartotoją{% endblock %}
 {% block content %}
-<h2>Edit user: {{ user.full_name }}</h2>
+<div class="container mt-4">
+  <h2>Redaguoti: {{ user.full_name }}</h2>
+  <form method="POST">
+    {{ form.hidden_tag() }}
 
-<form method="POST">
-  {{ form.csrf_token() }}
+    <div class="mb-3">
+      <label for="role" class="form-label">Rolė</label>
+      <select name="role" id="role" class="form-select">
+        <option value="student" {% if user.is_student %}selected{% endif %}>Studentas</option>
+        <option value="teacher" {% if user.is_teacher %}selected{% endif %}>Dėstytojas</option>
+      </select>
+    </div>
 
-  {% if not user.is_admin %}
-  <label for="role">Role:</label>
-  <select name="role" id="role">
-    <option value="student" {% if user.is_student %}selected{% endif %}>Student</option>
-    <option value="teacher" {% if user.is_teacher %}selected{% endif %}>Teacher</option>
-  </select>
-  <br><br>
-  {% else %}
-  <p><strong>Role:</strong>
-    {% if user.is_teacher %}Teacher (Admin){% else %}Admin{% endif %}
-  </p>
-  {% endif %}
+    <div class="mb-3 form-check">
+      <input type="checkbox" name="is_active" class="form-check-input" id="is_active" {% if user.is_active %}checked{% endif %}>
+      <label class="form-check-label" for="is_active">Aktyvus</label>
+    </div>
 
-  {% if user.is_student and user.student_info %}
-  <label for="program_id">Study program:</label>
-  <select name="program_id" id="program_id">
-    {% for program in programs %}
-      <option value="{{ program.id }}" {% if user.student_info.study_program_id == program.id %}selected{% endif %}>
-        {{ program.name }}
-      </option>
-    {% endfor %}
-  </select>
-  <br><br>
-  {% endif %}
+    {% if user.is_student %}
+    <div class="mb-3">
+      <label for="program_id" class="form-label">Studijų programa</label>
+      <select name="program_id" id="program_id" class="form-select">
+        {% for program in programs %}
+        <option value="{{ program.id }}" {% if user.student_info and user.student_info.study_program_id == program.id %}selected{% endif %}>{{ program.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    {% endif %}
 
-  <label>
-    <input type="checkbox" name="is_active" {% if user.is_active %}checked{% endif %}>
-    Account active
-  </label>
-
-  <br><br>
-  <button type="submit">Save</button>
-  <a href="{{ url_for('admin.manage_users') }}">Back</a>
-</form>
+    <button type="submit" class="btn btn-success">Išsaugoti</button>
+    <a href="{{ url_for('admin.manage_users') }}" class="btn btn-secondary">Atgal</a>
+  </form>
+</div>
 {% endblock %}
