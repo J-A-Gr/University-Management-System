@@ -13,7 +13,7 @@ class StudyProgram(db.Model):
     
     # Ryšiai
 
-    #faculty = db.relationship('Faculty', back_populates='study_programs') #back_populates = 'study_programs' reiškia, kad Faculty modelyje bus ryšys su studijų programomis
+    faculty = db.relationship('Faculty', back_populates='study_programs') #back_populates = 'study_programs' reiškia, kad Faculty modelyje bus ryšys su studijų programomis
 
     students = db.relationship('StudentInfo', back_populates='study_program')
     groups = db.relationship('Group', back_populates='study_program')

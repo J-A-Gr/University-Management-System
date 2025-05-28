@@ -6,10 +6,10 @@ class TeacherInfo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
-    # faculty_id = db.Column(db.Integer, db.ForeignKey('faculties.id'), nullable=True)  # TODO: grąžinti ForeignKey kai bus sukurtas Faculty modelis
+    faculty_id = db.Column(db.Integer, db.ForeignKey('faculties.id'), nullable=True)  # TODO: grąžinti ForeignKey kai bus sukurtas Faculty modelis
     user = db.relationship('User', back_populates='teacher_info')
     taught_modules = db.relationship('Module', back_populates='teacher')   # TODO Dėstytojai gali kurti ir redaguoti modulius, turi matyti savo modelius, 
-    # faculty = db.relationship('Faculty', back_populates='teachers')  # TODO
+    faculty = db.relationship('Faculty', back_populates='teachers')  # TODO
 
 
 def get_current_modules(self, semester=None, is_active=True):
