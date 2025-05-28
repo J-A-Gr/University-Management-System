@@ -4,9 +4,8 @@ from datetime import datetime
 
 def create_hardcoded_admin():
     """Creates a default admin user if none exists."""
-    if not User.query.filter_by(username='admin').first():
+    if not User.query.filter_by(email='admin@example.com').first():
         admin = User(
-            username='admin',
             email='admin@example.com',
             password_hash=bcrypt.generate_password_hash('Admin123+').decode('utf-8'),
             is_admin=True,

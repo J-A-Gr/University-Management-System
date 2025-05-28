@@ -7,8 +7,14 @@ load_dotenv(os.path.join(basedir, '..', '.env'))
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'hard-to-guess-string'
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        'mysql+pymysql://root:915276MySQL@localhost:3306/university_db' + os.path.join(basedir, '..', 'app.db')  # TODO 1. edit 'mysql string with your db info'
+        'mysql+pymysql://root:915276MySQL@localhost:3306/university_db'  # TODO 1. edit 'mysql string with your db info'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    # nuotraukų išsaugojimui
+    UPLOAD_FOLDER = os.path.join(basedir, 'static', 'profile_pics')
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+    MAX_CONTENT_LENGTH = 2 * 1024 * 1024  # Max upload size: 2MB
     
 class DevelopmentConfig(Config):
     DEBUG = True

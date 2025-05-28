@@ -26,26 +26,27 @@
           </li>
           {% if current_user.is_authenticated %}
           <li>
-            <a href="{{ url_for('main.dashboard') }}" class="nav-link"
-              >Dashboard</a
-            >
+            <a href="{{ url_for('main.dashboard') }}" class="nav-link">
+              Dashboard
+            </a>
           </li>
+
           <li>
             <a href="{{ url_for('main.profile') }}" class="nav-link">Profile</a>
           </li>
           <li>
-            <a href="{{ url_for('auth.logout') }}" class="nav-link"
-              >Logout ({{ current_user.username }})</a
-            >
+            <a href="{{ url_for('auth.logout') }}" class="nav-link">
+              Logout ({{ current_user.first_name }})
+            </a>
           </li>
           {% else %}
           <li>
             <a href="{{ url_for('auth.login') }}" class="nav-link">Sign In</a>
           </li>
           <li>
-            <a href="{{ url_for('auth.register') }}" class="nav-link"
-              >Register</a
-            >
+            <a href="{{ url_for('auth.register') }}" class="nav-link">
+              Register
+            </a>
           </li>
           {% endif %}
         </ul>
@@ -73,7 +74,7 @@
     <!-- Footer -->
     <footer class="footer">
       <div class="container">
-        <p>&copy; 2024 Dashboard. All rights reserved.</p>
+        <p>&copy; 2025 Dashboard. All rights reserved.</p>
       </div>
     </footer>
 
