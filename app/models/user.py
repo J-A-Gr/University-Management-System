@@ -34,7 +34,7 @@ class User(UserMixin, db.Model):
     # pridėti ryšiai su student_info / teacher_info lentelėmis.
     student_info = db.relationship('StudentInfo', back_populates='user', uselist=False) # uselist=False užtikrina one-to-one ryšį.
     teacher_info = db.relationship('TeacherInfo', back_populates='user', uselist=False)
-    created_modules = db.relationship('Module', backref='created_by')
+    created_modules = db.relationship('Module', back_populates='created_by')
 
     @property
     def full_name(self):
