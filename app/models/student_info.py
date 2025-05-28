@@ -16,7 +16,7 @@ class StudentInfo(db.Model):
     group_id = db.Column(db.Integer, db.ForeignKey('groups.id'), nullable=False)
     
     # Ryšiai
-    user = db.relationship('User', back_populates='student_info')
+    user = db.relationship('User', back_populates='student_info') #back_populates = 'student_info' reiškia, kad User modelyje bus ryšys su student_info
     study_program = db.relationship('StudyProgram', back_populates='students')
     group = db.relationship('Group', back_populates='students')
     
