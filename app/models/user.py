@@ -15,7 +15,7 @@ class User(UserMixin, db.Model):
     last_name = db.Column(db.String(64))
     birthday = db.Column(db.DateTime)
 
-    profile_picture = db.Column(db.String(255))  # kažkaip reiks pridėti kelią kur yra saugoma foto :D
+    profile_picture = db.Column(db.String(255), default='default.png') 
     # pridėtas identifikatorius user. (gali būti kaip pvz dėstytojas ir admin.)
     is_student = db.Column(db.Boolean, default=False)
     is_teacher = db.Column(db.Boolean, default=False)
@@ -34,6 +34,7 @@ class User(UserMixin, db.Model):
     # pridėti ryšiai su student_info / teacher_info lentelėmis.
     student_info = db.relationship('StudentInfo', back_populates='user', uselist=False) # uselist=False užtikrina one-to-one ryšį.
     teacher_info = db.relationship('TeacherInfo', back_populates='user', uselist=False)
+    created_modules = db.relationship('Module', back_populates='created_by')
 
     @property
     def full_name(self):
@@ -88,7 +89,6 @@ class User(UserMixin, db.Model):
             else:
                 raise ValueError(f"Invalid role: {role}")
             
-            db.session.commit()
         except Exception as e:
             db.session.rollback()
             raise Exception(f"Failed to set role: {str(e)}")
@@ -105,16 +105,22 @@ class User(UserMixin, db.Model):
             
             self.student_info.study_program_id = new_program_id
             # Galimai pagal nauja (pakesita studiju programą reiktų pasikeisti ir studento grupę)
-            db.session.commit()
         except Exception as e:
             db.session.rollback()
             raise Exception(f"Failed to change study program: {str(e)}")
 
 
-
-
-
-
-
     def __repr__(self):
         return f'<User {self.email} ({self.role})>'
+    
+    def ensure_student_info(self):
+        if self.is_student and not self.student_info:
+            from app.models.student_info import StudentInfo
+            self.student_info = StudentInfo(user_id=self.id)
+            db.session.add(self.student_info)
+
+    def ensure_teacher_info(self):
+        if self.is_teacher and not self.teacher_info:
+            from app.models.teacher_info import TeacherInfo
+            self.teacher_info = TeacherInfo(user_id=self.id)
+            db.session.add(self.teacher_info)

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Redaguoti vartotoją{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Redaguoti: {{ user.full_name }}</h2>
+  <form method="POST">
+    {{ form.hidden_tag() }}
+
+    <div class="mb-3">
+      <label for="role" class="form-label">Rolė</label>
+      <select name="role" id="role" class="form-select">
+        <option value="student" {% if user.is_student %}selected{% endif %}>Studentas</option>
+        <option value="teacher" {% if user.is_teacher %}selected{% endif %}>Dėstytojas</option>
+      </select>
+    </div>
+
+    <div class="mb-3 form-check">
+      <input type="checkbox" name="is_active" class="form-check-input" id="is_active" {% if user.is_active %}checked{% endif %}>
+      <label class="form-check-label" for="is_active">Aktyvus</label>
+    </div>
+
+    {% if user.is_student %}
+    <div class="mb-3">
+      <label for="program_id" class="form-label">Studijų programa</label>
+      <select name="program_id" id="program_id" class="form-select">
+        {% for program in programs %}
+        <option value="{{ program.id }}" {% if user.student_info and user.student_info.study_program_id == program.id %}selected{% endif %}>{{ program.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    {% endif %}
+
+    <button type="submit" class="btn btn-success">Išsaugoti</button>
+    <a href="{{ url_for('admin.manage_users') }}" class="btn btn-secondary">Atgal</a>
+  </form>
+</div>
+{% endblock %}

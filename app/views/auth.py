@@ -1,10 +1,14 @@
 from flask import Blueprint, render_template, flash, redirect, url_for, request
 from flask_login import login_user, logout_user, current_user, login_required
 from app.forms.auth import LoginForm, RegistrationForm, PasswordResetRequestForm, PasswordResetForm
-from app.models import User
+from app.models import User, StudyProgram, Group
 from app.extensions import db, bcrypt
 from datetime import datetime, timedelta
+from werkzeug.utils import secure_filename
 import os
+import uuid
+from app.config import Config
+from app.utils.helpers import allowed_file
 
 bp = Blueprint('auth', __name__)
 
@@ -65,9 +69,21 @@ def register():
     """User registration"""
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
-    
+
     form = RegistrationForm()
+    form.study_program.choices = [(p.id, p.name) for p in StudyProgram.query.all()]
     if form.validate_on_submit():
+
+        profile_filename = 'default.png' # apsauga nuo sulūžimo (jeigu neįkeltų failo(image))
+        file = form.profile_picture.data
+
+        if file and allowed_file(file.filename):  # tikrinam ar įkeltas failas (none ar ne) ir jo formatą 
+            filename = secure_filename(file.filename)
+            unique_filename = f"{uuid.uuid4().hex}_{filename}"  # uuid sugeneruoja unikalų string (apsauga nuo pasikartojančio pav.)
+            file_path = os.path.join(Config.UPLOAD_FOLDER, unique_filename)
+            file.save(file_path)
+            profile_filename = unique_filename 
+
         role = form.role.data
         user = User(
             is_student=(role == 'student'),
@@ -76,11 +92,37 @@ def register():
             first_name=form.first_name.data,
             last_name=form.last_name.data,
             birthday = form.birthday.data,
-            profile_picture = form.profile_picture.data, # į db keliauja pavadinimas nuotraukos
+            profile_picture = profile_filename # į db keliauja pavadinimas nuotraukos
          
         )
         user.set_password(form.password.data)
-        
+
+        if user.is_student:
+            user.ensure_student_info() # įsitikinam, kad jis turi StudentInfo
+            user.student_info.study_program_id = form.study_program.data # Priskiriam studijų programa
+            user.student_info.admission_year = form.admission_year.data # įrašom įstojimo metus
+         
+            # Surandam ar tokia grupė egzistuoja
+            group = Group.query.filter_by(
+                study_program_id=form.study_program.data,
+                admission_year=form.admission_year.data,
+                group_letter=form.group_letter.data.upper()
+            ).first()
+
+            # Jei neradom – sukuriam naują
+            if not group:
+                group_name = f"AUTO-{form.admission_year.data}-{form.group_letter.data.upper()}"  # gali būti generuojama kaip reikia
+                group = Group(
+                    name=group_name,
+                    admission_year=form.admission_year.data,
+                    group_letter=form.group_letter.data.upper(),
+                    study_program_id=form.study_program.data
+                )
+                db.session.add(group)
+
+            user.student_info.group = group
+
+
         db.session.add(user)
         db.session.commit()
         

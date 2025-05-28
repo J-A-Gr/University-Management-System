@@ -1,0 +1,15 @@
+{% extends "base.html" %} {% block title %}Pasirinkite dalykus{% endblock %} {%
+block content %}
+<div class="main-content glass-card">
+  <h2>Pasirinkite dalykus</h2>
+  <form method="POST">
+    {{ form.hidden_tag() }} {% for field in form.modules %}
+    <div class="form-check mb-2 text-start">
+      {{ field() }}
+      <label class="form-check-label">{{ field.label.text }}</label>
+    </div>
+    {% endfor %}
+    <button type="submit" class="big-button mt-3">Išsaugoti</button>
+  </form>
+</div>
+{% endblock %}

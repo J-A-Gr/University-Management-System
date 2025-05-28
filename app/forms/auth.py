@@ -1,9 +1,11 @@
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileAllowed, FileField
 from wtforms import (StringField, PasswordField, BooleanField, SubmitField, EmailField,
-RadioField, DateField, FileField)
-from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError
+RadioField, DateField, SelectField, IntegerField)
+from wtforms.validators import DataRequired, NumberRange, Email, Length, EqualTo, ValidationError
 from app.models.user import User
 from app.utils.validators import StrongPassword
+import datetime
 
 
 class LoginForm(FlaskForm):
@@ -25,7 +27,21 @@ class RegistrationForm(FlaskForm):
         DataRequired(), StrongPassword(), 
         EqualTo('password', message='Passwords must match')
     ])
-    profile_picture = FileField('Profile Photo')
+    profile_picture = FileField('Profile Photo', validators=[
+        FileAllowed(['jpg', 'jpeg', 'png', 'gif'], 'Images only!')
+    ])
+
+    study_program = SelectField('Studijų programa', choices=[], coerce=int)
+    admission_year = IntegerField('Įstojimo metai', validators=[
+    DataRequired(),
+    NumberRange(min=1900, max=datetime.datetime.now().year, message="Įveskite tinkamus metus.")
+    ])
+
+    group_letter = StringField('Grupės raidė', validators=[
+    DataRequired(),
+    Length(min=1, max=10, message="Grupės raidė turi būti 1-10 simbolių")
+    ])
+
     submit = SubmitField('Register')
     
 

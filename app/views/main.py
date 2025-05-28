@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, flash, redirect, url_for, request
+from flask import Blueprint, render_template, flash, redirect, url_for, request, abort
 from flask_login import login_required, current_user
 from app.forms.main import ProfileForm
 from app.extensions import db
@@ -30,8 +30,15 @@ def profile():
     return render_template('profile.html', title='Profile', form=form)
 
 
-@bp.route('/dashboard')
+@bp.route('/dashboard', endpoint='dashboard')
 @login_required
-def dashboard():
-    """User dashboard"""
-    return render_template('dashboard.html', title='Dashboard')
+def universal_dashboard():
+    match current_user.role:
+        case 'student':
+            return redirect(url_for('student.student_dashboard'))
+        case 'teacher':
+            return redirect(url_for('teacher.teacher_dashboard'))
+        case 'admin':
+            return redirect(url_for('admin.admin_dashboard'))
+        case _:
+            abort(403)

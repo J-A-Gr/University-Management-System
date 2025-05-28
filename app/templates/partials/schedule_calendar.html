@@ -1,0 +1,24 @@
+{% if schedule %}
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th>Modulis</th>
+      <th>Diena</th>
+      <th>Laikas</th>
+      <th>Atsiskaitymo data</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in schedule %}
+    <tr>
+      <td>{{ item.module_name }}</td>
+      <td>{{ item.day }}</td>
+      <td>{{ item.time }}</td>
+      <td>{{ item.exam_date or '-' }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>Tvarkaraščio informacijos nėra.</p>
+{% endif %}

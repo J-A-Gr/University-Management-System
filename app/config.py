@@ -9,6 +9,12 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
         'mysql+pymysql://root:simplepass159!@localhost:3306/mano_band1'  # TODO 1. edit 'mysql string with your db info'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    # nuotraukų išsaugojimui
+    UPLOAD_FOLDER = os.path.join(basedir, 'static', 'profile_pics')
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+    MAX_CONTENT_LENGTH = 2 * 1024 * 1024  # Max upload size: 2MB
     
 class DevelopmentConfig(Config):
     DEBUG = True
