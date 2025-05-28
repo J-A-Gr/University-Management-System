@@ -8,3 +8,5 @@ class Faculty(db.Model):
     
     name = db.Column(db.String(100), nullable=False, unique=True)  # "Informatikos fakultetas"
     code = db.Column(db.String(10), nullable=False, unique=True) 
+
+    study_programs = db.relationship('StudyProgram', back_populates='faculty')

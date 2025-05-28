@@ -7,24 +7,30 @@ class TeacherInfo(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
     # faculty_id = db.Column(db.Integer, db.ForeignKey('faculties.id'))  # TODO: grąžinti ForeignKey kai bus sukurtas Faculty modelis
-
     user = db.relationship('User', back_populates='teacher_info')
+    taught_modules = db.relationship('Module', back_populates='teacher')   # TODO Dėstytojai gali kurti ir redaguoti modulius, turi matyti savo modelius, 
     # faculty = db.relationship('Faculty', back_populates='teachers')  # TODO
 
-    # taught_modules = db.relationship('Module', back_populates='teacher')  # TODO Dėstytojai gali kurti ir redaguoti modulius, turi matyti savo modelius, 
 
-
-
-def get_current_modules(self, semester=None):
+def get_current_modules(self, semester=None, is_active=True):
         """Get modules currently taught by teacher"""
         try:
-            query = self.taught_modules         # išsitraukia modulius, kuriuos dėstytojas moko
+            from app.models.module import Module 
+            
+            query = Module.query.filter_by(teacher_id=self.id)
+            
+            if is_active:
+                query = query.filter_by(is_active=True)
+            
             if semester:
-                query = query.filter_by(semester=semester) # jei nurodytas semestras, filtruojame pagal jį
-            return query.all() 
+                query = query.filter_by(semester=semester)
+            
+            return query.all()
         except Exception as e:
-            raise Exception(f"Failed to get current modules: {str(e)}") #  grąžina klaidą, jei nepavyksta gauti modulių
-        
+            raise Exception(f"Failed to get current modules: {str(e)}")
+    
+
+
 def can_teach_in_faculty(self, faculty_id):
         """Check if teacher belongs to specific faculty"""
         return self.faculty_id == faculty_id # patikrina, ar dėstytojas priklauso fakultetui. Programoje įterpkite fakultetus Studentai ir moduliai privalo priklausyti konkrečiam fakultetui ir studijų programos priklauso fakultetui (pavyzdžiui Informatikos Inžinerija priklauso Informatikos fakultetui ) (Bonus points).
@@ -55,7 +61,21 @@ def remove_module(self, module):
         except Exception as e: 
             db.session.rollback() 
             raise Exception(f"Failed to remove module: {str(e)}")
-    
+
+
+   
+def to_dict(self):
+        """Convert teacher info to dictionary"""
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'faculty_id': self.faculty_id,
+            'user_name': f"{self.user.first_name} {self.user.last_name}" if self.user else None,
+            'user_email': self.user.email if self.user else None,
+            'faculty_name': getattr(self.faculty, 'name', None) if hasattr(self, 'faculty') and self.faculty else None,
+            'modules_count': len(self.get_active_modules()),
+        }
+
     
 def __repr__(self):
         faculty_name = self.faculty.name if self.faculty else "No Faculty"
