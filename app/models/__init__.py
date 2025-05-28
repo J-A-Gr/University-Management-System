@@ -4,6 +4,7 @@ from app.models.teacher_info import TeacherInfo
 from app.models.study_program import StudyProgram
 from app.models.group import Group
 from app.models.faculty import Faculty 
+from app.models.module import Module
 
 
-__all__ = ['User', 'StudentInfo', 'TeacherInfo', 'StudyProgram', 'Group', 'Faculty']
+__all__ = ['User', 'StudentInfo', 'TeacherInfo', 'StudyProgram', 'Group', 'Faculty', 'Module']
