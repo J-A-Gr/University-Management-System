@@ -1,0 +1,5 @@
+{% extends "base.html" %} {% block content %}
+<h2>File Too Large</h2>
+<p>The uploaded file exceeds the maximum allowed size (2MB).</p>
+<a href="{{ request.referrer or url_for('main.index') }}">Go back</a>
+{% endblock %}
