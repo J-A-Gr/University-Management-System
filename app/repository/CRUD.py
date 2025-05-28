@@ -9,9 +9,9 @@ from app.models.user import User
 from app.models.student_info import StudentInfo 
 from app.models.teacher_info import TeacherInfo
 
+from app.models.study_program import StudyProgram
+
 def create_student_info(student_data):
-
-
 
 
 def create_user(user_data):
