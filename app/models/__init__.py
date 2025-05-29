@@ -6,7 +6,7 @@ from app.models.group import Group
 from app.models.faculty import Faculty 
 from app.models.module import Module
 from app.models.assessment import Assessment
-from app.models.assessment_submition import AssessmentSubmission
+from app.models.assessment_submission import AssessmentSubmission
 from app.models.module_enrollment import ModuleEnrollment
 
 
