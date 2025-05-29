@@ -2,6 +2,7 @@ from app.extensions import db
 from datetime import datetime
 
 
+
 class ModuleEnrollment(db.Model):
     """Model for student enrollment in modules"""
     __tablename__ = 'module_enrollments'
@@ -22,7 +23,7 @@ class ModuleEnrollment(db.Model):
     
     @staticmethod
     def register_student(student_id, module_id):
-        """Registruoti studentą į modulį - viena paprasta funkcija"""
+        """Register student"""
         from app.models.student_info import StudentInfo
         from app.models.module import Module
         student = StudentInfo.query.get(student_id) # randam studenta
