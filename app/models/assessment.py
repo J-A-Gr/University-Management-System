@@ -20,6 +20,8 @@ class Assessment(db.Model):
 
     module = db.relationship('Module', back_populates='assessments')  # Vienas modulis - daug assessments
     created_by_teacher = db.relationship('TeacherInfo', back_populates='created_assessments') 
+    submissions = db.relationship('AssessmentSubmission', back_populates='assessment')
+
 
     def __repr__(self):
         return f'<Assessment {self.title} ({self.assessment_type})>'

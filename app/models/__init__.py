@@ -6,6 +6,7 @@ from app.models.group import Group
 from app.models.faculty import Faculty 
 from app.models.module import Module
 from app.models.assessment import Assessment
+from app.models.assessment_submition import AssessmentSubmission
 
 
-__all__ = ['User', 'StudentInfo', 'TeacherInfo', 'StudyProgram', 'Group', 'Faculty', 'Module', 'Assessment']
+__all__ = ['User', 'StudentInfo', 'TeacherInfo', 'StudyProgram', 'Group', 'Faculty', 'Module', 'Assessment', 'AssessmentSubmission']
