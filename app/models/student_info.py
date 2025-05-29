@@ -36,7 +36,7 @@ class StudentInfo(db.Model):
             return self.group
         except Exception as e:
             raise Exception(f"Failed to generate study group code: {str(e)}")
-
+     #Dar reikia pridėti logiką patikrinimo ar jau yra priskirta grupė. Arba iškviesti tik kai priskiriama grupė.
 
     @property
     def year_of_study(self):
