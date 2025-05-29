@@ -28,11 +28,10 @@ class StudyProgram(db.Model):
         try:
             base = self.name[:3].upper() #Pirmos trys didžiosios raidės iš programos pavadinimo
             faculty_part = self.faculty[:2].lower() if self.faculty else "XX"  # Pirmi du fakulteto inicialai, jei fakultetas nenurodytas, naudojame "XX"
-            self.code = base + "-" + faculty_part
+            self.code = faculty_part + "-" + base 
             return self.code
         except Exception as e:
             raise Exception(f"Failed to generate study program code: {str(e)}")
-
 
     def student_count(self):
         """Get total number of students in this program"""
