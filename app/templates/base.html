@@ -89,10 +89,11 @@
     {% block head %}{% endblock %}
   </head>
   <body>
+    {% set ep = request.endpoint or '' %}
     <nav class="d-flex gap-3 p-3">
       <a
         href="{{ url_for('main.index') }}"
-        class="nav-btn {% if request.endpoint == 'main.index' %}active{% endif %}"
+        class="nav-btn {% if ep == 'main.index' %}active{% endif %}"
       >
         Pagrindinis
       </a>
@@ -101,28 +102,28 @@
       %}
       <a
         href="{{ url_for('admin.admin_dashboard') }}"
-        class="nav-btn {% if request.endpoint == 'admin.admin_dashboard' or request.endpoint.startswith('admin.') %}active{% endif %}"
+        class="nav-btn {% if ep == 'admin.admin_dashboard' or ep.startswith('admin.') %}active{% endif %}"
       >
-        Admin Panel
+        Administratoriaus skydelis
       </a>
       {% elif current_user.role == 'teacher' %}
       <a
         href="{{ url_for('teacher.teacher_dashboard') }}"
-        class="nav-btn {% if request.endpoint == 'teacher.teacher_dashboard' or request.endpoint.startswith('teacher.') %}active{% endif %}"
+        class="nav-btn {% if ep == 'teacher.teacher_dashboard' or ep.startswith('teacher.') %}active{% endif %}"
       >
         Mokytojo Panelė
       </a>
       {% elif current_user.role == 'student' %}
       <a
         href="{{ url_for('student.student_dashboard') }}"
-        class="nav-btn {% if request.endpoint == 'student.student_dashboard' or request.endpoint.startswith('student.') %}active{% endif %}"
+        class="nav-btn {% if ep == 'student.student_dashboard' or ep.startswith('student.') %}active{% endif %}"
       >
         Studento Panelė
       </a>
       {% endif %}
       <a
         href="{{ url_for('main.profile') }}"
-        class="nav-btn {% if request.endpoint == 'main.profile' %}active{% endif %}"
+        class="nav-btn {% if ep == 'main.profile' %}active{% endif %}"
       >
         Profilis
       </a>
@@ -130,13 +131,13 @@
       {% else %}
       <a
         href="{{ url_for('auth.login') }}"
-        class="nav-btn {% if request.endpoint == 'auth.login' %}active{% endif %}"
+        class="nav-btn {% if ep == 'auth.login' %}active{% endif %}"
       >
         Prisijungti
       </a>
       <a
         href="{{ url_for('auth.register') }}"
-        class="nav-btn {% if request.endpoint == 'auth.register' %}active{% endif %}"
+        class="nav-btn {% if ep == 'auth.register' %}active{% endif %}"
       >
         Registruotis
       </a>

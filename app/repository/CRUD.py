@@ -1,5 +1,5 @@
-#### Čia padaryti informacijos įrašymas, atnaujinimas, ištrynimas ir gavimas iš duomenų bazės
-
+### Čia reikia padaryti informacijos įrašymą, atnaujinimą, ištrynimą ir gavimą iš duomenų bazės
+### Dabartinis sugeneruotas AI, tikriausiai nieko gero nedaro! :DDD 
 ### DB CRUD operations
 
 from app.extensions import db
@@ -9,9 +9,9 @@ from app.models.user import User
 from app.models.student_info import StudentInfo 
 from app.models.teacher_info import TeacherInfo
 
+from app.models.study_program import StudyProgram
+
 def create_student_info(student_data):
-
-
 
 
 def create_user(user_data):

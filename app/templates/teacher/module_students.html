@@ -1,0 +1,33 @@
+{% extends 'base.html' %} {% block title %}Studentai modulyje - {{ module.name
+}}{% endblock %} {% block content %}
+<h2 class="my-4">
+  Studentai modulyje:
+  <strong>{{ module.name }}</strong>
+</h2>
+
+{% if enrollments %}
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th>Studentas</th>
+      <th>Grupė</th>
+      <th>Lankomumas (%)</th>
+      <th>Galutinis pažymys</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for e in enrollments %}
+    <tr>
+      <td>{{ e.student_info.user.full_name }}</td>
+      <td>{{ e.student_info.group.name }}</td>
+      <td>{{ e.attendance_percentage }}%</td>
+      <td>{{ e.final_grade if e.final_grade is not none else "–" }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<div class="alert alert-warning">
+  Šiame modulyje nėra užregistruotų studentų.
+</div>
+{% endif %} {% endblock %}

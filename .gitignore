@@ -13,7 +13,9 @@ ENV/
 
 # Flask/Migrations
 instance/
-migrations/versions/
+migrations/versions/__pycache__/
+migrations/__pycache__/
+migrations/alembic.ini.bak 
 app.db
 
 # VSCode and other editors
@@ -39,21 +41,4 @@ htmlcov/
 
 # Sensitive files
 .env
-
-run.py
-alembic.ini
-.env
-config.py
-views/auth.py
-views/__init__.py
-views/config.py
-migrations/
-models/user.py
-forms/auth.py
-env.py
-migrations/versions
-models/
-views/
-forms/
-
 
