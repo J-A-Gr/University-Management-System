@@ -1,15 +1,15 @@
 {% extends "base.html" %} {% block content %}
 <div class="main-content">
-  <h1 style="margin-bottom: 18px">Admin Panel</h1>
+  <h1 style="margin-bottom: 18px">Administratoriaus Skydelis</h1>
 
   <!-- Statistics Summary -->
   <div class="stats" style="margin-bottom: 20px">
-    <h2 style="margin-bottom: 10px">System Statistics</h2>
+    <h2 style="margin-bottom: 10px">Sistemos Statistika</h2>
     <ul>
-      <li>Users: {{ user_count }}</li>
-      <li>Modules: {{ module_count }}</li>
-      <li>Study Programs: {{ program_count }}</li>
-      <li>Groups: {{ group_count }}</li>
+      <li>Vartotojai: {{ user_count }}</li>
+      <li>Moduliai: {{ module_count }}</li>
+      <li>Studijų programos: {{ program_count }}</li>
+      <li>Grupės: {{ group_count }}</li>
     </ul>
   </div>
 
@@ -74,9 +74,10 @@
     <table style="width: 100%; border-collapse: collapse">
       <thead>
         <tr>
-          <th style="padding: 8px 10px; text-align: left">Email</th>
-          <th style="padding: 8px 10px; text-align: left">Role</th>
-          <th style="padding: 8px 10px; text-align: left">Actions</th>
+          <th style="padding: 8px 10px; text-align: left">El. paštas</th>
+          <th style="padding: 8px 10px; text-align: left">Rolė</th>
+          <th style="padding: 8px 10px; text-align: left">Veiksmas</th>
+          <th style="padding: 8px 10px; text-align: left">Tvarkaraštis</th>
         </tr>
       </thead>
       <tbody>
@@ -118,7 +119,7 @@
                 class="button"
                 style="background: #e07a29; color: #fff"
               >
-                Remove Admin
+                Pašalinti Admin
               </button>
             </form>
             {% else %}
@@ -133,9 +134,29 @@
                 class="button"
                 style="background: #44bb63; color: #fff"
               >
-                Make Admin
+                Padaryti Admin
               </button>
             </form>
+            {% endif %}
+          </td>
+          <td style="padding: 8px 10px">
+            {% if user.is_student or user.is_teacher %}
+            <a
+              href="{{ url_for('admin.admin_schedule', user_id=user.id) }}"
+              class="button"
+              style="
+                background: #2980b9;
+                color: #fff;
+                padding: 6px 12px;
+                border-radius: 8px;
+                font-size: 0.9em;
+                text-decoration: none;
+              "
+            >
+              Tvarkaraštis
+            </a>
+            {% else %}
+            <span style="color: #999; font-size: 0.9em">N/A</span>
             {% endif %}
           </td>
         </tr>

@@ -4,6 +4,11 @@ from datetime import datetime, time, timedelta
 
 """Čia jeigu norite testavimui [pasiseedint duombaze]"""
 
+""" flask shell
+>>> from app.utils.seed_data import seed_data
+>>> seed_data()"""
+
+
 def seed_data():
     try:
         # Fakultetai
@@ -151,8 +156,3 @@ def seed_data():
     except Exception as e:
         db.session.rollback()
         print(f"Klaida kuriant pradinius duomenis: {e}")
-
-
-""" flask shell
->>> from app.utils.seed_data import seed_data
->>> seed_data()"""
