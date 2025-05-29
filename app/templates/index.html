@@ -8,11 +8,41 @@ content %}
         Sveiki atvykę į universiteto informacinę sistemą!
       </p>
       {% if current_user.is_authenticated %}
-      <p class="mt-4">
+      <p
+        class="mt-4"
+        style="
+          color: #181818;
+          font-weight: 700;
+          font-size: 1.17em;
+          text-align: center;
+          text-shadow: 0 2px 8px rgba(255, 255, 255, 0.19),
+            0 1px 0 rgba(255, 255, 255, 0.08);
+          margin-bottom: 10px;
+        "
+      >
         Jūs esate prisijungęs kaip
-        <b>{{ current_user.first_name }} {{ current_user.last_name }}</b>.
+        <span style="font-weight: 800; color: #181818">
+          <em
+            >{{ current_user.first_name or '' }} {{ current_user.last_name or ''
+            }}</em
+          > </span
+        >.
       </p>
-      <p>Rolė: <b>{{ current_user.role|capitalize }}</b></p>
+      <p
+        style="
+          color: #181818;
+          font-weight: 700;
+          font-size: 1.15em;
+          text-align: center;
+          text-shadow: 0 2px 8px rgba(255, 255, 255, 0.19),
+            0 1px 0 rgba(255, 255, 255, 0.08);
+        "
+      >
+        Rolė:
+        <span style="font-weight: 800; color: #181818">
+          {{ current_user.role|capitalize }}
+        </span>
+      </p>
       <div
         style="
           display: flex;
