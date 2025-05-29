@@ -64,19 +64,21 @@ content %}
     </div>
 
     <!-- ROLĖ -->
-    <div class="floating-label">
-      <span class="input-icon"><i data-lucide="user-check"></i></span>
-      {% for subfield in form.role %}
-      <div>
-        {{ subfield(id=subfield.id, onchange="toggleStudentFields()") }}
-        <label for="{{ subfield.id }}">{{ subfield.label.text }}</label>
+<div class="floating-label">
+  <span class="input-icon"><i data-lucide="user-check"></i></span>
+  <label>Vaidmuo</label>
+  <div class="radio-group">
+    {% for subfield in form.role %}
+      <div class="form-check">
+        {{ subfield(onchange="toggleStudentFields()", class="form-check-input") }}
+        <label class="form-check-label" for="{{ subfield.id }}">{{ subfield.label.text }}</label>
       </div>
-      {% endfor %}
-      <label>Vaidmuo</label>
-      {% for error in form.role.errors %}
-      <div class="invalid-feedback d-block">{{ error }}</div>
-      {% endfor %}
-    </div>
+    {% endfor %}
+  </div>
+  {% for error in form.role.errors %}
+  <div class="invalid-feedback d-block">{{ error }}</div>
+  {% endfor %}
+</div>
 
     <div id="student-fields">
       <!-- STUDIJŲ PROGRAMA -->
@@ -90,27 +92,7 @@ content %}
         {% endfor %}
       </div>
 
-      <!-- ĮSTOJIMO/KURSO METAI -->
-      <div class="floating-label">
-        <span class="input-icon"><i data-lucide="calendar"></i></span>
-        {{ form.admission_year(class="input", id="admission_year", placeholder="
-        ", required=True) }}
-        <label for="admission_year">Įstojimo/Kurso metai (pvz., 2023)</label>
-        {% for error in form.admission_year.errors %}
-        <div class="invalid-feedback d-block">{{ error }}</div>
-        {% endfor %}
-      </div>
 
-      <!-- GRUPĖS RAIDĖ -->
-      <div class="floating-label">
-        <span class="input-icon"><i data-lucide="tag"></i></span>
-        {{ form.group_letter(class="input", id="group_letter", required=True) }}
-        <label for="group_letter">Grupės raidė (pvz., A, B, C)</label>
-        {% for error in form.group_letter.errors %}
-        <div class="invalid-feedback d-block">{{ error }}</div>
-        {% endfor %}
-      </div>
-    </div>
 
     <!-- PROFILIO NUOTRAUKA (optional) -->
     <div class="floating-label">
@@ -156,8 +138,6 @@ content %}
     } else {
       studentFields.style.display = "none";
       document.getElementById("study_program").removeAttribute("required");
-      document.getElementById("entry_year").removeAttribute("required");
-      document.getElementById("group_letter").removeAttribute("required");
     }
   }
   // Paleisti funkciją iškart, kai užkraunama (kad teisingai paslėptų laukus po reload ar validacijos)

@@ -47,6 +47,7 @@ def admin_dashboard():
                             users=users, 
                             search=search, 
                             form=form,
+                            user_count=user_count,
                             module_count=module_count,
                             program_count=program_count,
                             group_count=group_count)
