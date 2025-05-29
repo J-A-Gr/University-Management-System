@@ -30,13 +30,16 @@ class RegistrationForm(FlaskForm):
     profile_picture = FileField('Profile Photo', validators=[
         FileAllowed(['jpg', 'jpeg', 'png', 'gif'], 'Images only!')
     ])
-
+            #  TODO Čia dar reikia persidaryti. admission metus daryt automatiškai registruojantis? ir po to, kad būtų galima editinti?
+            # ar palikti, kad registracijos metu įvestu?
     study_program = SelectField('Studijų programa', choices=[], coerce=int)
     admission_year = IntegerField('Įstojimo metai', validators=[
     DataRequired(),
     NumberRange(min=1900, max=datetime.datetime.now().year, message="Įveskite tinkamus metus.")
     ])
 
+    # TODO Ar tai reikalinga registracijai? Ar tiesiog palikti Study program + admission year ir priskirti palei kažkokia logika
+    # (pvz viršijus 10žmonių grupe, keisti raide į B ir t.t.)
     group_letter = StringField('Grupės raidė', validators=[
     DataRequired(),
     Length(min=1, max=10, message="Grupės raidė turi būti 1-10 simbolių")
