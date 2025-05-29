@@ -42,18 +42,3 @@ htmlcov/
 # Sensitive files
 .env
 
-run.py
-alembic.ini
-.env
-config.py
-views/auth.py
-views/__init__.py
-views/config.py
-models/user.py
-forms/auth.py
-env.py
-models/
-views/
-forms/
-
-
