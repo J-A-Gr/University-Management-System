@@ -20,12 +20,30 @@ class StudentInfo(db.Model):
     study_program = db.relationship('StudyProgram', back_populates='students')
     group = db.relationship('Group', back_populates='students')
     #Ryšiai su moduliais ir pažymiais
+
     module_enrollments = db.relationship('ModuleEnrollment', back_populates='student_info')
+ 
     
+        # Studijų grupės kodo sugeneravimas (studijų programos kodo ir įstojimo metų derinys)
+    @property #Nežinau ar čia  reikia property, bet palieku, kad būtų galima naudoti kaip atributą (Copilotas pasiūlė ;))
+    def generate_study_groupe_code(self):
+        try:
+            #kažkaip reikia pasiimti studijų programos kodą, kad būtų galima sukurti grupės kodą, nežinu ar taip veiks...
+            
+            base = self.study_program.code #Pirmos trys didžiosios raidės iš programos pavadinimo
+            year = self.admission_year # Įstojimo metai
+            if not base or not year:
+                raise ValueError("Study program code or admission year is missing")
+            self.group = base + "-" + year
+            return self.group
+        except Exception as e:
+            raise Exception(f"Failed to generate study group code: {str(e)}")
+     #Dar reikia pridėti logiką patikrinimo ar jau yra priskirta grupė. Arba iškviesti tik kai priskiriama grupė.
+
     @property
     def year_of_study(self):
         """Calculate current year of study"""
-        return ((self.current_semester - 1) // 2) + 1
+        return ((self.current_semester - 1) // 2) + 1  
     
 
     # Išsiaiškinam koks semestras

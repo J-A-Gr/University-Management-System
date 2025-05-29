@@ -16,18 +16,27 @@ class StudyProgram(db.Model):
     faculty = db.relationship('Faculty', back_populates='study_programs') #back_populates = 'study_programs' reiškia, kad Faculty modelyje bus ryšys su studijų programomis
     students = db.relationship('StudentInfo', back_populates='study_program')
     groups = db.relationship('Group', back_populates='study_program')
-    # logiskiau manau butu many to many su moduliais, nes viena programa gali turėti daug modulių, o vienas modulis gali priklausyti daugeliui programų
+    # logiskiau manau butu many to many su moduliais, nes viena programa gali turėti daug modulių, o vienas modulis gali priklausyti daugeliui programų - pritariu :)
     # bet dabar pasilikim prie vienai studiju programai priklauso daug moduliu.
     modules = db.relationship('Module', back_populates='study_program')
 
 
-    @property
+    # Programos kodo sugeneravimas (trys didžiosios raidės iš pavadinimo ir pirmi du fakulteto inicialai)
+    @property #Nežinau ar čia  reikia property, bet palieku, kad būtų galima naudoti kaip atributą (Copilotas pasiūlė)
+    def generate_code(self):
+        try:
+            base = self.name[:3].upper() #Pirmos trys didžiosios raidės iš programos pavadinimo
+            faculty_part = self.faculty[:2].lower() if self.faculty else "XX"  # Pirmi du fakulteto inicialai, jei fakultetas nenurodytas, naudojame "XX"
+            self.code = faculty_part + "-" + base 
+            return self.code
+        except Exception as e:
+            raise Exception(f"Failed to generate study program code: {str(e)}")
+
     def student_count(self):
         """Get total number of students in this program"""
         return len(self.students)
 
     # TODO pagal mane čia dar turėtų būti grupės kodo generavimas, bet kol kas palieku kaip yra, nes grupės kodas yra sudarytas iš programos kodo, fakulteto  ir metų
-
 
 
     def get_students_by_year(self, admission_year): # tur4tų būti reikalinga grupės kodo sudarymui, jeigu ne tai istrinam ;D
