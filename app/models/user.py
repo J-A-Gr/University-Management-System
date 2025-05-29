@@ -35,6 +35,7 @@ class User(UserMixin, db.Model):
     student_info = db.relationship('StudentInfo', back_populates='user', uselist=False) # uselist=False užtikrina one-to-one ryšį.
     teacher_info = db.relationship('TeacherInfo', back_populates='user', uselist=False)
     created_modules = db.relationship('Module', back_populates='created_by')
+    submissions = db.relationship('AssessmentSubmission', back_populates='student')
 
     @property
     def full_name(self):

@@ -26,6 +26,8 @@ class Module(db.Model):
     created_by = db.relationship('User', back_populates='created_modules')# sito reikia, kad zinotume kas ir ka sukure
     study_program = db.relationship('StudyProgram', back_populates='modules')# sito reiks. . . visur :D
     assessments = db.relationship('Assessment', back_populates='module')
+    enrollments = db.relationship('ModuleEnrollment', back_populates='module', cascade='all, delete-orphan')    
+
 
     def __repr__(self):
         return f'<Module {self.name}>'

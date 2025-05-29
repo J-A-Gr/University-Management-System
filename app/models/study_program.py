@@ -14,7 +14,6 @@ class StudyProgram(db.Model):
     # Ryšiai
 
     faculty = db.relationship('Faculty', back_populates='study_programs') #back_populates = 'study_programs' reiškia, kad Faculty modelyje bus ryšys su studijų programomis
-
     students = db.relationship('StudentInfo', back_populates='study_program')
     groups = db.relationship('Group', back_populates='study_program')
     # logiskiau manau butu many to many su moduliais, nes viena programa gali turėti daug modulių, o vienas modulis gali priklausyti daugeliui programų
@@ -89,7 +88,7 @@ class StudyProgram(db.Model):
  
 
  # Many-to-Many tarpinė lentelė tarp StudyProgram ir Module
-# program_modules = db.Table('program_modules', #TODO: atkurti ryšį su moduliais, kai bus sukurta Module model
+    # program_modules = db.Table('program_modules', #TODO: atkurti ryšį su moduliais, kai bus sukurta Module model
     # db.Column('study_program_id', db.Integer, db.ForeignKey('study_programs.id'), primary_key=True),
     # db.Column('module_id', db.Integer, db.ForeignKey('modules.id'), primary_key=True)
 # )
