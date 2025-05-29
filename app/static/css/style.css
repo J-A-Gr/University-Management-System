@@ -7,6 +7,17 @@
   --border: #e3ddd3; /* švelnus kraštas, priderintas prie šiltos temos */
 }
 
+/* Wide kortelė lentelėms */
+.wide-card {
+  max-width: 1100px !important;
+  width: 100%;
+}
+@media (max-width: 1200px) {
+  .wide-card {
+    max-width: 99vw !important;
+  }
+}
+
 /* FLASH ŽINUČIŲ STILIUS */
 .alert {
   padding: 16px 22px;
@@ -65,7 +76,6 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 0;
-  /* svarbiausia, kad tėvas neduotų papildomo tarpo */
 }
 
 /* Sticky FOOTER */
@@ -89,13 +99,13 @@ footer {
   min-height: 0;
   display: flex;
   flex-direction: column;
-  justify-content: center; /* Centruoja vertikaliai */
-  align-items: center; /* Centruoja horizontaliai */
+  justify-content: center;
+  align-items: center;
   margin: 0;
   padding: 0;
 }
 
-/* Kiti jau buvę tavo stiliai */
+/* GLASSMORPHISM kortelėms */
 header,
 .main-content,
 .glass-card {
@@ -109,6 +119,7 @@ header,
   max-width: 500px;
   color: #fff;
   transition: background 0.35s, box-shadow 0.22s, transform 0.18s;
+  text-shadow: 0 2px 8px rgba(40, 50, 60, 0.22), 0 1px 0 rgba(0, 0, 0, 0.22);
 }
 
 .main-content:hover,
@@ -117,7 +128,41 @@ header,
   transform: translateY(-4px) scale(1.04);
 }
 
-/* HERO sekcija */
+.center-text {
+  text-align: center;
+}
+
+.avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  display: block;
+  margin: 0 auto 14px auto;
+  box-shadow: 0 2px 12px 0 rgba(53, 92, 82, 0.12);
+}
+
+/* Papildomas kontrastas vartotojo vardui profilyje */
+.main-content h3,
+.glass-card h3 {
+  font-weight: 800;
+  letter-spacing: -1px;
+  font-size: 1.4em;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(40, 50, 60, 0.3), 0 1px 0 rgba(0, 0, 0, 0.22);
+}
+
+.profile-list {
+  text-align: left;
+  list-style-type: none;
+  padding: 0;
+  font-size: 1.06em;
+  margin-bottom: 22px;
+}
+.profile-list li {
+  margin-bottom: 10px;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.22), 0 1px 0 rgba(0, 0, 0, 0.13);
+}
+
 .hero-section {
   display: flex;
   align-items: center;
@@ -131,12 +176,10 @@ header,
   gap: 38px;
   width: 100%;
 }
-
 .hero-content {
   flex: 2;
-  text-align: center; /* <-- Naujiena, dėl centro! */
+  text-align: center;
 }
-
 .hero-content h1 {
   font-size: 2.7em;
   font-weight: 800;
@@ -144,33 +187,27 @@ header,
   color: var(--accent-dark);
   letter-spacing: -1.5px;
 }
-
 .hero-subtitle {
   font-size: 1.25em;
   color: var(--card-bg);
   margin-bottom: 2.1em;
 }
-
 .hero-btn {
   font-size: 1.13em;
   padding: 1em 2.4em;
 }
-
 .hero-illustration {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-
 .hero-illustration img {
   width: 250px;
   height: auto;
   filter: drop-shadow(0 2px 24px var(--main-bg));
   border-radius: 22px;
 }
-
-/* Responsive hero sekcijai */
 @media (max-width: 900px) {
   .hero-section {
     flex-direction: column;
@@ -186,7 +223,6 @@ header,
   }
 }
 
-/* NAVIGATION */
 nav {
   display: flex;
   justify-content: center;
@@ -211,7 +247,6 @@ nav {
   display: inline-block;
   letter-spacing: 0.02em;
 }
-
 .nav-btn.active,
 .nav-btn:hover,
 .nav-btn:focus {
@@ -220,30 +255,6 @@ nav {
   border-color: var(--accent-dark);
   box-shadow: 0 4px 20px 0 rgba(224, 122, 41, 0.16);
   text-decoration: none;
-}
-
-.center-text {
-  text-align: center;
-}
-
-.avatar {
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  display: block;
-  margin: 0 auto 14px auto;
-  box-shadow: 0 2px 12px 0 rgba(53, 92, 82, 0.12);
-}
-
-.profile-list {
-  text-align: left;
-  list-style-type: none;
-  padding: 0;
-  font-size: 1.06em;
-  margin-bottom: 22px;
-}
-.profile-list li {
-  margin-bottom: 10px;
 }
 
 /* ==== Floating label inputai ==== */
@@ -263,7 +274,6 @@ nav {
   pointer-events: none;
   z-index: 2;
 }
-
 .input,
 select.input {
   width: 100%;
@@ -280,13 +290,11 @@ select.input {
   -webkit-appearance: none;
   -moz-appearance: none;
 }
-
 .input:focus,
 select.input:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 2px var(--accent-dark);
 }
-
 .floating-label select.input {
   background-image: url("data:image/svg+xml;charset=UTF-8,<svg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'><path d='M7 8L10 11L13 8' stroke='%23E07A29' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>");
   background-repeat: no-repeat;
@@ -294,7 +302,6 @@ select.input:focus {
   background-size: 20px 20px;
   padding-right: 36px;
 }
-
 .floating-label label {
   position: absolute;
   left: 42px;
@@ -308,7 +315,6 @@ select.input:focus {
   padding: 0 4px;
   z-index: 3;
 }
-
 .input:focus + label,
 .input:not(:placeholder-shown) + label,
 select.input:focus + label,
@@ -336,6 +342,9 @@ select.input:not([value=""]) + label {
     padding: 12px 7px;
     max-width: 99vw;
   }
+  .wide-card {
+    max-width: 99vw !important;
+  }
   footer {
     border-radius: 14px 14px 0 0;
     font-size: 0.95em;
@@ -356,7 +365,6 @@ select.input:not([value=""]) + label {
   width: 100%;
 }
 
-/* ==== BUTTONS ==== */
 .big-button,
 .button {
   background: linear-gradient(90deg, var(--accent), var(--accent-dark) 80%);
@@ -378,6 +386,40 @@ select.input:not([value=""]) + label {
   color: #fff;
   transform: scale(1.04) translateY(-2px);
   box-shadow: 0 8px 32px 0 rgba(224, 122, 41, 0.19);
+}
+
+/* ==== Lentelės mygtukai ==== */
+.table-button {
+  background: linear-gradient(90deg, var(--accent), var(--accent-dark) 80%);
+  color: #fff;
+  border: none;
+  font-weight: 700;
+  border-radius: 14px;
+  padding: 8px 22px;
+  font-size: 1.05rem;
+  margin: 0;
+  box-shadow: 0 2px 8px 0 rgba(224, 122, 41, 0.11);
+  transition: background 0.15s, transform 0.15s, color 0.15s, box-shadow 0.15s;
+  display: inline-block;
+  letter-spacing: 0.01em;
+}
+.table-button:hover {
+  background: linear-gradient(90deg, var(--accent-dark), var(--accent));
+  color: #fff;
+  transform: scale(1.04) translateY(-1px);
+  box-shadow: 0 4px 16px 0 rgba(224, 122, 41, 0.17);
+}
+.table-button.red {
+  background: #e7333b;
+  color: #fff;
+}
+.table-button.yellow {
+  background: #ffd600;
+  color: #3b2e14;
+}
+.table-button.gold {
+  background: #b88725;
+  color: #fff;
 }
 
 /* ==== GLASS BUTTONS ==== */
@@ -441,6 +483,7 @@ select.input:not([value=""]) + label {
   }
 }
 
+/* ==== Scrollbar stiliai ==== */
 ::-webkit-scrollbar {
   width: 10px;
   background: var(--main-bg);
@@ -451,4 +494,36 @@ select.input:not([value=""]) + label {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--accent);
+}
+
+.extra-wide-card {
+  max-width: 1400px !important;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+@media (max-width: 1500px) {
+  .extra-wide-card {
+    max-width: 98vw !important;
+  }
+}
+
+.button-group {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.extra-wide-card {
+  max-width: 1400px !important;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+@media (max-width: 1500px) {
+  .extra-wide-card {
+    max-width: 98vw !important;
+  }
 }

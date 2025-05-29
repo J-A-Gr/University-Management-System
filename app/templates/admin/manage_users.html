@@ -1,59 +1,129 @@
 {% extends "base.html" %} {% block title %}Vartotojų valdymas{% endblock %} {%
 block content %}
-<div class="container mt-4">
-  <h2>Vartotojų sąrašas</h2>
-  <table class="table table-bordered table-hover mt-3">
-    <thead>
-      <tr>
-        <th>Vardas</th>
-        <th>El. paštas</th>
-        <th>Rolė</th>
-        <th>Aktyvus</th>
-        <th>Veiksmai</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for user in users %}
-      <tr>
-        <td>{{ user.full_name }}</td>
-        <td>{{ user.email }}</td>
-        <td>
-          {% if user.is_admin %}Admin{% elif user.is_teacher %}Dėstytojas{% elif
-          user.is_student %}Studentas{% else %}–{% endif %}
-        </td>
-        <td>{{ 'Taip' if user.is_active else 'Ne' }}</td>
-        <td class="d-flex gap-2">
-          <a
-            href="{{ url_for('admin.edit_user', user_id=user.id) }}"
-            class="btn btn-sm btn-primary"
+<div class="main-content wide-card extra-wide-card">
+  <h2 style="margin-bottom: 22px">Vartotojų sąrašas</h2>
+  <div style="overflow-x: auto">
+    <table style="width: 100%; border-collapse: collapse; table-layout: auto">
+      <thead>
+        <tr>
+          <th style="padding: 8px 4px; text-align: left">Vardas</th>
+          <th style="padding: 8px 4px; text-align: left">El. paštas</th>
+          <th style="padding: 8px 4px; text-align: left">Rolė</th>
+          <th style="padding: 8px 4px; text-align: left">Aktyvus</th>
+          <th
+            style="
+              padding: 8px 4px;
+              text-align: left;
+              min-width: 240px;
+              width: 1%;
+            "
           >
-            Redaguoti
-          </a>
-
-          <form
-            method="POST"
-            action="{{ url_for('admin.deactivate_user', user_id=user.id) }}"
+            Veiksmai
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+        <tr>
+          <td
+            style="
+              padding: 8px 4px;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            "
           >
-            {{ form.hidden_tag() }}
-            <button type="submit" class="btn btn-sm btn-warning">
-              Deaktyvuoti
-            </button>
-          </form>
-
-          <form
-            method="POST"
-            action="{{ url_for('admin.delete_user', user_id=user.id) }}"
-            onsubmit="return confirm('Ar tikrai norite ištrinti?');"
+            {{ user.full_name }}
+          </td>
+          <td
+            style="
+              padding: 8px 4px;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            "
           >
-            {{ form.hidden_tag() }}
-            <button type="submit" class="btn btn-sm btn-danger">
-              Ištrinti
-            </button>
-          </form>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+            {{ user.email }}
+          </td>
+          <td style="padding: 8px 4px">
+            {% if user.is_admin %}Admin{% elif user.is_teacher %}Dėstytojas{%
+            elif user.is_student %}Studentas{% else %}–{% endif %}
+          </td>
+          <td style="padding: 8px 4px">
+            {{ 'Taip' if user.is_active else 'Ne' }}
+          </td>
+          <td style="padding: 8px 4px">
+            <div
+              style="
+                display: flex;
+                gap: 8px;
+                align-items: center;
+                flex-wrap: nowrap;
+              "
+            >
+              <a
+                href="{{ url_for('admin.edit_user', user_id=user.id) }}"
+                class="table-button gold"
+                style="padding: 6px 12px; font-size: 1em; min-width: 0"
+                >Redaguoti</a
+              >
+              {% if user.is_active %}
+              <form
+                method="POST"
+                action="{{ url_for('admin.deactivate_user', user_id=user.id) }}"
+                style="display: inline"
+              >
+                {{ form.hidden_tag() }}
+                <button
+                  type="submit"
+                  class="table-button yellow"
+                  style="padding: 6px 12px; font-size: 1em; min-width: 0"
+                >
+                  Deaktyvuoti
+                </button>
+              </form>
+              {% else %}
+              <form
+                method="POST"
+                action="{{ url_for('admin.activate_user', user_id=user.id) }}"
+                style="display: inline"
+              >
+                {{ form.hidden_tag() }}
+                <button
+                  type="submit"
+                  class="table-button"
+                  style="
+                    background: #44bb63;
+                    padding: 6px 12px;
+                    font-size: 1em;
+                    min-width: 0;
+                  "
+                >
+                  Aktyvuoti
+                </button>
+              </form>
+              {% endif %}
+              <form
+                method="POST"
+                action="{{ url_for('admin.delete_user', user_id=user.id) }}"
+                onsubmit="return confirm('Ar tikrai norite ištrinti?');"
+                style="display: inline"
+              >
+                {{ form.hidden_tag() }}
+                <button
+                  type="submit"
+                  class="table-button red"
+                  style="padding: 6px 12px; font-size: 1em; min-width: 0"
+                >
+                  Ištrinti
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </div>
 {% endblock %}
