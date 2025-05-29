@@ -66,9 +66,13 @@ content %}
     <!-- ROLĖ -->
     <div class="floating-label">
       <span class="input-icon"><i data-lucide="user-check"></i></span>
-      {{ form.role(class="input", id="role", required=True,
-      onchange="toggleStudentFields()") }}
-      <label for="role">Vaidmuo</label>
+      {% for subfield in form.role %}
+      <div>
+        {{ subfield(id=subfield.id, onchange="toggleStudentFields()") }}
+        <label for="{{ subfield.id }}">{{ subfield.label.text }}</label>
+      </div>
+      {% endfor %}
+      <label>Vaidmuo</label>
       {% for error in form.role.errors %}
       <div class="invalid-feedback d-block">{{ error }}</div>
       {% endfor %}
@@ -80,9 +84,7 @@ content %}
         <span class="input-icon"><i data-lucide="book-open"></i></span>
         {{ form.study_program(class="input", id="study_program", required=True)
         }}
-        <label for="study_program">
-          Studijų programos trumpinys (pvz., IFIN)
-        </label>
+        <label for="study_program">Studijų programa</label>
         {% for error in form.study_program.errors %}
         <div class="invalid-feedback d-block">{{ error }}</div>
         {% endfor %}
