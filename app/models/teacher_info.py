@@ -12,6 +12,9 @@ class TeacherInfo(db.Model):
     taught_modules = db.relationship('Module', back_populates='teacher')   # TODO Dėstytojai gali kurti ir redaguoti modulius, turi matyti savo modelius, 
     faculty = db.relationship('Faculty', back_populates='teachers')  # TODO
     created_assessments = db.relationship('Assessment', back_populates='created_by_teacher')
+    graded_submissions = db.relationship('AssessmentSubmission', back_populates='graded_by_teacher')
+
+
 
     def get_current_modules(self, semester=None, is_active=True):
         """Get modules currently taught by teacher"""

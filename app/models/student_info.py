@@ -19,9 +19,8 @@ class StudentInfo(db.Model):
     user = db.relationship('User', back_populates='student_info') #back_populates = 'student_info' reiškia, kad User modelyje bus ryšys su student_info
     study_program = db.relationship('StudyProgram', back_populates='students')
     group = db.relationship('Group', back_populates='students')
-    
-    # Ryšiai su moduliais ir pažymiais
-    # module_enrollments = db.relationship('ModuleEnrollment', back_populates='student', cascade='all, delete-orphan')  # TODO atkomentuoti nepamiršti kai bus ModuleEnrollment modelis
+    #Ryšiai su moduliais ir pažymiais
+    module_enrollments = db.relationship('ModuleEnrollment', back_populates='student', cascade='all, delete-orphan')
     
         # Studijų grupės kodo sugeneravimas (studijų programos kodo ir įstojimo metų derinys)
     @property #Nežinau ar čia  reikia property, bet palieku, kad būtų galima naudoti kaip atributą (Copilotas pasiūlė ;))
@@ -88,6 +87,17 @@ class StudentInfo(db.Model):
             return query.all()
         except Exception as e:
             raise Exception(f"Failed to get enrolled modules: {str(e)}")
+        
+
+
+    def get_my_modules(self):
+        """Gauti studento modulius"""
+        from app.models.module import Module
+        from app.models.module_enrollment import ModuleEnrollment
+        
+        return db.session.query(Module).join(ModuleEnrollment).filter(
+            ModuleEnrollment.student_id == self.id
+        ).all()
     
     # Pasitikrinam ar studentas nėra užsiregistravęs konkrečiame modulyje, registracijoj tikrinsim ar dar nėra užsireginęs į modulį, 
     def is_enrolled_in_module(self, module_id, semester=None):
