@@ -1,5 +1,5 @@
-#### Čia padaryti informacijos įrašymas, atnaujinimas, ištrynimas ir gavimas iš duomenų bazės
-
+### Čia reikia padaryti informacijos įrašymą, atnaujinimą, ištrynimą ir gavimą iš duomenų bazės
+### Dabartinis sugeneruotas AI, tikriausiai nieko gero nedaro! :DDD 
 ### DB CRUD operations
 
 from app.extensions import db
