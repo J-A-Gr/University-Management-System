@@ -20,8 +20,7 @@ class StudentInfo(db.Model):
     study_program = db.relationship('StudyProgram', back_populates='students')
     group = db.relationship('Group', back_populates='students')
     #Ryšiai su moduliais ir pažymiais
-    module_enrollments = db.relationship('ModuleEnrollment', back_populates='student', cascade='all, delete-orphan')
-    
+    module_enrollments = db.relationship('ModuleEnrollment', back_populates='student_info')
     
     @property
     def year_of_study(self):
@@ -74,15 +73,6 @@ class StudentInfo(db.Model):
             raise Exception(f"Failed to get enrolled modules: {str(e)}")
         
 
-
-    def get_my_modules(self):
-        """Gauti studento modulius"""
-        from app.models.module import Module
-        from app.models.module_enrollment import ModuleEnrollment
-        
-        return db.session.query(Module).join(ModuleEnrollment).filter(
-            ModuleEnrollment.student_id == self.id
-        ).all()
     
     # Pasitikrinam ar studentas nėra užsiregistravęs konkrečiame modulyje, registracijoj tikrinsim ar dar nėra užsireginęs į modulį, 
     def is_enrolled_in_module(self, module_id, semester=None):
