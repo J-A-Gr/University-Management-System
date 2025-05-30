@@ -7,8 +7,7 @@ load_dotenv(os.path.join(basedir, '..', '.env'))
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'hard-to-guess-string'
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-
-        'mysql+pymysql://root:localhost:3306/university_db'  # <-- čia tavo nauja DB info
+    'mysql+pymysql://root:localhost:3306/mano_band1'  # <-- čia tavo nauja DB info
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
