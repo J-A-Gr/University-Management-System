@@ -5,6 +5,7 @@ from app.utils.decorators import admin_required
 from app.models import User, Module, StudyProgram, Group
 from sqlalchemy import func
 from app.forms.admin import EmptyForm
+from collections import defaultdict
 
 bp = Blueprint('admin', __name__)
 
@@ -46,6 +47,7 @@ def admin_dashboard():
                             users=users, 
                             search=search, 
                             form=form,
+                            user_count=user_count,
                             module_count=module_count,
                             program_count=program_count,
                             group_count=group_count)
@@ -165,3 +167,62 @@ def delete_user(user_id):
         db.session.commit()
         flash("User deleted", "warning")
     return redirect(url_for('admin.manage_users'))
+
+
+
+
+@bp.route('/schedule/<int:user_id>')
+@admin_required
+def admin_schedule(user_id):
+    if not current_user.is_admin:
+        return "Unauthorized", 403
+
+    user = User.query.get_or_404(user_id)
+
+    schedule = defaultdict(list)
+
+    if user.is_student:
+        enrollments = user.student_info.module_enrollments
+        for enrollment in enrollments:
+            module = enrollment.module
+            teacher = module.teacher.user.full_name if module.teacher else "Nenurodyta"
+            assessments = [
+                {
+                    "title": a.title,
+                    "type": a.assessment_type,
+                    "due_date": a.due_date.strftime("%Y-%m-%d")
+                }
+                for a in module.assessments if a.is_active
+            ]
+            schedule[module.day_of_week].append({
+                "module_name": module.name,
+                "start_time": module.start_time.strftime("%H:%M"),
+                "end_time": module.end_time.strftime("%H:%M"),
+                "room": module.room,
+                "teacher": teacher,
+                "assessments": assessments
+            })
+
+    elif user.is_teacher:
+        modules = user.teacher_info.taught_modules
+        for module in modules:
+            assessments = [
+                {
+                    "title": a.title,
+                    "type": a.assessment_type,
+                    "due_date": a.due_date.strftime("%Y-%m-%d")
+                }
+                for a in module.assessments if a.is_active
+            ]
+            schedule[module.day_of_week].append({
+                "module_name": module.name,
+                "start_time": module.start_time.strftime("%H:%M"),
+                "end_time": module.end_time.strftime("%H:%M"),
+                "room": module.room,
+                "assessments": assessments
+            })
+
+    else:
+        return render_template("admin/admin_schedule.html", user=user, schedule=None, is_unknown=True)
+
+    return render_template("admin/admin_schedule.html", user=user, schedule=dict(schedule), is_unknown=False)

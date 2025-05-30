@@ -2,8 +2,9 @@ from flask import Flask
 from app.extensions import db, migrate, login_manager, csrf
 from app.config import Config
 from app.models.user import User
-from app.utils.seed import create_hardcoded_admin
+from app.utils.seed import create_hardcoded_admin # create_hardcoded_student, create_hardcoded_teacher
 import os
+from app.utils.seed_data import seed_data
 
 def create_app(config_class=Config):
     app = Flask(__name__)
@@ -48,6 +49,8 @@ def create_app(config_class=Config):
     # hardcoded admin
     with app.app_context():
         create_hardcoded_admin()
+        # create_hardcoded_student() # FOR TEST PURPOSES
+        # create_hardcoded_teacher() # FOR TEST PURPOSES
     
     return app 
     

@@ -55,7 +55,13 @@
   <!-- Statistics Summary -->
   <div class="stats" style="margin-bottom: 20px">
     <h2 style="margin-bottom: 10px">Sistemos Statistika</h2>
+  <div class="stats" style="margin-bottom: 20px">
+    <h2 style="margin-bottom: 10px">Sistemos Statistika</h2>
     <ul>
+      <li>Vartotojai: {{ user_count }}</li>
+      <li>Moduliai: {{ module_count }}</li>
+      <li>Studijų programos: {{ program_count }}</li>
+      <li>Grupės: {{ group_count }}</li>
       <li>Vartotojai: {{ user_count }}</li>
       <li>Moduliai: {{ module_count }}</li>
       <li>Studijų programos: {{ program_count }}</li>
@@ -65,8 +71,11 @@
 
   <!-- nukreipimas į userių managementa -->
   <div class="admin-nav d-flex flex-column gap-2" style="margin-bottom: 18px">
+  <div class="admin-nav d-flex flex-column gap-2" style="margin-bottom: 18px">
     <a
       href="{{ url_for('admin.manage_users') }}"
+      class="button"
+      style="width: 100%; text-align: center"
       class="button"
       style="width: 100%; text-align: center"
     >
@@ -74,6 +83,49 @@
     </a>
   </div>
 
+  <!-- Search Form su ikona -->
+  <form
+    method="GET"
+    action="{{ url_for('admin.admin_dashboard') }}"
+    style="display: flex; align-items: flex-end; gap: 10px; margin-bottom: 18px"
+  >
+    <div
+      class="floating-label"
+      style="margin-bottom: 0; width: 230px; position: relative"
+    >
+      <span
+        class="input-icon"
+        style="left: 12px; top: 50%; transform: translateY(-50%)"
+      >
+        <!-- Paprasta paieškos SVG ikona -->
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="7" stroke="#d9a441" stroke-width="2" />
+          <path
+            d="M20 20L16.65 16.65"
+            stroke="#d9a441"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+        </svg>
+      </span>
+      <input
+        type="text"
+        name="search"
+        class="input"
+        id="search-input"
+        placeholder=" "
+        value="{{ search }}"
+        style="padding-left: 42px"
+      />
+      <label for="search-input">Search by email</label>
+    </div>
+    <button
+      type="submit"
+      class="button"
+      style="padding: 12px 24px; font-size: 1em"
+    >
+      Search
+    </button>
   <!-- Search Form su ikona -->
   <form
     method="GET"

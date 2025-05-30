@@ -114,10 +114,13 @@ footer {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  justify-content: center;
+  align-items: center;
   margin: 0;
   padding: 0;
 }
 
+/* GLASSMORPHISM kortelėms */
 /* GLASSMORPHISM kortelėms */
 header,
 .main-content,
@@ -203,6 +206,7 @@ header,
 }
 .hero-content {
   flex: 2;
+  text-align: center;
   text-align: center;
 }
 .hero-content h1 {
@@ -450,6 +454,40 @@ select.input:not([value=""]) + label {
   color: #fff;
 }
 
+/* ==== Lentelės mygtukai ==== */
+.table-button {
+  background: linear-gradient(90deg, var(--accent), var(--accent-dark) 80%);
+  color: #fff;
+  border: none;
+  font-weight: 700;
+  border-radius: 14px;
+  padding: 8px 22px;
+  font-size: 1.05rem;
+  margin: 0;
+  box-shadow: 0 2px 8px 0 rgba(224, 122, 41, 0.11);
+  transition: background 0.15s, transform 0.15s, color 0.15s, box-shadow 0.15s;
+  display: inline-block;
+  letter-spacing: 0.01em;
+}
+.table-button:hover {
+  background: linear-gradient(90deg, var(--accent-dark), var(--accent));
+  color: #fff;
+  transform: scale(1.04) translateY(-1px);
+  box-shadow: 0 4px 16px 0 rgba(224, 122, 41, 0.17);
+}
+.table-button.red {
+  background: #e7333b;
+  color: #fff;
+}
+.table-button.yellow {
+  background: #ffd600;
+  color: #3b2e14;
+}
+.table-button.gold {
+  background: #b88725;
+  color: #fff;
+}
+
 /* ==== GLASS BUTTONS ==== */
 .glass-btn {
   background: rgba(255, 255, 255, 0.18);
@@ -511,6 +549,7 @@ select.input:not([value=""]) + label {
   }
 }
 
+/* ==== Scrollbar stiliai ==== */
 /* ==== Scrollbar stiliai ==== */
 ::-webkit-scrollbar {
   width: 10px;
