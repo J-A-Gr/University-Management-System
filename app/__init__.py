@@ -46,6 +46,10 @@ def create_app(config_class=Config):
     from app.views.error_handlers import bp as errors_bp
     app.register_blueprint(errors_bp)
 
+    from app.views.modules import bp as modules_bp
+    app.register_blueprint(modules_bp, url_prefix='/modules')
+    
+
     # hardcoded admin
     with app.app_context():
         create_hardcoded_admin()

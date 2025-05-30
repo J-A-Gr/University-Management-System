@@ -27,6 +27,8 @@ class Module(db.Model):
     study_program = db.relationship('StudyProgram', back_populates='modules')# sito reiks. . . visur :D
     assessments = db.relationship('Assessment', back_populates='module')
     enrollments = db.relationship('ModuleEnrollment', back_populates='module', cascade='all, delete-orphan')    
+    prerequisite_records = db.relationship('ModulePrerequisite', foreign_keys='ModulePrerequisite.module_id', back_populates='module')
+    required_for_records = db.relationship('ModulePrerequisite', foreign_keys='ModulePrerequisite.prerequisite_id', back_populates='prerequisite_module')
 
 
     def __repr__(self):
@@ -45,11 +47,13 @@ class Module(db.Model):
             'end_time': self.end_time.strftime('%H:%M') if self.end_time else None,
             'room': self.room,
             'is_active': self.is_active,
-            # TODO pasiziureti biski dar kas cia ne taip :D
             'study_program_name': self.study_program.name if self.study_program else None,
             'teacher_name': f"{self.teacher.user.first_name} {self.teacher.user.last_name}" if self.teacher and self.teacher.user else None,  #destyti gali kitas destytojas nei tas, kuris sukure moduli
             'created_by_name': f"{self.created_by.first_name} {self.created_by.last_name}" if self.created_by else None,
-            'created_at': self.created_at.isoformat() if self.created_at else None
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'prerequisites': self.get_prerequisites_list(),
+            'has_prerequisites': self.has_prerequisites(),
+            'prerequisite_count': len(self.get_prerequisites())
         }
        
 
@@ -88,3 +92,65 @@ class Module(db.Model):
         
         conflicting_modules = query.all()
         return conflicting_modules
+    
+
+    
+    def get_prerequisites(self):
+        """Get prerequisite modules for this module"""
+        try:
+            from app.models.module_prerequisite import ModulePrerequisite
+            return ModulePrerequisite.get_module_prerequisites(self.id)
+        except Exception as e:
+            return []
+    
+    def get_required_for(self):
+        """Get modules that require this module as prerequisite"""
+        try:
+            from app.models.module_prerequisite import ModulePrerequisite
+            return ModulePrerequisite.get_modules_requiring(self.id)
+        except Exception as e:
+            return []
+    
+    def add_prerequisite(self, prerequisite_module_id):
+        """Add a prerequisite module"""
+        try:
+            from app.models.module_prerequisite import ModulePrerequisite
+            return ModulePrerequisite.create_prerequisite(self.id, prerequisite_module_id)
+        except Exception as e:
+            return False, f"Error: {str(e)}"
+    
+    def remove_prerequisite(self, prerequisite_module_id):
+        """Remove a prerequisite module"""
+        try:
+            from app.models.module_prerequisite import ModulePrerequisite
+            return ModulePrerequisite.remove_prerequisite(self.id, prerequisite_module_id)
+        except Exception as e:
+            return False, f"Error: {str(e)}"
+    
+    def check_student_prerequisites(self, student_id):
+        """Check if student meets prerequisites for this module"""
+        try:
+            from app.models.module_prerequisite import ModulePrerequisite
+            return ModulePrerequisite.check_student_can_enroll(student_id, self.id)
+        except Exception as e:
+            return False, f"Error: {str(e)}"
+    
+    def get_prerequisites_list(self):
+        """Get prerequisites as dictionary list"""
+        try:
+            prerequisite_modules = self.get_prerequisites()
+            return [
+                {
+                    'id': module.id,
+                    'name': module.name,
+                    'credits': module.credits,
+                    'semester': module.semester
+                }
+                for module in prerequisite_modules
+            ]
+        except Exception as e:
+            return []
+    
+    def has_prerequisites(self):
+        """Check if module has any prerequisites"""
+        return len(self.get_prerequisites()) > 0
