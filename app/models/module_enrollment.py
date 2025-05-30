@@ -1,47 +1,67 @@
 from app.extensions import db
 from datetime import datetime
 
+
+
 class ModuleEnrollment(db.Model):
-    """Studento registracija į modulį + lankomumas, pažymiai, statusas"""
+    """Model for student enrollment in modules"""
     __tablename__ = 'module_enrollments'
-
+    
     id = db.Column(db.Integer, primary_key=True)
-
-    student_id = db.Column(db.Integer, db.ForeignKey('student_info.id'), nullable=False)
+    student_info_id = db.Column(db.Integer, db.ForeignKey('student_info.id'))
     module_id = db.Column(db.Integer, db.ForeignKey('modules.id'), nullable=False)
-
-    semester = db.Column(db.Integer, nullable=False)
-    final_grade = db.Column(db.Float, nullable=True)  # Galutinis pažymys
-    attendance_percentage = db.Column(db.Float, default=0.0)
-    completed = db.Column(db.Boolean, default=False)
-
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-    # Ryšiai
+    enrollment_date = db.Column(db.DateTime, default=datetime.utcnow)
+    semester = db.Column(db.Enum('rudens', 'pavasario'), nullable=True)     
+ 
     student_info = db.relationship('StudentInfo', back_populates='module_enrollments')
     module = db.relationship('Module', back_populates='enrollments')
-
+    
+    # Kad studentas negalėtų registruotis į tą patį modulį du kartus
     __table_args__ = (
-        db.UniqueConstraint('student_id', 'module_id', name='unique_student_module'),
+        db.UniqueConstraint('student_info_id', 'module_id', name='unique_student_module'),
     )
+    
+    @staticmethod
+    def register_student(student_id, module_id):
+        """Register student"""
+        from app.models.student_info import StudentInfo
+        from app.models.module import Module
+        student = StudentInfo.query.get(student_id) # randam studenta
+        if not student:
+            return "Studentas nerastas"
+        
+        module = Module.query.get(module_id) # randa moduli
+        if not module:
+            return "Modulis nerastas"
+        
+        for enrollment in student.module_enrollments:  #tikrinam ar neprisiregistrves
+            if enrollment.module_id == module_id:
+                return "Jau esi registruotas šiame modulyje"
+        
+        if student.study_program_id != module.study_program_id: # tikrinam ar modulis tinka studento studiju programai
+            return "Šis modulis nepriklauso jūsų studijų programai"
+        
+        for enrollment in student.module_enrollments: # tikrinam ar tvarkarastis ok
+            other_module = enrollment.module
+            
+            # Jei ta pati diena
+            if other_module.day_of_week == module.day_of_week: # ar diena ta pati
+
+                if (other_module.start_time < module.end_time and # ar laikas persidengia
+                    other_module.end_time > module.start_time):
+                    return f"Tvarkaraščio konfliktas su {other_module.name}"
+        
+
+        new_enrollment = ModuleEnrollment(  #jeigu viskas ok, tai registruojam
+            student_info_id=student_id,
+            module_id=module_id
+        )
+        
+        db.session.add(new_enrollment)
+        db.session.commit()
+        
+        return "Sėkmingai registruotasi!"
+
 
     def __repr__(self):
-        student_name = self.student_info.user.full_name if self.student_info and self.student_info.user else "Unknown"
-        return f"<ModuleEnrollment {student_name} - {self.module.name}>"
-
-    def mark_completed(self):
-        """Pažymėti modulį kaip baigtą"""
-        self.completed = True
-        db.session.commit()
-
-    def update_attendance(self, percentage):
-        """Atnaujinti lankomumą"""
-        try:
-            if 0 <= percentage <= 100:
-                self.attendance_percentage = percentage
-                db.session.commit()
-            else:
-                raise ValueError("Attendance must be between 0 and 100")
-        except Exception as e:
-            db.session.rollback()
-            raise Exception(f"Failed to update attendance: {str(e)}")
+        return f'<ModuleEnrollment Student:{self.student_info_id} Module:{self.module_id}>'
