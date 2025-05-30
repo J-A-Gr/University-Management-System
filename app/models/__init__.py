@@ -8,6 +8,7 @@ from app.models.module import Module
 from app.models.assessment import Assessment
 from app.models.assessment_submission import AssessmentSubmission
 from app.models.module_enrollment import ModuleEnrollment
+from app.models.module_prerequisite import ModulePrerequisite
 
 
-__all__ = ['User', 'StudentInfo', 'TeacherInfo', 'StudyProgram', 'Group', 'Faculty', 'Module', 'Assessment', 'AssessmentSubmission', 'ModuleEnrollment']
+__all__ = ['User', 'StudentInfo', 'TeacherInfo', 'StudyProgram', 'Group', 'Faculty', 'Module', 'Assessment', 'AssessmentSubmission', 'ModuleEnrollment', 'ModulePrerequisite']
