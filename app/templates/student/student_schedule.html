@@ -1,0 +1,31 @@
+{% extends 'base.html' %} {% block title %}Tvarkaraštis - Studento Panelė{%
+endblock %} {% block content %}
+<h2 class="my-4">Mano tvarkaraštis</h2>
+
+{% if schedule %} {% for day, entries in schedule.items() %}
+<div class="card mb-4">
+  <div class="card-header">
+    <strong>{{ day|capitalize }}</strong>
+  </div>
+  <ul class="list-group list-group-flush">
+    {% for item in entries %}
+    <li class="list-group-item">
+      <div>
+        <strong>{{ item.module_name }}</strong>
+        ({{ item.start_time }} - {{ item.end_time }}) - {{ item.room }}
+      </div>
+      <div>Dėstytojas: {{ item.teacher }}</div>
+      {% if item.assessments %}
+      <ul class="mt-2">
+        {% for a in item.assessments %}
+        <li>{{ a.title }} ({{ a.type }}) - iki {{ a.due_date }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endfor %} {% else %}
+<div class="alert alert-warning">Tvarkaraštis nerastas.</div>
+{% endif %} {% endblock %}
