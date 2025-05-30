@@ -24,3 +24,7 @@ class ModuleForm(FlaskForm):
     teacher_id = SelectField('Dėstytojas', coerce=int, choices=[], validate_choice=False)  # gali būti tuščias
 
     prerequisite_module_ids = SelectMultipleField('Priklausomi moduliai', coerce=int, validate_choice=False)
+
+
+class DeleteForm(FlaskForm):
+    pass  # tuščias, bet reikalingas CSRF apsaugai

@@ -1,0 +1,72 @@
+{% extends "base.html" %} {% block title %}Moduliai{% endblock %} {% block
+content %}
+<div class="container mt-4">
+  <h2 class="mb-4">Visi moduliai</h2>
+
+  <a href="{{ url_for('modules.create_module') }}" class="btn btn-success mb-3">
+    + Naujas modulis
+  </a>
+
+  {% if modules %}
+  <table class="table table-bordered table-hover">
+    <thead class="table-light">
+      <tr>
+        <th>Pavadinimas</th>
+        <th>Semestras</th>
+        <th>Kreditai</th>
+        <th>Diena</th>
+        <th>Laikas</th>
+        <th>Dėstytojas</th>
+        <th>Veiksmai</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for module in modules %}
+      <tr>
+        <td>{{ module.name }}</td>
+        <td>{{ module.semester.title() }}</td>
+        <td>{{ module.credits }}</td>
+        <td>{{ module.day_of_week.title() }}</td>
+        <td>
+          {{ module.start_time.strftime('%H:%M') }} – {{
+          module.end_time.strftime('%H:%M') }}
+        </td>
+        <td>
+          {% if module.teacher %} {{ module.teacher.user.full_name }} {% else %}
+          <em>–</em>
+          {% endif %}
+        </td>
+        <td>
+          <a
+            href="{{ url_for('modules.view_module', module_id=module.id) }}"
+            class="btn btn-sm btn-primary"
+          >
+            Peržiūrėti
+          </a>
+          <a
+            href="{{ url_for('modules.edit_module', module_id=module.id) }}"
+            class="btn btn-sm btn-warning"
+          >
+            Redaguoti
+          </a>
+          <form
+            method="POST"
+            action="{{ url_for('modules.delete_module', module_id=module.id) }}"
+            class="d-inline"
+            onsubmit="return confirm('Ar tikrai norite ištrinti šį modulį?');"
+          >
+            {{ form.hidden_tag() }}
+            <button type="submit" class="btn btn-sm btn-danger">
+              Ištrinti
+            </button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>Nėra sukurtų modulių.</p>
+  {% endif %}
+</div>
+{% endblock %}
