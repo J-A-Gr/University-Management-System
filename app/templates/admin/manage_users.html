@@ -65,8 +65,9 @@ block content %}
                 href="{{ url_for('admin.edit_user', user_id=user.id) }}"
                 class="table-button gold"
                 style="padding: 6px 12px; font-size: 1em; min-width: 0"
-                >Redaguoti</a
               >
+                Redaguoti
+              </a>
               {% if user.is_active %}
               <form
                 method="POST"
