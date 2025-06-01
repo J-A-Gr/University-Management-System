@@ -13,7 +13,7 @@ class TeacherInfo(db.Model):
     faculty = db.relationship('Faculty', back_populates='teachers')  # TODO
     created_assessments = db.relationship('Assessment', back_populates='created_by_teacher')
     graded_submissions = db.relationship('AssessmentSubmission', back_populates='graded_by_teacher')
-
+    created_tests = db.relationship('Test', back_populates='created_by_teacher')
 
 
     def get_current_modules(self, semester=None, is_active=True):
@@ -81,7 +81,7 @@ class TeacherInfo(db.Model):
     
 
     
-def __repr__(self):
-    faculty_name = self.faculty.name if self.faculty else "No Faculty"
-    user_name = f"{self.user.first_name} {self.user.last_name}" if self.user else "Unknown"
-    return f'<TeacherInfo ID:{self.id} - {user_name} ({faculty_name})>'  
+    def __repr__(self):
+        faculty_name = self.faculty.name if self.faculty else "No Faculty"
+        user_name = f"{self.user.first_name} {self.user.last_name}" if self.user else "Unknown"
+        return f'<TeacherInfo ID:{self.id} - {user_name} ({faculty_name})>'  

@@ -20,7 +20,7 @@ class Module(db.Model):
     
     study_program_id = db.Column(db.Integer, db.ForeignKey('study_programs.id'), nullable=False)
     created_by_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False) 
-    teacher_id = db.Column(db.Integer, db.ForeignKey('teacher_info.id'), nullable=True)
+    teacher_id = db.Column(db.Integer, db.ForeignKey('teacher_info.id'), nullable=False)
 
     teacher = db.relationship('TeacherInfo', back_populates='taught_modules')
     created_by = db.relationship('User', back_populates='created_modules')# sito reikia, kad zinotume kas ir ka sukure
@@ -29,7 +29,7 @@ class Module(db.Model):
     enrollments = db.relationship('ModuleEnrollment', back_populates='module', cascade='all, delete-orphan')    
     prerequisite_records = db.relationship('ModulePrerequisite', foreign_keys='ModulePrerequisite.module_id', back_populates='module')
     required_for_records = db.relationship('ModulePrerequisite', foreign_keys='ModulePrerequisite.prerequisite_id', back_populates='prerequisite_module')
-
+    tests = db.relationship('Test', back_populates='module')
 
     def __repr__(self):
         return f'<Module {self.name}>'
@@ -94,7 +94,7 @@ class Module(db.Model):
         return conflicting_modules
     
 
-    
+
     def get_prerequisites(self):
         """Get prerequisite modules for this module"""
         try:
