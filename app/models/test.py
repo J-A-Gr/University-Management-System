@@ -1,5 +1,7 @@
 from app.extensions import db
 from datetime import datetime
+from app.models.test_result import TestResult 
+
 
 class Test(db.Model):
     """Test model"""
