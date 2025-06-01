@@ -22,17 +22,17 @@ def student_schedule():
     student_info = current_user.student_info
     if not student_info:
         return render_template("student/student_schedule.html", schedule=None, error="Student profile not found")
-    enrollments = student_info.module_enrollments
+    enrollments = student_info.module_enrollments  # pasitraukiam visus modelius, kuriuos turi studentas
 
-    schedule = defaultdict(list)
+    schedule = defaultdict(list) # Tvarkaraščio struktūros paruošimas
 
-    for enrollment in enrollments:
+    for enrollment in enrollments: # Iteruojame per kiekvieną modulį, kur studentas yra užsiregistravęs.
         module = enrollment.module
         teacher_name = (
             f"{module.teacher.user.first_name} {module.teacher.user.last_name}"
             if module.teacher and module.teacher.user else "Nenurodyta"
         )
-
+        # Aktyvių atsiskaitymų paėmimas
         assessments_data = [
             {
                 "title": a.title,

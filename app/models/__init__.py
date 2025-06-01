@@ -6,8 +6,12 @@ from app.models.group import Group
 from app.models.faculty import Faculty 
 from app.models.module import Module
 from app.models.assessment import Assessment
-from app.models.assessment_submition import AssessmentSubmission
+from app.models.assessment_submission import AssessmentSubmission
 from app.models.module_enrollment import ModuleEnrollment
+from app.models.module_prerequisite import ModulePrerequisite
+from app.models.test import Test
+from app.models.test_question import TestQuestion
+from app.models.test_answer import TestAnswer   
+from app.models.test_result import TestResult
 
-
-__all__ = ['User', 'StudentInfo', 'TeacherInfo', 'StudyProgram', 'Group', 'Faculty', 'Module', 'Assessment', 'AssessmentSubmission', 'ModuleEnrollment']
+__all__ = ['User', 'StudentInfo', 'TeacherInfo', 'StudyProgram', 'Group', 'Faculty', 'Module', 'Assessment', 'AssessmentSubmission', 'ModuleEnrollment', 'ModulePrerequisite', 'Test', 'TestQuestion', 'TestAnswer', 'TestResult']

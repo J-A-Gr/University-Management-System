@@ -36,6 +36,7 @@ class User(UserMixin, db.Model):
     teacher_info = db.relationship('TeacherInfo', back_populates='user', uselist=False)
     created_modules = db.relationship('Module', back_populates='created_by')
     submissions = db.relationship('AssessmentSubmission', back_populates='student')
+    test_results = db.relationship('TestResult', back_populates='user') # sita dedam cia, o ne pas student, kad destytojas ar adminas galetu irgi pabandyti issispresti/ prasitestuoti testa
 
     @property
     def full_name(self):
@@ -90,6 +91,8 @@ class User(UserMixin, db.Model):
             else:
                 raise ValueError(f"Invalid role: {role}")
             
+            db.session.commit()
+
         except Exception as e:
             db.session.rollback()
             raise Exception(f"Failed to set role: {str(e)}")

@@ -1,0 +1,74 @@
+{% extends "base.html" %} {% block title %}Sukurti modulį{% endblock %} {% block
+content %}
+<div class="container mt-4">
+  <h2 class="mb-4">Naujo modulio kūrimas</h2>
+
+  <form method="POST" class="needs-validation" novalidate>
+    {{ form.hidden_tag() }}
+
+    <div class="mb-3">
+      {{ form.name.label(class="form-label") }} {{
+      form.name(class="form-control") }} {% for error in form.name.errors %}
+      <div class="text-danger">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="mb-3">
+      {{ form.description.label(class="form-label") }} {{
+      form.description(class="form-control", rows=3) }} {% for error in
+      form.description.errors %}
+      <div class="text-danger">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="mb-3">
+      {{ form.credits.label(class="form-label") }} {{
+      form.credits(class="form-control") }}
+    </div>
+
+    <div class="mb-3">
+      {{ form.semester.label(class="form-label") }} {{
+      form.semester(class="form-select") }}
+    </div>
+
+    <div class="mb-3">
+      {{ form.day_of_week.label(class="form-label") }} {{
+      form.day_of_week(class="form-select") }}
+    </div>
+
+    <div class="row">
+      <div class="col mb-3">
+        {{ form.start_time.label(class="form-label") }} {{
+        form.start_time(class="form-control") }}
+      </div>
+      <div class="col mb-3">
+        {{ form.end_time.label(class="form-label") }} {{
+        form.end_time(class="form-control") }}
+      </div>
+    </div>
+
+    <div class="mb-3">
+      {{ form.room.label(class="form-label") }} {{
+      form.room(class="form-control") }}
+    </div>
+
+    <div class="mb-3">
+      {{ form.study_program_id.label(class="form-label") }} {{
+      form.study_program_id(class="form-select") }}
+    </div>
+
+    <div class="mb-3">
+      {{ form.teacher_id.label(class="form-label") }} {{
+      form.teacher_id(class="form-select") }}
+    </div>
+
+    <div class="mb-3">
+      {{ form.prerequisite_module_ids.label(class="form-label") }} {{
+      form.prerequisite_module_ids(class="form-select", multiple=True, size=5)
+      }}
+    </div>
+
+    <button type="submit" class="btn btn-primary">Sukurti modulį</button>
+  </form>
+</div>
+{% endblock %}

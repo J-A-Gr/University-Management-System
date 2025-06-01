@@ -6,7 +6,8 @@ from datetime import datetime, time, timedelta
 
 """ flask shell
 >>> from app.utils.seed_data import seed_data
->>> seed_data()"""
+>>> seed_data()
+"""
 
 
 def seed_data():
@@ -124,16 +125,16 @@ def seed_data():
 
         # Užregistruoti studentą į visus aktyvius modulius
 
-        existing_enrollments = ModuleEnrollment.query.filter_by(student_id=student_info.id).all()
+        existing_enrollments = ModuleEnrollment.query.filter_by(student_info_id=student_info.id).all()
         enrolled_module_ids = [e.module_id for e in existing_enrollments]
 
         active_modules = Module.query.filter_by(is_active=True).all()
         for module in active_modules:
             if module.id not in enrolled_module_ids:
                 enrollment = ModuleEnrollment(
-                    student_id=student_info.id,
+                    student_info_id=student_info.id,
                     module_id=module.id,
-                    semester=student_info.current_semester
+                    semester='rudens' if student_info.current_semester % 2 == 1 else 'pavasario'
                 )
                 db.session.add(enrollment)
 
