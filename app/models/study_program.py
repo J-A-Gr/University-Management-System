@@ -20,13 +20,13 @@ class StudyProgram(db.Model):
     # bet dabar pasilikim prie vienai studiju programai priklauso daug moduliu.
     modules = db.relationship('Module', back_populates='study_program')
 
+    # TODO pagal mane čia dar turėtų būti grupės kodo generavimas, bet kol kas palieku kaip yra, nes grupės kodas yra sudarytas iš programos kodo, fakulteto  ir metų
 
-    # Programos kodo sugeneravimas (trys didžiosios raidės iš pavadinimo ir pirmi du fakulteto inicialai)
-    @property #Nežinau ar čia  reikia property, bet palieku, kad būtų galima naudoti kaip atributą (Copilotas pasiūlė)
+    # Programos kodo sugeneravimas (trys didžiosios raidės iš pavadinimo ir pirmi du fakulteto pavadinimo inicialai)
     def generate_code(self):
         try:
             base = self.name[:3].upper() #Pirmos trys didžiosios raidės iš programos pavadinimo
-            faculty_part = self.faculty[:2].lower() if self.faculty else "XX"  # Pirmi du fakulteto inicialai, jei fakultetas nenurodytas, naudojame "XX"
+            faculty_part = self.faculty.name[:3].lower() if self.faculty else "XX"  # Pirmi du fakulteto inicialai, jei fakultetas nenurodytas, naudojame "XX"
             self.code = faculty_part + "-" + base 
             return self.code
         except Exception as e:
@@ -36,7 +36,6 @@ class StudyProgram(db.Model):
         """Get total number of students in this program"""
         return len(self.students)
 
-    # TODO pagal mane čia dar turėtų būti grupės kodo generavimas, bet kol kas palieku kaip yra, nes grupės kodas yra sudarytas iš programos kodo, fakulteto  ir metų
 
 
     def get_students_by_year(self, admission_year): # tur4tų būti reikalinga grupės kodo sudarymui, jeigu ne tai istrinam ;D
