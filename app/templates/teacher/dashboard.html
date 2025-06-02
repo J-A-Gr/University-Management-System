@@ -1,27 +1,71 @@
 {% extends "base.html" %} {% block content %}
-<div class="dashboard">
-  <!-- Navigacijos mygtukai mokytojui -->
-  <div class="mb-4">
-    <a
-      href="{{ url_for('teacher.teacher_schedule') }}"
-      class="btn btn-secondary me-2"
-      >Tvarkaraštis</a
-    >
+<div class="main-content">
+  <h1>Dėstytojo Skydelis</h1>
+
+  <div
+    style="
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    "
+  >
+    <h2 style="margin: 0">Mano Statistika</h2>
     <a
       href="{{ url_for('modules.list_modules') }}"
-      class="btn btn-secondary me-2"
-      >Dėstomi moduliai</a
+      class="button"
+      style="
+        padding: 10px 16px;
+        border-radius: 8px;
+        background: #2c3e50;
+        color: white;
+        text-decoration: none;
+        font-weight: 500;
+      "
     >
-    <a href="{{ url_for('main.profile') }}" class="btn btn-secondary"
-      >Profilis</a
-    >
+      Visi moduliai
+    </a>
   </div>
 
-  <h2>Sveiki, {{ teacher.first_name }}!</h2>
-  <p>Čia laikinas mokytojo skydelis.</p>
-  <p>
-    Daugiau informacijos (----,---,---,---) atsiras, kai jūsų profilis bus
-    pilnai užpildytas.
-  </p>
+  <div class="stats" style="margin-bottom: 20px">
+    <ul>
+      <li>Dėstomi moduliai: {{ module_count }}</li>
+    </ul>
+  </div>
+
+  <div class="table-scroll">
+    <h2>Tvarkaraštis</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Diena</th>
+          <th>Modulis</th>
+          <th>Laikas</th>
+          <th>Vieta</th>
+          <th>Atsiskaitymai</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for day, modules in schedule.items() %} {% for module in modules %}
+        <tr>
+          <td>{{ day }}</td>
+          <td>{{ module.module_name }}</td>
+          <td>{{ module.start_time }} - {{ module.end_time }}</td>
+          <td>{{ module.room }}</td>
+          <td>
+            <ul>
+              {% for assessment in module.assessments %}
+              <li>
+                {{ assessment.title }} ({{ assessment.type }}) - {{
+                assessment.due_date }}
+              </li>
+              {% endfor %}
+            </ul>
+          </td>
+        </tr>
+        {% endfor %} {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </div>
 {% endblock %}

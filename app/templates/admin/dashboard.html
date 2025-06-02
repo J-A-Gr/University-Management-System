@@ -132,16 +132,6 @@
   }
 </style>
 <div class="main-content">
-  <!-- Navigacija administratoriui -->
-  <div class="mb-4">
-    <a href="{{ url_for('admin.manage_users') }}" class="btn btn-secondary me-2"
-      >Vartotojų valdymas</a
-    >
-    <a href="{{ url_for('main.profile') }}" class="btn btn-secondary"
-      >Profilis</a
-    >
-  </div>
-
   <h1 style="margin-bottom: 18px">Administratoriaus Skydelis</h1>
   <div class="stats" style="margin-bottom: 20px">
     <h2 style="margin-bottom: 10px">Sistemos Statistika</h2>
@@ -152,17 +142,6 @@
       <li>Grupės: {{ group_count }}</li>
     </ul>
   </div>
-
-  <div class="admin-nav d-flex flex-column gap-2" style="margin-bottom: 18px">
-    <div class="admin-nav d-flex flex-column gap-2" style="margin-bottom: 18px">
-      <a
-        href="{{ url_for('admin.manage_users') }}"
-        class="button"
-        style="width: 100%; text-align: center"
-      >
-        Vartotojų valdymas
-      </a>
-    </div>
 
     <!-- PRIDĖTA admin-search KLASĖ! -->
     <form
