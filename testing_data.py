@@ -1,6 +1,6 @@
 from app import create_app, db
 from app.models import User, Faculty, StudyProgram, StudentInfo
-from app.utils import create_hardcoded_admin
+from app.utils.seed import create_hardcoded_admin
 
 # Sukuriame Flask aplikaciją (pvz., naudojant factory funkciją)
 app = create_app()
