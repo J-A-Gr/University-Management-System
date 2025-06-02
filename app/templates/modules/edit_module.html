@@ -1,5 +1,32 @@
 {% extends "base.html" %} {% block title %}Redaguoti modulį{% endblock %} {%
 block content %}
+
+<!-- Navigacija viršuje -->
+<div class="mb-4">
+  {% if current_user.is_authenticated %} {% if current_user.role == 'student' %}
+  <a href="{{ url_for('student.dashboard') }}" class="btn btn-secondary me-2"
+    >← Atgal į skydelį</a
+  >
+  {% elif current_user.role == 'teacher' %}
+  <a
+    href="{{ url_for('teacher.teacher_dashboard') }}"
+    class="btn btn-secondary me-2"
+    >← Atgal į skydelį</a
+  >
+  {% elif current_user.role == 'admin' %}
+  <a
+    href="{{ url_for('admin.admin_dashboard') }}"
+    class="btn btn-secondary me-2"
+    >← Atgal į skydelį</a
+  >
+  {% endif %}
+  <a href="{{ url_for('modules.list_modules') }}" class="btn btn-secondary me-2"
+    >Modulių sąrašas</a
+  >
+  <a href="{{ url_for('main.profile') }}" class="btn btn-secondary">Profilis</a>
+  {% endif %}
+</div>
+
 <div class="container mt-4">
   <h2 class="mb-4">Modulio redagavimas: {{ module.name }}</h2>
 
