@@ -25,16 +25,14 @@ class StudentInfo(db.Model):
  
     
         # Studijų grupės kodo sugeneravimas (studijų programos kodo ir įstojimo metų derinys)
-    @property #Nežinau ar čia  reikia property, bet palieku, kad būtų galima naudoti kaip atributą (Copilotas pasiūlė ;))
     def generate_study_groupe_code(self):
         try:
             #kažkaip reikia pasiimti studijų programos kodą, kad būtų galima sukurti grupės kodą, nežinu ar taip veiks...
-            
-            base = self.study_program.code #Pirmos trys didžiosios raidės iš programos pavadinimo
-            year = self.admission_year # Įstojimo metai
-            if not base or not year:
-                raise ValueError("Study program code or admission year is missing")
-            self.group = base + "-" + year
+            if not self.study_program or not self.admission_year:
+                raise ValueError("Study program or admission year is not set")
+            if not self.study_program.code:
+                self.study_program.generate_code()
+            self.group = self.study_program.code + "-" + str(self.admission_year)  # Grupės kodas sudarytas iš studijų programos kodo ir įstojimo metų   
             return self.group
         except Exception as e:
             raise Exception(f"Failed to generate study group code: {str(e)}")

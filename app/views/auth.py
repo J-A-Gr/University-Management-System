@@ -9,6 +9,8 @@ import os
 import uuid
 from app.config import Config
 from app.utils.helpers import allowed_file
+from app.services.group_services import find_or_create_available_group
+
 
 bp = Blueprint('auth', __name__)
 
@@ -72,9 +74,10 @@ def register():
 
     form = RegistrationForm()
     form.study_program.choices = [(p.id, p.name) for p in StudyProgram.query.all()]
+    
     if form.validate_on_submit():
 
-        profile_filename = 'default.png' # apsauga nuo sulūžimo (jeigu neįkeltų failo(image))
+        profile_filename = 'default.png'  # apsauga nuo sulūžimo (jeigu neįkeltų failo(image))
         file = form.profile_picture.data
 
         if file and allowed_file(file.filename):  # tikrinam ar įkeltas failas (none ar ne) ir jo formatą 
@@ -91,44 +94,26 @@ def register():
             email=form.email.data,
             first_name=form.first_name.data,
             last_name=form.last_name.data,
-            birthday = form.birthday.data,
-            profile_picture = profile_filename # į db keliauja pavadinimas nuotraukos
-         
+            birthday=form.birthday.data,
+            profile_picture=profile_filename  # į db keliauja pavadinimas nuotraukos
         )
         user.set_password(form.password.data)
 
-        if user.is_student:
-            user.ensure_student_info() # įsitikinam, kad jis turi StudentInfo
-            user.student_info.study_program_id = form.study_program.data # Priskiriam studijų programa
-            user.student_info.admission_year = form.admission_year.data # įrašom įstojimo metus
-         
-            # Surandam ar tokia grupė egzistuoja
-            group = Group.query.filter_by(
-                study_program_id=form.study_program.data,
-                admission_year=form.admission_year.data,
-                group_letter=form.group_letter.data.upper()
-            ).first()
+        if user.is_student:  # programos kodo sugeneravimas
+            current_year = datetime.utcnow().year  # dabartiniai metai
+            group = find_or_create_available_group(form.study_program.data, current_year)
 
-            # Jei neradom – sukuriam naują
-            if not group:
-                group_name = f"AUTO-{form.admission_year.data}-{form.group_letter.data.upper()}"  # gali būti generuojama kaip reikia
-                group = Group(
-                    name=group_name,
-                    admission_year=form.admission_year.data,
-                    group_letter=form.group_letter.data.upper(),
-                    study_program_id=form.study_program.data
-                )
-                db.session.add(group)
-
-            user.student_info.group = group
-
+            user.ensure_student_info()  # įsitikinam, kad jis turi StudentInfo
+            user.student_info.study_program_id = form.study_program.data  # Priskiriam studijų programa
+            user.student_info.admission_year = current_year  # automatiškai priskiria įstojimo metus
+            user.student_info.group = group  # priskiriam grupę
 
         db.session.add(user)
         db.session.commit()
-        
+
         flash('Registration successful! You can now log in.', 'success')
         return redirect(url_for('auth.login'))
-    
+
     return render_template('auth/register.html', title='Register', form=form)
 
 

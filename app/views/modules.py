@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required, current_user
 from app.forms.module import ModuleForm, DeleteForm
+from app.forms.admin import EmptyForm
 from app.models import Module, StudyProgram, TeacherInfo, ModulePrerequisite, User, ModuleEnrollment
 from app.extensions import db
 
@@ -17,8 +18,13 @@ def list_modules():
 @bp.route('/create', methods=['GET', 'POST'])
 @login_required
 def create_module():
-    form = ModuleForm()
+    # užtikrinam, kad tik studentai negali kurti naujų modelių
+    if current_user.is_student:
+        flash('Tik administratoriai ir dėstytojai gali kurti modulius.', 'danger')
+        return redirect(url_for('modules.list_modules'))
 
+    form = ModuleForm()
+    
     # Užkraunam pasirinkimų sąrašus atskirai
     study_programs = StudyProgram.query.all()
     teachers = TeacherInfo.query.all()
@@ -151,6 +157,43 @@ def edit_module(module_id):
             flash(f"Klaida atnaujinant modulį: {str(e)}", "danger")
 
     return render_template("modules/edit_module.html", form=form, module=module)
+
+
+@bp.route('/<int:module_id>/choose', methods=['GET', 'POST'])
+@login_required
+def choose_module(module_id):
+    module = Module.query.get_or_404(module_id)
+
+    if not current_user.is_student:
+        flash('Tik studentai gali rinktis modulius.', 'danger')
+        return redirect(url_for('modules.view_module', module_id=module.id))
+
+    form = EmptyForm()
+
+    already_enrolled = ModuleEnrollment.query.filter_by(
+        student_info_id=current_user.id,
+        module_id=module.id
+    ).first()
+
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            if already_enrolled:
+                flash('Jau esate užsiregistravęs į šį modulį.', 'warning')
+            else:
+                enrollment = ModuleEnrollment(student_info_id=current_user.id, module_id=module.id)
+                db.session.add(enrollment)
+                db.session.commit()
+                flash('Sėkmingai užsiregistravote į modulį.', 'success')
+            return redirect(url_for('modules.view_module', module_id=module.id))
+        else:
+            flash('Formos validacija nepavyko.', 'danger')
+
+    return render_template(
+        'modules/choose_module.html',
+        module=module,
+        form=form,
+        already_enrolled=already_enrolled
+    )
 
 
 @bp.route('/<int:module_id>/delete', methods=['POST'])

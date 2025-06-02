@@ -2,7 +2,9 @@ from flask import Flask
 from app.extensions import db, migrate, login_manager, csrf
 from app.config import Config
 from app.models.user import User
-from app.utils.seed import create_hardcoded_admin # create_hardcoded_student, create_hardcoded_teacher
+#from app.utils.seed import create_hardcoded_admin # create_hardcoded_student, create_hardcoded_teacher
+#Šitą pakeičiau, kad nekurtų hardcoded admin, nes gaunu ciklinį importą, 
+#Padariau testing_data.py, kurį reikia pasileisti prieš run.py ir jis sukuria adminą ir kitus (jei reiks tik admino kitus užkomentuokit ;)).
 import os
 from app.utils.seed_data import seed_data
 
@@ -51,8 +53,8 @@ def create_app(config_class=Config):
     
 
     # hardcoded admin
-    with app.app_context():
-        create_hardcoded_admin()
+    # with app.app_context():
+    #     create_hardcoded_admin()
         # create_hardcoded_student() # FOR TEST PURPOSES
         # create_hardcoded_teacher() # FOR TEST PURPOSES
     
