@@ -1,6 +1,14 @@
 {% extends "base.html" %}
 {% block title %}Redaguoti vartotoją{% endblock %}
 {% block content %}
+
+<!-- Navigacija viršuje -->
+<div class="mb-4">
+  <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-secondary me-2">← Atgal į admin skydelį</a>
+  <a href="{{ url_for('admin.manage_users') }}" class="btn btn-secondary me-2">Vartotojų valdymas</a>
+  <a href="{{ url_for('main.profile') }}" class="btn btn-secondary">Profilis</a>
+</div>
+
 <div class="center-wrapper">
   <div class="main-content glass-card" style="max-width: 420px;">
     <h2 style="margin-bottom: 22px; color: #fff; text-shadow: 0 2px 8px rgba(40, 50, 60, 0.22); font-weight: 800;">

@@ -1,5 +1,17 @@
 {% extends 'base.html' %} {% block title %}Tvarkaraštis - Studento Panelė{%
 endblock %} {% block content %}
+
+<!-- Navigacijos mygtukai viršuje -->
+<div class="mb-4">
+  <a href="{{ url_for('student.dashboard') }}" class="btn btn-secondary me-2"
+    >← Atgal į skydelį</a
+  >
+  <a href="{{ url_for('modules.list_modules') }}" class="btn btn-secondary me-2"
+    >Dalykų sąrašas</a
+  >
+  <a href="{{ url_for('main.profile') }}" class="btn btn-secondary">Profilis</a>
+</div>
+
 <h2 class="my-4">Mano tvarkaraštis</h2>
 
 {% if schedule %} {% for day, entries in schedule.items() %}
