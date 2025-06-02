@@ -1,10 +1,10 @@
 :root {
-  --main-bg: #f6f5f3; /* 60%: pagrindinis fonas */
-  --card-bg: #4a6d73; /* 30%: kortelės, nav, inputai */
-  --accent: #d9a441; /* 10%: akcentai, CTA */
-  --accent-dark: #b88725; /* tamsesnis garstyčių akcentas (hover, active) */
-  --text: #fff; /* šviesus tekstas ant tamsaus fono */
-  --border: #e3ddd3; /* švelnus kraštas, priderintas prie šiltos temos */
+  --main-bg: #f6f5f3;
+  --card-bg: #4a6d73;
+  --accent: #d9a441;
+  --accent-dark: #b88725;
+  --text: #fff;
+  --border: #e3ddd3;
 }
 
 /* Wide kortelė lentelėms */
@@ -15,6 +15,19 @@
 @media (max-width: 1200px) {
   .wide-card {
     max-width: 99vw !important;
+  }
+}
+
+/* Platesnė kortelė (dar platesnė už wide-card) */
+.extra-wide-card {
+  max-width: 1400px !important;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+@media (max-width: 1500px) {
+  .extra-wide-card {
+    max-width: 98vw !important;
   }
 }
 
@@ -64,7 +77,9 @@ body {
   padding: 0;
   min-height: 100vh;
   font-family: "Inter", "Segoe UI", Arial, sans-serif;
-  color: var(--text);
+  color: var(
+    --text: #3b2e14
+  ); /* TODO pakeičiau į tamsesne spalva, kad matytus kažkas */
   background: linear-gradient(120deg, var(--main-bg) 70%, var(--main-bg) 100%);
   transition: background 0.6s, color 0.3s;
   display: flex;
@@ -101,10 +116,13 @@ footer {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  justify-content: center;
+  align-items: center;
   margin: 0;
   padding: 0;
 }
 
+/* GLASSMORPHISM kortelėms */
 /* GLASSMORPHISM kortelėms */
 header,
 .main-content,
@@ -120,6 +138,19 @@ header,
   color: #fff;
   transition: background 0.35s, box-shadow 0.22s, transform 0.18s;
   text-shadow: 0 2px 8px rgba(40, 50, 60, 0.22), 0 1px 0 rgba(0, 0, 0, 0.22);
+}
+
+/* Platesnei kortelei (lentelėms) padidinam max-width */
+.extra-wide-card.main-content {
+  max-width: 1400px !important;
+  padding: 36px 38px 32px 38px;
+}
+@media (max-width: 900px) {
+  .extra-wide-card.main-content {
+    max-width: 99vw !important;
+    padding: 12px 7px;
+    border-radius: 12px;
+  }
 }
 
 .main-content:hover,
@@ -141,7 +172,6 @@ header,
   box-shadow: 0 2px 12px 0 rgba(53, 92, 82, 0.12);
 }
 
-/* Papildomas kontrastas vartotojo vardui profilyje */
 .main-content h3,
 .glass-card h3 {
   font-weight: 800;
@@ -178,6 +208,7 @@ header,
 }
 .hero-content {
   flex: 2;
+  text-align: center;
   text-align: center;
 }
 .hero-content h1 {
@@ -345,6 +376,9 @@ select.input:not([value=""]) + label {
   .wide-card {
     max-width: 99vw !important;
   }
+  .extra-wide-card {
+    max-width: 99vw !important;
+  }
   footer {
     border-radius: 14px 14px 0 0;
     font-size: 0.95em;
@@ -386,6 +420,40 @@ select.input:not([value=""]) + label {
   color: #fff;
   transform: scale(1.04) translateY(-2px);
   box-shadow: 0 8px 32px 0 rgba(224, 122, 41, 0.19);
+}
+
+/* ==== Lentelės mygtukai ==== */
+.table-button {
+  background: linear-gradient(90deg, var(--accent), var(--accent-dark) 80%);
+  color: #fff;
+  border: none;
+  font-weight: 700;
+  border-radius: 14px;
+  padding: 8px 22px;
+  font-size: 1.05rem;
+  margin: 0;
+  box-shadow: 0 2px 8px 0 rgba(224, 122, 41, 0.11);
+  transition: background 0.15s, transform 0.15s, color 0.15s, box-shadow 0.15s;
+  display: inline-block;
+  letter-spacing: 0.01em;
+}
+.table-button:hover {
+  background: linear-gradient(90deg, var(--accent-dark), var(--accent));
+  color: #fff;
+  transform: scale(1.04) translateY(-1px);
+  box-shadow: 0 4px 16px 0 rgba(224, 122, 41, 0.17);
+}
+.table-button.red {
+  background: #e7333b;
+  color: #fff;
+}
+.table-button.yellow {
+  background: #ffd600;
+  color: #3b2e14;
+}
+.table-button.gold {
+  background: #b88725;
+  color: #fff;
 }
 
 /* ==== Lentelės mygtukai ==== */
@@ -484,6 +552,7 @@ select.input:not([value=""]) + label {
 }
 
 /* ==== Scrollbar stiliai ==== */
+/* ==== Scrollbar stiliai ==== */
 ::-webkit-scrollbar {
   width: 10px;
   background: var(--main-bg);
@@ -496,18 +565,6 @@ select.input:not([value=""]) + label {
   background: var(--accent);
 }
 
-.extra-wide-card {
-  max-width: 1400px !important;
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-}
-@media (max-width: 1500px) {
-  .extra-wide-card {
-    max-width: 98vw !important;
-  }
-}
-
 .button-group {
   display: flex;
   gap: 14px;
@@ -516,14 +573,128 @@ select.input:not([value=""]) + label {
   justify-content: flex-start;
 }
 
-.extra-wide-card {
-  max-width: 1400px !important;
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
+.radio-group .form-check-label {
+  cursor: pointer;
+  transition: color 0.2s, font-weight 0.2s;
 }
-@media (max-width: 1500px) {
-  .extra-wide-card {
-    max-width: 98vw !important;
+.radio-group .form-check-input:checked + .form-check-label {
+  color: var(--accent, #3686ff);
+  font-weight: bold;
+  text-decoration: underline;
+}
+.role-selected-label {
+  margin-left: 10px;
+  color: var(--accent, #3686ff);
+  font-size: 0.95em;
+  font-weight: bold;
+}
+
+/* ====== LENTELĖS KONTEINERIS ====== */
+.table-scroll {
+  overflow-x: auto;
+  width: 100%;
+  position: relative;
+  margin-bottom: 22px;
+}
+.table-scroll table {
+  min-width: 1200px;
+  width: 100%;
+  border-collapse: collapse;
+}
+.table-scroll::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 20px;
+  pointer-events: none;
+  background: linear-gradient(
+    to left,
+    rgba(255, 255, 255, 0.92),
+    rgba(255, 255, 255, 0)
+  );
+  display: block;
+}
+@media (max-width: 900px) {
+  .table-scroll table {
+    font-size: 0.97em;
+    min-width: 540px;
   }
+}
+
+/* === ADMIN DASHBOARD paieškos laukeliui siaurinimas === */
+.admin-search .floating-label {
+  width: 110px !important;
+  min-width: 0;
+  margin-bottom: 0;
+  position: relative;
+}
+.admin-search .input {
+  font-size: 0.91em;
+  padding: 4px 8px 4px 28px !important;
+  width: 100% !important;
+  min-width: 0;
+  height: 28px;
+  box-sizing: border-box;
+  border-radius: 7px;
+}
+.admin-search .input-icon {
+  left: 6px !important;
+  width: 16px;
+  height: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  position: absolute;
+  z-index: 2;
+}
+.admin-search label {
+  left: 28px;
+  font-size: 0.98em;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0 2px;
+  background: #fff;
+  transition: 0.16s;
+  z-index: 3;
+}
+.admin-search .input:focus + label,
+.admin-search .input:not(:placeholder-shown) + label {
+  top: -12px;
+  left: 22px;
+  font-size: 0.89em;
+  color: #d9a441;
+  background: #fff;
+  padding: 0 3px;
+  z-index: 4;
+}
+
+/* Admin paieškos laukelio label sumažinimas */
+.admin-search label {
+  font-size: 0.75em !important;
+  left: 26px;
+  top: 48%;
+  transform: translateY(-50%);
+  padding: 0 2px;
+  background: #fff;
+  color: #c9b787;
+  transition: 0.16s;
+  z-index: 3;
+  line-height: 1;
+  pointer-events: none;
+  white-space: nowrap;
+  max-width: 75px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.admin-search .input:focus + label,
+.admin-search .input:not(:placeholder-shown) + label {
+  top: -12px;
+  left: 20px;
+  font-size: 0.65em !important;
+  color: #d9a441;
+  background: #fff;
+  padding: 0 3px;
+  z-index: 4;
+  max-width: 80px;
 }

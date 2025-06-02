@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Modulių pasirinkimas{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-4">Modulių pasirinkimas</h2>
+
+  {% if message %}
+    <div class="alert alert-info">{{ message }}</div>
+  {% endif %}
+
+  {% if form %}
+    <form method="POST" action="{{ url_for('student.choose_module') }}">
+      {{ form.hidden_tag() }}
+
+      <div class="mb-3">
+        <label for="module_id" class="form-label"><strong>Pasirinkite modulį:</strong></label>
+        {{ form.module_id(class="form-select") }}
+      </div>
+
+      <button type="submit" class="btn btn-primary">{{ form.submit.label.text }}</button>
+    </form>
+  {% else %}
+    <div class="alert alert-warning">
+      <strong>Visi galimi kreditai jau išnaudoti.</strong> Negalite pasirinkti daugiau modulių.
+    </div>
+  {% endif %}
+  
+  <hr class="my-4" />
+  <h5>Jūsų aktyvūs moduliai</h5>
+
+  {% if current_modules %}
+    <ul class="list-group">
+      {% for module in current_modules %}
+        <li class="list-group-item">
+          <strong>{{ module.name }}</strong> – {{ module.credits }} ECTS,
+          {{ module.day_of_week.title() }}, {{ module.start_time.strftime('%H:%M') }}–{{ module.end_time.strftime('%H:%M') }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p><em>Dar nesate užsiregistravęs į jokį modulį.</em></p>
+  {% endif %}
+</div>
+{% endblock %}

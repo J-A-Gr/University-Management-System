@@ -1,0 +1,118 @@
+{% extends "base.html" %} {% block title %}Modulio peržiūra{% endblock %} {%
+block content %}
+
+<!-- Navigacija viršuje -->
+<div class="mb-4">
+  {% if current_user.is_authenticated %} {% if current_user.role == 'student' %}
+  <a href="{{ url_for('student.dashboard') }}" class="btn btn-secondary me-2"
+    >← Atgal į skydelį</a
+  >
+  {% elif current_user.role == 'teacher' %}
+  <a
+    href="{{ url_for('teacher.teacher_dashboard') }}"
+    class="btn btn-secondary me-2"
+    >← Atgal į skydelį</a
+  >
+  {% elif current_user.role == 'admin' %}
+  <a
+    href="{{ url_for('admin.admin_dashboard') }}"
+    class="btn btn-secondary me-2"
+    >← Atgal į skydelį</a
+  >
+  {% endif %}
+  <a href="{{ url_for('modules.list_modules') }}" class="btn btn-secondary me-2"
+    >Modulių sąrašas</a
+  >
+  <a href="{{ url_for('main.profile') }}" class="btn btn-secondary">Profilis</a>
+  {% endif %}
+</div>
+
+<div class="container mt-4">
+  <h2 class="mb-4">Modulio peržiūra: {{ module.name }}</h2>
+
+  <div class="mb-3">
+    <strong>Aprašymas:</strong>
+    <p>{{ module.description }}</p>
+  </div>
+
+  <div class="row">
+    <div class="col-md-4 mb-3">
+      <strong>Kreditai:</strong>
+      {{ module.credits }}
+    </div>
+    <div class="col-md-4 mb-3">
+      <strong>Semestras:</strong>
+      {{ module.semester.title() }}
+    </div>
+    <div class="col-md-4 mb-3">
+      <strong>Diena/laikas:</strong>
+      {{ module.day_of_week.title() }}, {{ module.start_time.strftime('%H:%M')
+      }} – {{ module.end_time.strftime('%H:%M') }}
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <strong>Auditorija:</strong>
+    {{ module.room or 'Nenurodyta' }}
+  </div>
+
+  <div class="mb-3">
+    <strong>Aktyvumas:</strong>
+    {% if module.is_active %}
+    <span class="badge bg-success">Aktyvus</span>
+    {% else %}
+    <span class="badge bg-secondary">Neaktyvus</span>
+    {% endif %}
+  </div>
+
+  <hr />
+
+  <h5>Dėstytojas</h5>
+  {% if module.teacher %}
+  <p>{{ module.teacher.user.full_name }}</p>
+  {% else %}
+  <p><em>Nenurodyta</em></p>
+  {% endif %}
+
+  <h5>Išankstiniai reikalavimai</h5>
+  {% if prerequisites %}
+  <ul>
+    {% for prereq in prerequisites %}
+    <li>{{ prereq.prerequisite_module.name }}</li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p><em>Nėra</em></p>
+  {% endif %}
+
+  <h5>Užsiregistravę studentai</h5>
+  {% if enrolled_students %}
+  <ul>
+    {% for student in enrolled_students %}
+    <li>{{ student.first_name }} {{ student.last_name }}</li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p><em>Nėra</em></p>
+  {% endif %} {% if current_user.is_authenticated and (current_user.is_teacher
+  or current_user.is_admin) %}
+  <div class="mt-4">
+    <a
+      href="{{ url_for('modules.edit_module', module_id=module.id) }}"
+      class="btn btn-warning me-2"
+    >
+      Redaguoti
+    </a>
+    <form
+      method="POST"
+      action="{{ url_for('modules.delete_module', module_id=module.id) }}"
+      class="d-inline"
+      onsubmit="return confirm('Ar tikrai norite ištrinti šį modulį?');"
+    >
+      {{ form.hidden_tag() }}
+      <button type="submit" class="btn btn-danger">Ištrinti</button>
+    </form>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

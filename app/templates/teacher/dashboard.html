@@ -1,10 +1,27 @@
 {% extends "base.html" %} {% block content %}
 <div class="dashboard">
-  <h2>Welcome, {{ teacher.first_name }}!</h2>
-  <p>This is your temporary teacher dashboard.</p>
+  <!-- Navigacijos mygtukai mokytojui -->
+  <div class="mb-4">
+    <a
+      href="{{ url_for('teacher.teacher_schedule') }}"
+      class="btn btn-secondary me-2"
+      >Tvarkaraštis</a
+    >
+    <a
+      href="{{ url_for('modules.list_modules') }}"
+      class="btn btn-secondary me-2"
+      >Dėstomi moduliai</a
+    >
+    <a href="{{ url_for('main.profile') }}" class="btn btn-secondary"
+      >Profilis</a
+    >
+  </div>
+
+  <h2>Sveiki, {{ teacher.first_name }}!</h2>
+  <p>Čia laikinas mokytojo skydelis.</p>
   <p>
-    More information (----,---,---,---) will appear once your profile is
-    complete.
+    Daugiau informacijos (----,---,---,---) atsiras, kai jūsų profilis bus
+    pilnai užpildytas.
   </p>
 </div>
 {% endblock %}

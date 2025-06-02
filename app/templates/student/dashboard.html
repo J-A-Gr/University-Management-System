@@ -1,10 +1,25 @@
 {% extends "base.html" %} {% block content %}
 <div class="dashboard">
-  <h2>Welcome, {{ student.first_name }}!</h2>
-  <p>This is your temporary student dashboard.</p>
+  <!-- Navigacijos mygtukai į pagrindinius subpages -->
+  <div class="mb-4">
+    <a href="{{ url_for('main.timetable') }}" class="btn btn-secondary me-2"
+      >Tvarkaraštis</a
+    >
+    <a
+      href="{{ url_for('modules.list_modules') }}"
+      class="btn btn-secondary me-2"
+      >Dalykų sąrašas</a
+    >
+    <a href="{{ url_for('main.profile') }}" class="btn btn-secondary"
+      >Profilis</a
+    >
+  </div>
+
+  <h2>Sveiki, {{ student.first_name }}!</h2>
+  <p>Čia laikinas studento skydelis.</p>
   <p>
-    More information (----,---,---,---) will appear once your profile is
-    complete.
+    Daugiau informacijos (----,---,---,---) atsiras, kai jūsų profilis bus
+    pilnai užpildytas.
   </p>
 </div>
 {% endblock %}

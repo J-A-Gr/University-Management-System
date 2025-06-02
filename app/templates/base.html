@@ -85,6 +85,22 @@
         margin-top: 0;
         box-shadow: 0 -4px 24px 0 rgba(53, 92, 82, 0.07);
       }
+      /* PAPILDOMAS CSS ROLĖS PASIRINKIMUI */
+      .radio-group .form-check-label {
+        cursor: pointer;
+        transition: color 0.2s, font-weight 0.2s;
+      }
+      .radio-group .form-check-input:checked + .form-check-label {
+        color: var(--accent, #3686ff);
+        font-weight: bold;
+        text-decoration: underline;
+      }
+      .role-selected-label {
+        margin-left: 10px;
+        color: var(--accent, #3686ff);
+        font-size: 0.95em;
+        font-weight: bold;
+      }
     </style>
     {% block head %}{% endblock %}
   </head>
@@ -94,53 +110,64 @@
       <a
         href="{{ url_for('main.index') }}"
         class="nav-btn {% if ep == 'main.index' %}active{% endif %}"
+        >Pagrindinis</a
       >
-        Pagrindinis
-      </a>
-
       {% if current_user.is_authenticated %} {% if current_user.role == 'admin'
       %}
       <a
         href="{{ url_for('admin.admin_dashboard') }}"
         class="nav-btn {% if ep == 'admin.admin_dashboard' or ep.startswith('admin.') %}active{% endif %}"
+        >Administratoriaus skydelis</a
       >
-        Administratoriaus skydelis
-      </a>
+      <a
+        href="{{ url_for('admin.manage_users') }}"
+        class="nav-btn {% if ep == 'admin.manage_users' %}active{% endif %}"
+        >Vartotojų valdymas</a
+      >
       {% elif current_user.role == 'teacher' %}
       <a
         href="{{ url_for('teacher.teacher_dashboard') }}"
         class="nav-btn {% if ep == 'teacher.teacher_dashboard' or ep.startswith('teacher.') %}active{% endif %}"
+        >Mokytojo Panelė</a
       >
-        Mokytojo Panelė
-      </a>
-      {% elif current_user.role == 'student' %}
+      {# Papildomos nuorodos mokytojui, jei tokios egzistuoja tavo projekte: #}
+      {#
+      <a href="{{ url_for('modules.teacher_modules') }}" class="nav-btn"
+        >Dėstomi moduliai</a
+      >
+      #} {#
+      <a href="{{ url_for('main.timetable') }}" class="nav-btn">Tvarkaraštis</a>
+      #} {% elif current_user.role == 'student' %}
       <a
         href="{{ url_for('student.student_dashboard') }}"
         class="nav-btn {% if ep == 'student.student_dashboard' or ep.startswith('student.') %}active{% endif %}"
+        >Studento Panelė</a
       >
-        Studento Panelė
-      </a>
-      {% endif %}
+      {# Papildomos nuorodos studentui, jei tokios egzistuoja tavo projekte: #}
+      {#
+      <a href="{{ url_for('main.timetable') }}" class="nav-btn">Tvarkaraštis</a>
+      #} {#
+      <a href="{{ url_for('modules.student_modules') }}" class="nav-btn"
+        >Mano dalykai</a
+      >
+      #} {% endif %}
       <a
         href="{{ url_for('main.profile') }}"
         class="nav-btn {% if ep == 'main.profile' %}active{% endif %}"
+        >Profilis</a
       >
-        Profilis
-      </a>
       <a href="{{ url_for('auth.logout') }}" class="nav-btn">Atsijungti</a>
       {% else %}
       <a
         href="{{ url_for('auth.login') }}"
         class="nav-btn {% if ep == 'auth.login' %}active{% endif %}"
+        >Prisijungti</a
       >
-        Prisijungti
-      </a>
       <a
         href="{{ url_for('auth.register') }}"
         class="nav-btn {% if ep == 'auth.register' %}active{% endif %}"
+        >Registruotis</a
       >
-        Registruotis
-      </a>
       {% endif %}
     </nav>
     <div class="main-wrapper">

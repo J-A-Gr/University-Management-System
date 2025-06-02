@@ -1,5 +1,16 @@
 {% extends "base.html" %} {% block title %}Vartotojų valdymas{% endblock %} {%
 block content %}
+
+<!-- Navigacija viršuje -->
+<div class="mb-4">
+  <a
+    href="{{ url_for('admin.admin_dashboard') }}"
+    class="btn btn-secondary me-2"
+    >← Atgal į admin skydelį</a
+  >
+  <a href="{{ url_for('main.profile') }}" class="btn btn-secondary">Profilis</a>
+</div>
+
 <div class="main-content wide-card extra-wide-card">
   <h2 style="margin-bottom: 22px">Vartotojų sąrašas</h2>
   <div style="overflow-x: auto">
@@ -46,8 +57,8 @@ block content %}
             {{ user.email }}
           </td>
           <td style="padding: 8px 4px">
-            {% if user.is_admin %}Admin{% elif user.is_teacher %}Dėstytojas{%
-            elif user.is_student %}Studentas{% else %}–{% endif %}
+            {% if user.is_admin %}Admin {% elif user.is_teacher %}Dėstytojas {%
+            elif user.is_student %}Studentas {% else %}–{% endif %}
           </td>
           <td style="padding: 8px 4px">
             {{ 'Taip' if user.is_active else 'Ne' }}
@@ -65,8 +76,9 @@ block content %}
                 href="{{ url_for('admin.edit_user', user_id=user.id) }}"
                 class="table-button gold"
                 style="padding: 6px 12px; font-size: 1em; min-width: 0"
-                >Redaguoti</a
               >
+                Redaguoti
+              </a>
               {% if user.is_active %}
               <form
                 method="POST"

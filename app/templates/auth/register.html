@@ -42,6 +42,17 @@ content %}
       {% endfor %}
     </div>
 
+    <!-- GIMTADIENIS -->
+    <div class="floating-label">
+      <span class="input-icon"><i data-lucide="calendar"></i></span>
+      {{ form.birthday(class="input", id="birthday", type="date", required=True)
+      }}
+      <label for="birthday">Gimimo data</label>
+      {% for error in form.birthday.errors %}
+      <div class="invalid-feedback d-block">{{ error }}</div>
+      {% endfor %}
+    </div>
+
     <!-- SLAPTAŽODIS -->
     <div class="floating-label">
       <span class="input-icon"><i data-lucide="lock"></i></span>
@@ -63,24 +74,24 @@ content %}
       {% endfor %}
     </div>
 
-    <!-- ROLĖ -->
-<div class="floating-label">
-  <span class="input-icon"><i data-lucide="user-check"></i></span>
-  <label>Vaidmuo</label>
-  <div class="radio-group">
-    {% for subfield in form.role %}
-      <div class="form-check">
-        {{ subfield(onchange="toggleStudentFields()", class="form-check-input") }}
-        <label class="form-check-label" for="{{ subfield.id }}">{{ subfield.label.text }}</label>
-      </div>
-    {% endfor %}
-  </div>
-  {% for error in form.role.errors %}
-  <div class="invalid-feedback d-block">{{ error }}</div>
-  {% endfor %}
-</div>
+    <!-- ROLĖ SELECT (vietoje radio) -->
+    <div class="floating-label">
+      <span class="input-icon"><i data-lucide="user-check"></i></span>
+      <select
+        class="input"
+        id="role"
+        name="role"
+        required
+        onchange="toggleStudentFields()"
+      >
+        <option value="" disabled selected>Pasirinkite vaidmenį</option>
+        <option value="teacher">Mokytojas</option>
+        <option value="student">Studentas</option>
+      </select>
+      <label for="role">Vaidmuo</label>
+    </div>
 
-    <div id="student-fields">
+    <div id="student-fields" style="display: none">
       <!-- STUDIJŲ PROGRAMA -->
       <div class="floating-label">
         <span class="input-icon"><i data-lucide="book-open"></i></span>
@@ -91,8 +102,7 @@ content %}
         <div class="invalid-feedback d-block">{{ error }}</div>
         {% endfor %}
       </div>
-
-
+    </div>
 
     <!-- PROFILIO NUOTRAUKA (optional) -->
     <div class="floating-label">
@@ -129,20 +139,14 @@ content %}
       document
         .getElementById("study_program")
         .setAttribute("required", "required");
-      document
-        .getElementById("entry_year")
-        .setAttribute("required", "required");
-      document
-        .getElementById("group_letter")
-        .setAttribute("required", "required");
     } else {
       studentFields.style.display = "none";
       document.getElementById("study_program").removeAttribute("required");
     }
   }
-  // Paleisti funkciją iškart, kai užkraunama (kad teisingai paslėptų laukus po reload ar validacijos)
   window.addEventListener("DOMContentLoaded", function () {
     toggleStudentFields();
+    if (window.lucide) lucide.createIcons();
   });
 </script>
 {% endblock %}
