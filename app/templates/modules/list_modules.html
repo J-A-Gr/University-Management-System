@@ -42,6 +42,8 @@ content %}
           >
             Peržiūrėti
           </a>
+
+          {% if not current_user.is_student %}
           <a
             href="{{ url_for('modules.edit_module', module_id=module.id) }}"
             class="btn btn-sm btn-warning"
@@ -59,6 +61,7 @@ content %}
               Ištrinti
             </button>
           </form>
+          {% endif %}
         </td>
       </tr>
       {% endfor %}

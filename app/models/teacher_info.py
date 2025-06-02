@@ -1,4 +1,5 @@
 from app.extensions import db
+from collections import defaultdict
 
 class TeacherInfo(db.Model):
     __tablename__ = 'teacher_info'
@@ -84,4 +85,29 @@ class TeacherInfo(db.Model):
     def __repr__(self):
         faculty_name = self.faculty.name if self.faculty else "No Faculty"
         user_name = f"{self.user.first_name} {self.user.last_name}" if self.user else "Unknown"
-        return f'<TeacherInfo ID:{self.id} - {user_name} ({faculty_name})>'  
+        return f'<TeacherInfo ID:{self.id} - {user_name} ({faculty_name})>' 
+    
+    
+    def get_schedule(self):
+        schedule = defaultdict(list)
+
+        for module in self.taught_modules:
+            assessments_data = [
+                {
+                    "title": a.title,
+                    "type": a.assessment_type,
+                    "due_date": a.due_date.strftime("%Y-%m-%d")
+                }
+                for a in module.assessments if a.is_active
+            ]
+
+            schedule[module.day_of_week].append({
+                "module_id": module.id,
+                "module_name": module.name,
+                "start_time": module.start_time.strftime("%H:%M"),
+                "end_time": module.end_time.strftime("%H:%M"),
+                "room": module.room,
+                "assessments": assessments_data
+            })
+
+        return dict(schedule) 
