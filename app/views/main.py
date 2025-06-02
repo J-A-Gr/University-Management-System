@@ -44,6 +44,15 @@ def universal_dashboard():
             abort(403)
 
 
+@bp.route('/add-module')
+@login_required
+def add_module():
+    """Add module - redirect to modules.create_module"""
+    if current_user.is_teacher or current_user.is_admin:
+        return redirect(url_for('modules.create_module'))
+    else:
+        abort(403)
+
 @bp.route('/select-subjects')
 @login_required
 def select_subjects():
@@ -55,3 +64,4 @@ def select_subjects():
         return redirect(url_for('teacher_tests.my_tests'))
     else:
         return redirect(url_for('main.dashboard'))
+    

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Spręsti testą - {{ test_result.test.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <!-- Testo header -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h4>{{ test_result.test.title }}</h4>
+      <p>{{ test_result.test.description or 'Spręskite testą atidžiai' }}</p>
+    </div>
+  </div>
+
+  <!-- Klausimai -->
+  <form method="POST" action="{{ url_for('student_tests.complete_test', result_id=test_result.id) }}">
+    {{ completion_form.hidden_tag() }}
+    
+    {% for question in questions %}
+    <div class="card mb-3">
+      <div class="card-header">
+        <h6>{{ loop.index }}. {{ question.question }} ({{ question.points }} tšk.)</h6>
+      </div>
+      <div class="card-body">
+        <textarea 
+          class="form-control" 
+          name="question_{{ question.id }}" 
+          rows="3" 
+          placeholder="Įveskite atsakymą...">{{ existing_answers.get(question.id, '') }}</textarea>
+      </div>
+    </div>
+    {% endfor %}
+
+    <!-- Baigimo mygtukas -->
+    <div class="card">
+      <div class="card-body text-center">
+        <button type="submit" class="btn btn-success btn-lg">
+          Baigti testą
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

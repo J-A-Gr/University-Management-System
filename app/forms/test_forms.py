@@ -25,8 +25,7 @@ class TestForm(FlaskForm):
                             coerce=int)
         
     assessment_id = SelectField('Exam (optional)', 
-                               coerce=int,
-                               validate_choice=False) 
+                           validate_choice=False)
 
 
     submit = SubmitField('Create test')

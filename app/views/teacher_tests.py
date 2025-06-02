@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, abort
+from flask import Blueprint, render_template, redirect, url_for, abort, flash, request
 from flask_login import login_required, current_user
 from app.models import Test, TestQuestion, Module, Assessment, TestResult
 from app.forms.test_forms import TestForm, TestQuestionForm, EditTestQuestionForm
@@ -10,8 +10,9 @@ bp = Blueprint('teacher_tests', __name__, url_prefix='/teacher/tests')
 @login_required
 def my_tests():
     """Teacher's tests overview"""
-    if not current_user.is_teacher:
-        abort(403)
+    if not current_user.teacher_info:
+        current_user.ensure_teacher_info()
+        db.session.commit()
     
     tests = Test.query.filter_by(
         created_by_teacher_id=current_user.teacher_info.id
@@ -36,6 +37,7 @@ def create_test():
         assessment_id = None
         if form.assessment_id.data and form.assessment_id.data != '':
             assessment_id = form.assessment_id.data
+
         
         test = Test(
             title=form.title.data,

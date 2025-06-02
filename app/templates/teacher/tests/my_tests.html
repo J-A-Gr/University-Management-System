@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Mano testai{% endblock %}
+
+{% block content %}
+<!-- Navigacija -->
+<div class="mb-4">
+  <a href="{{ url_for('teacher.teacher_dashboard') }}" class="btn btn-secondary me-2">← Atgal į skydelį</a>
+  <a href="{{ url_for('teacher.teacher_schedule') }}" class="btn btn-secondary me-2">Tvarkaraštis</a>
+  <a href="{{ url_for('main.profile') }}" class="btn btn-secondary">Profilis</a>
+</div>
+
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Mano testai</h2>
+    <a href="{{ url_for('teacher_tests.create_test') }}" class="btn btn-success">+ Naujas testas</a>
+  </div>
+
+  {% if tests %}
+  <div class="row">
+    {% for test in tests %}
+    <div class="col-md-6 col-lg-4 mb-4">
+      <div class="card h-100">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h6 class="card-title mb-0">{{ test.title }}</h6>
+          <span class="badge {% if test.is_active %}bg-success{% else %}bg-secondary{% endif %}">
+            {{ 'Aktyvus' if test.is_active else 'Neaktyvus' }}
+          </span>
+        </div>
+        <div class="card-body">
+          <p class="card-text">{{ test.description or 'Nėra aprašymo' }}</p>
+          <small class="text-muted">
+            <strong>Modulis:</strong> {{ test.module.name }}<br>
+            <strong>Klausimų:</strong> {{ test.test_questions|length }}<br>
+            <strong>Maks. bandymai:</strong> {{ test.max_attempts }}<br>
+            <strong>Laiko limitas:</strong> {{ test.time_limit or 'Neribota' }} min
+          </small>
+        </div>
+        <div class="card-footer">
+          <div class="btn-group w-100" role="group">
+            <a href="{{ url_for('teacher_tests.edit_test', test_id=test.id) }}" 
+               class="btn btn-sm btn-primary">Redaguoti</a>
+            <a href="{{ url_for('teacher_tests.test_results', test_id=test.id) }}" 
+               class="btn btn-sm btn-info">Rezultatai</a>
+            
+            <form method="POST" action="{{ url_for('teacher_tests.toggle_test_status', test_id=test.id) }}" 
+                  class="d-inline">
+              <button type="submit" class="btn btn-sm {% if test.is_active %}btn-warning{% else %}btn-success{% endif %}">
+                {{ 'Deaktyvuoti' if test.is_active else 'Aktyvuoti' }}
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="alert alert-info">
+    <h5>Nėra sukurtų testų</h5>
+    <p>Sukurkite savo pirmą testą spustelėdami "Naujas testas" mygtuką.</p>
+    <a href="{{ url_for('teacher_tests.create_test') }}" class="btn btn-primary">Sukurti testą</a>
+  </div>
+  {% endif %}
+</div>
+
+<style>
+.test-card {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.test-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+</style>
+{% endblock %}

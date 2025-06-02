@@ -110,6 +110,42 @@ class TestResult(db.Model):
             return False, f"Error completing test: {str(e)}"
         
 
+    # Pridėkite į savo test_result.py failą, į TestResult klasę:
+
+    def integrate_with_module_grade(self):
+        """Simple integration - CORE REQUIREMENT"""
+        try:
+            from app.models.module_enrollment import ModuleEnrollment
+            
+            # Rasti enrollment
+            if not self.user.student_info:
+                return False, "Student info not found"
+                
+            enrollment = ModuleEnrollment.query.filter_by(
+                student_info_id=self.user.student_info.id,
+                module_id=self.test.module_id,
+                status='active'
+            ).first()
+            
+            if not enrollment:
+                return False, "Student not enrolled in module"
+            
+            # Gauti pažymį
+            grade = self.calculate_grade()
+            
+            # Jei egzamino testas - įrašyti galutinį pažymį
+            if self.test.assessment_id:
+                assessment = self.test.assessment
+                if assessment.assessment_type == 'egzaminas':
+                    success, message = enrollment.mark_completed(grade)
+                    return success, message
+            
+            # Paprastas testas - tiesiog saugoti TestResult
+            return True, "Test result recorded"
+            
+        except Exception as e:
+            return False, f"Integration error: {str(e)}"
+
 
     @staticmethod
     def get_user_results(user_id):

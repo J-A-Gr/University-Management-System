@@ -1,9 +1,9 @@
-from flask import Blueprint, render_template, request, redirect, url_for, jsonify, abort
+from flask import Blueprint, render_template, request, redirect, url_for, jsonify, abort, flash
 from flask_login import login_required, current_user
+from datetime import datetime
 from app.models import Test, TestResult, TestAnswer, TestQuestion, ModuleEnrollment
 from app.forms.test_forms import TestCompletionForm
 from app.extensions import db
-from datetime import datetime
 
 bp = Blueprint('student_tests', __name__, url_prefix='/student/tests')
 
@@ -150,7 +150,6 @@ def submit_answer():
     return jsonify({'success': True, 'message': 'Answer saved'})
 
 
-
 @bp.route('/complete/<int:result_id>', methods=['POST'])
 @login_required
 def complete_test(result_id):
@@ -170,9 +169,25 @@ def complete_test(result_id):
     if form.validate_on_submit():
         success, message = test_result.complete_test()
         if success:
+            print(f"Test completed successfully: {message}")
+            try:
+                integration_success, integration_message = test_result.integrate_with_module_grade()
+                if integration_success:
+                    print(f"Integration SUCCESS: {integration_message}")
+                else:
+                    print(f"Integration FAILED: {integration_message}")
+            except Exception as e:
+                print(f"Integration ERROR: {str(e)}")
+            
             return redirect(url_for('student_tests.test_result', result_id=result_id))
+        else:
+            print(f"Test completion failed: {message}")
+    else:
+        print("Form validation failed")
     
     return redirect(url_for('student_tests.take_test', result_id=result_id))
+
+
 
 @bp.route('/result/<int:result_id>')
 @login_required

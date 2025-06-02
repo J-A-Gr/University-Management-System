@@ -4,7 +4,7 @@ content %}
 <!-- Navigacija viršuje -->
 <div class="mb-4">
   {% if current_user.is_authenticated %} {% if current_user.role == 'student' %}
-  <a href="{{ url_for('student.dashboard') }}" class="btn btn-secondary me-2"
+  <a href="{{ url_for('student.student_dashboard') }}" class="btn btn-secondary me-2"
     >← Atgal į skydelį</a
   >
   {% elif current_user.role == 'teacher' %}
