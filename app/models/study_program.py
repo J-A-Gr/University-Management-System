@@ -32,6 +32,8 @@ class StudyProgram(db.Model):
         except Exception as e:
             raise Exception(f"Failed to generate study program code: {str(e)}")
 
+
+
     def student_count(self):
         """Get total number of students in this program"""
         return len(self.students)
@@ -92,11 +94,5 @@ class StudyProgram(db.Model):
 
     def __repr__(self):
         faculty_name = self.faculty.name if self.faculty else "No Faculty"
-        return f'<StudyProgram {self.code}: {self.name} ({faculty_name}) - {self.student_count} students, {self.module_count} modules>'
+        return f'<StudyProgram {self.code}: {self.name} ({faculty_name}) - {self.student_count} students, {len(self.modules)} modules>'
  
-
- # Many-to-Many tarpinė lentelė tarp StudyProgram ir Module
-    # program_modules = db.Table('program_modules', #TODO: atkurti ryšį su moduliais, kai bus sukurta Module model
-    # db.Column('study_program_id', db.Integer, db.ForeignKey('study_programs.id'), primary_key=True),
-    # db.Column('module_id', db.Integer, db.ForeignKey('modules.id'), primary_key=True)
-# )
