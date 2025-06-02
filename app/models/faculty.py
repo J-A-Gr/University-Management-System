@@ -20,6 +20,11 @@ class Faculty(db.Model):
     def __repr__(self):
         return f'<Faculty {self.name} ({self.code})>'
     
+    def generate_code(self):
+        try:
+            self.code = self.name[:3].upper()   # Pirmos trys didžiosios raidės iš fakulteto pavadinimo
+        except Exception as e:
+            raise Exception(f"Faculty code generation failed: {str(e)}")
 
     def create_faculty(name, code, description=None):
         """Create new faculty"""
