@@ -622,3 +622,79 @@ select.input:not([value=""]) + label {
     min-width: 540px;
   }
 }
+
+/* === ADMIN DASHBOARD paieškos laukeliui siaurinimas === */
+.admin-search .floating-label {
+  width: 110px !important;
+  min-width: 0;
+  margin-bottom: 0;
+  position: relative;
+}
+.admin-search .input {
+  font-size: 0.91em;
+  padding: 4px 8px 4px 28px !important;
+  width: 100% !important;
+  min-width: 0;
+  height: 28px;
+  box-sizing: border-box;
+  border-radius: 7px;
+}
+.admin-search .input-icon {
+  left: 6px !important;
+  width: 16px;
+  height: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  position: absolute;
+  z-index: 2;
+}
+.admin-search label {
+  left: 28px;
+  font-size: 0.98em;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0 2px;
+  background: #fff;
+  transition: 0.16s;
+  z-index: 3;
+}
+.admin-search .input:focus + label,
+.admin-search .input:not(:placeholder-shown) + label {
+  top: -12px;
+  left: 22px;
+  font-size: 0.89em;
+  color: #d9a441;
+  background: #fff;
+  padding: 0 3px;
+  z-index: 4;
+}
+
+/* Admin paieškos laukelio label sumažinimas */
+.admin-search label {
+  font-size: 0.75em !important;
+  left: 26px;
+  top: 48%;
+  transform: translateY(-50%);
+  padding: 0 2px;
+  background: #fff;
+  color: #c9b787;
+  transition: 0.16s;
+  z-index: 3;
+  line-height: 1;
+  pointer-events: none;
+  white-space: nowrap;
+  max-width: 75px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.admin-search .input:focus + label,
+.admin-search .input:not(:placeholder-shown) + label {
+  top: -12px;
+  left: 20px;
+  font-size: 0.65em !important;
+  color: #d9a441;
+  background: #fff;
+  padding: 0 3px;
+  z-index: 4;
+  max-width: 80px;
+}
