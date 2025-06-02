@@ -1,8 +1,36 @@
 {% extends "base.html" %} {% block title %}Moduliai{% endblock %} {% block
 content %}
+
+<!-- Navigacija viršuje -->
+<div class="mb-4">
+  {% if current_user.is_authenticated %} {% if current_user.role == 'student' %}
+  <a href="{{ url_for('student.dashboard') }}" class="btn btn-secondary me-2">
+    ← Atgal į skydelį
+  </a>
+  {% elif current_user.role == 'teacher' %}
+  <a
+    href="{{ url_for('teacher.teacher_dashboard') }}"
+    class="btn btn-secondary me-2"
+  >
+    ← Atgal į skydelį
+  </a>
+  {% elif current_user.role == 'admin' %}
+  <a
+    href="{{ url_for('admin.admin_dashboard') }}"
+    class="btn btn-secondary me-2"
+  >
+    ← Atgal į skydelį
+  </a>
+  {% endif %}
+  <a href="{{ url_for('main.profile') }}" class="btn btn-secondary">Profilis</a>
+  {% endif %}
+</div>
+
 <div class="container mt-4">
   <h2 class="mb-4">Visi moduliai</h2>
-  {% if not current_user.is_student %}
+
+  {% if current_user.is_authenticated and (current_user.is_teacher or
+  current_user.is_admin) %}
   <a href="{{ url_for('modules.create_module') }}" class="btn btn-success mb-3">
     + Naujas modulis
   </a>
@@ -42,8 +70,8 @@ content %}
           >
             Peržiūrėti
           </a>
-
-          {% if not current_user.is_student %}
+          {% if current_user.is_authenticated and (current_user.is_teacher or
+          current_user.is_admin) %}
           <a
             href="{{ url_for('modules.edit_module', module_id=module.id) }}"
             class="btn btn-sm btn-warning"
