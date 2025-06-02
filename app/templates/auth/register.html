@@ -42,6 +42,17 @@ content %}
       {% endfor %}
     </div>
 
+    <!-- GIMTADIENIS -->
+    <div class="floating-label">
+      <span class="input-icon"><i data-lucide="calendar"></i></span>
+      {{ form.birthday(class="input", id="birthday", type="date", required=True)
+      }}
+      <label for="birthday">Gimimo data</label>
+      {% for error in form.birthday.errors %}
+      <div class="invalid-feedback d-block">{{ error }}</div>
+      {% endfor %}
+    </div>
+
     <!-- SLAPTAŽODIS -->
     <div class="floating-label">
       <span class="input-icon"><i data-lucide="lock"></i></span>
