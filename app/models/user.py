@@ -56,6 +56,15 @@ class User(UserMixin, db.Model):
             return 'student'
         return 'unknown'
 
+    # dėl atvaizdavimo webe.
+    @property
+    def role_display(self):
+        role_map = {
+            'student': 'Studentas',
+            'teacher': 'Dėstytojas',
+            'admin': 'Administratorius'
+        }
+        return role_map.get(self.role, self.role)
 
 
 
