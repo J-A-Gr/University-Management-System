@@ -3,12 +3,6 @@ content %}
 <div class="main-content glass-card">
   <h2 class="center-text mb-4">Prisijungimas</h2>
 
-  <!-- FLASH ŽINUTĖS -->
-  {% with messages = get_flashed_messages(with_categories=true) %} {% if
-  messages %} {% for category, message in messages %}
-  <div class="alert alert-{{ category }} mt-3">{{ message }}</div>
-  {% endfor %} {% endif %} {% endwith %}
-
   <form method="POST" novalidate>
     {{ form.hidden_tag() }}
     <div class="floating-label">

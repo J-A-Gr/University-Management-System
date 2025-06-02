@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required, current_user
 from app.forms.module import ModuleForm, DeleteForm
+from app.forms.admin import EmptyForm
 from app.models import Module, StudyProgram, TeacherInfo, ModulePrerequisite, User, ModuleEnrollment
 from app.extensions import db
 
@@ -17,8 +18,13 @@ def list_modules():
 @bp.route('/create', methods=['GET', 'POST'])
 @login_required
 def create_module():
-    form = ModuleForm()
+    # užtikrinam, kad tik studentai negali kurti naujų modelių
+    if current_user.is_student:
+        flash('Tik administratoriai ir dėstytojai gali kurti modulius.', 'danger')
+        return redirect(url_for('modules.list_modules'))
 
+    form = ModuleForm()
+    
     # Užkraunam pasirinkimų sąrašus atskirai
     study_programs = StudyProgram.query.all()
     teachers = TeacherInfo.query.all()

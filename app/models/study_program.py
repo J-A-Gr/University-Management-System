@@ -22,13 +22,11 @@ class StudyProgram(db.Model):
 
     # TODO pagal mane čia dar turėtų būti grupės kodo generavimas, bet kol kas palieku kaip yra, nes grupės kodas yra sudarytas iš programos kodo, fakulteto  ir metų
 
-    # Programos kodo sugeneravimas (trys didžiosios raidės iš pavadinimo ir pirmi du fakulteto pavadinimo inicialai)
+    # Programos kodo sugeneravimas
     def generate_code(self):
         try:
-            base = self.name[:3].upper() #Pirmos trys didžiosios raidės iš programos pavadinimo
-            faculty_part = self.faculty.name[:3].lower() if self.faculty else "XX"  # Pirmi du fakulteto inicialai, jei fakultetas nenurodytas, naudojame "XX"
-            self.code = faculty_part + "-" + base 
-            return self.code
+            base = self.name[:4].upper() #Pirmos keturios didžiosios raidės iš programos pavadinimo
+            return base
         except Exception as e:
             raise Exception(f"Failed to generate study program code: {str(e)}")
 
