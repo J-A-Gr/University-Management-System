@@ -1,31 +1,6 @@
 {% extends "base.html" %} {% block title %}Profilis{% endblock %} {% block
 content %}
 
-<!-- Navigacija viršuje -->
-<div class="mb-4">
-  {% if current_user.is_authenticated %} {% if current_user.role == 'student' %}
-  <a href="{{ url_for('student.dashboard') }}" class="btn btn-secondary me-2"
-    >← Atgal į skydelį</a
-  >
-  {% elif current_user.role == 'teacher' %}
-  <a
-    href="{{ url_for('teacher.teacher_dashboard') }}"
-    class="btn btn-secondary me-2"
-    >← Atgal į skydelį</a
-  >
-  {% elif current_user.role == 'admin' %}
-  <a
-    href="{{ url_for('admin.admin_dashboard') }}"
-    class="btn btn-secondary me-2"
-    >← Atgal į admin skydelį</a
-  >
-  {% endif %} {% if current_user.role != 'admin' %}
-  <a href="{{ url_for('modules.list_modules') }}" class="btn btn-secondary me-2"
-    >Dalykai</a
-  >
-  {% endif %} {% endif %}
-</div>
-
 <div class="main-content glass-card">
   <div class="center-text">
     {% if current_user.profile_picture %}
@@ -85,7 +60,7 @@ content %}
       <li>Nėra dėstomų dalykų.</li>
       {% endif %}
     </ul>
-    <a href="{{ url_for('main.add_module') }}" class="big-button mt-2">
+    <a href="{{ url_for('modules.create_module') }}" class="big-button mt-2">
       Pridėti naują modulį
     </a>
   </div>
