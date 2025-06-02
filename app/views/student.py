@@ -11,7 +11,16 @@ def student_dashboard():
     if not current_user.role == 'student':
         abort(403)
 
-    return render_template('student/dashboard.html', student=current_user) # student=student_info, modules=modules, gpa=gpa)
+    student_info = current_user.student_info
+    schedule = student_info.get_schedule()
+
+    return render_template(
+        'student/dashboard.html',
+        student=current_user,
+        schedule=schedule,
+        module_count=len(student_info.module_enrollments)
+    )
+
 
 @bp.route('/schedule')
 @login_required
@@ -22,36 +31,9 @@ def student_schedule():
     student_info = current_user.student_info
     if not student_info:
         return render_template("student/student_schedule.html", schedule=None, error="Student profile not found")
-    enrollments = student_info.module_enrollments  # pasitraukiam visus modelius, kuriuos turi studentas
 
-    schedule = defaultdict(list) # Tvarkaraščio struktūros paruošimas
+    return render_template("student/student_schedule.html", schedule=student_info.get_schedule())
 
-    for enrollment in enrollments: # Iteruojame per kiekvieną modulį, kur studentas yra užsiregistravęs.
-        module = enrollment.module
-        teacher_name = (
-            f"{module.teacher.user.first_name} {module.teacher.user.last_name}"
-            if module.teacher and module.teacher.user else "Nenurodyta"
-        )
-        # Aktyvių atsiskaitymų paėmimas
-        assessments_data = [
-            {
-                "title": a.title,
-                "type": a.assessment_type,
-                "due_date": a.due_date.strftime("%Y-%m-%d")
-            }
-            for a in module.assessments if a.is_active
-        ]
-
-        schedule[module.day_of_week].append({
-            "module_name": module.name,
-            "start_time": module.start_time.strftime("%H:%M"),
-            "end_time": module.end_time.strftime("%H:%M"),
-            "room": module.room,
-            "teacher": teacher_name,
-            "assessments": assessments_data
-        })
-
-    return render_template('student/student_schedule.html', schedule=dict(schedule))
 
 
 

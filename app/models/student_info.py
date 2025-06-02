@@ -1,5 +1,6 @@
 from datetime import datetime
 from app.extensions import db
+from collections import defaultdict
 
 class StudentInfo(db.Model):
     """Student information"""
@@ -124,3 +125,34 @@ class StudentInfo(db.Model):
     
     def __repr__(self):
         return f'<StudentInfo ID:{self.id} - {self.user.full_name if self.user else "Unknown"}>'
+    
+
+    def get_schedule(self):
+        schedule = defaultdict(list)  # Tai bus žodynas, kur raktai yra dienos (pvz. 'Monday'), o reikšmės – sąrašai modulių, kurie vyksta tą dieną.
+
+        for enrollment in self.module_enrollments: # sąrašas modulių
+            module = enrollment.module  # modulio informacija, .name, .day_of_week t.t
+            teacher_name = (
+                f"{module.teacher.user.first_name} {module.teacher.user.last_name}"
+                if module.teacher and module.teacher.user else "Nenurodyta"
+            )
+            # surenkam aktyvius atsiskaitymus
+            assessments_data = [
+                {
+                    "title": a.title,
+                    "type": a.assessment_type,
+                    "due_date": a.due_date.strftime("%Y-%m-%d")
+                }
+                for a in module.assessments if a.is_active
+            ]
+             # sudedam viską į tvarkaraštį
+            schedule[module.day_of_week].append({
+                "module_name": module.name,
+                "start_time": module.start_time.strftime("%H:%M"),
+                "end_time": module.end_time.strftime("%H:%M"),
+                "room": module.room,
+                "teacher": teacher_name,
+                "assessments": assessments_data
+            })
+
+        return dict(schedule)
