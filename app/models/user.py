@@ -110,6 +110,14 @@ class User(UserMixin, db.Model):
 
     #	5.2 Vartotojų Administravimas
     # Valdyti vartotojų vaidmenis bei priskyrimus prie studijų programų.
+
+    # Gražina studijų programos ID tiesiai iš vartotojo, jei vartotojas yra studentas ir turi studento informaciją.
+    @property
+    def study_id(self):
+        if self.is_student and self.student_info:
+            return self.student_info.study_program_id
+        return None
+
     def change_study_program(self, new_program_id):
         """Change student's study program"""
         try:
@@ -127,6 +135,7 @@ class User(UserMixin, db.Model):
         return f'<User {self.email} ({self.role})>'
     
     def ensure_student_info(self):
+        # Reikia pridėti "try"
         if self.is_student and not self.student_info:
             from app.models.student_info import StudentInfo
             self.student_info = StudentInfo(user_id=self.id)

@@ -25,10 +25,9 @@ class StudyProgram(db.Model):
     # Programos kodo sugeneravimas
     def generate_code(self):
         try:
-            base = self.name[:4].upper() #Pirmos keturios didžiosios raidės iš programos pavadinimo
-            return base
+            self.code = self.name[:4].upper() #Pirmos keturios didžiosios raidės iš programos pavadinimo
         except Exception as e:
-            raise Exception(f"Failed to generate study program code: {str(e)}")
+            raise Exception (f"Failed to generate study program code: {str(e)}")
 
 
 
