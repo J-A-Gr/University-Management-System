@@ -1,5 +1,5 @@
 {% extends "base.html" %} {% block content %}
-<div class="main-content">
+<div class="main-content" style="max-width: none; width: 98%;">
   <h1>Dėstytojo Skydelis</h1>
 
   <div
@@ -79,6 +79,30 @@ style="
             </ul>
           </td>
         </tr>
+        <style>
+        /* Desktop lentelės stiliai */
+        table {
+            width: 100%;
+            table-layout: auto;
+            border-collapse: collapse;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .main-content { 
+                width: 98% !important; 
+                padding: 10px; 
+                max-width: none !important;
+            }
+            table { 
+                font-size: 0.9em; 
+                width: 100%;
+            }
+            th, td {
+                padding: 8px 4px;
+            }
+        }
+        </style>
         {% endfor %} {% endfor %}
       </tbody>
     </table>
