@@ -1,0 +1,314 @@
+{% extends "base.html" %}
+{% block title %}Mano testų rezultatai{% endblock %}
+
+{% block content %}
+<!-- Navigacija viršuje -->
+<div class="mb-4">
+    <a href="{{ url_for('student_tests.available_tests') }}" class="btn btn-secondary me-2">← Atgal į testus</a>
+    <a href="{{ url_for('student.student_dashboard') }}" class="btn btn-secondary me-2">Skydelis</a>
+    <a href="{{ url_for('student.student_schedule') }}" class="btn btn-secondary me-2">Tvarkaraštis</a>
+    <a href="{{ url_for('main.profile') }}" class="btn btn-secondary">Profilis</a>
+</div>
+
+<div class="main-content wide-card">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 style="color: #fff; margin: 0;">📊 Mano testų rezultatai</h2>
+        <a href="{{ url_for('student_tests.available_tests') }}" class="big-button">
+            📝 Spręsti testus
+        </a>
+    </div>
+
+    {% if results %}
+        <!-- Statistikos skyrius -->
+        <div class="glass-card" style="margin-bottom: 30px;">
+            <h5 style="color: #fff; margin-bottom: 20px;">📈 Jūsų statistika</h5>
+            
+            {% set completed_results = results | selectattr('status', 'equalto', 'completed') | list %}
+            {% set passed_results = completed_results | selectattr('percentage', 'ge', 60) | list %}
+            {% set avg_percentage = (completed_results | sum(attribute='percentage')) / completed_results|length if completed_results else 0 %}
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; text-align: center; color: #fff;">
+                <div>
+                    <h4 style="color: var(--accent); margin-bottom: 5px;">{{ results|length }}</h4>
+                    <small>Iš viso bandymų</small>
+                </div>
+                <div>
+                    <h4 style="color: #44bb63; margin-bottom: 5px;">{{ completed_results|length }}</h4>
+                    <small>Užbaigta</small>
+                </div>
+                <div>
+                    <h4 style="color: #44bb63; margin-bottom: 5px;">{{ passed_results|length }}</h4>
+                    <small>Išlaikė (≥60%)</small>
+                </div>
+                <div>
+                    <h4 style="color: #3498db; margin-bottom: 5px;">
+                        {% if completed_results %}{{ "%.1f"|format(avg_percentage) }}%{% else %}—{% endif %}
+                    </h4>
+                    <small>Vidurkis</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rezultatų sąrašas -->
+        <div class="glass-card">
+            <h5 style="color: #fff; margin-bottom: 20px;">📋 Rezultatų istorija</h5>
+            
+            <!-- Filtras/paieška -->
+            <div style="margin-bottom: 20px; display: flex; gap: 15px; flex-wrap: wrap; align-items: center;">
+                <select id="statusFilter" onchange="filterResults()" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 8px 12px; border-radius: 6px;">
+                    <option value="">Visi rezultatai</option>
+                    <option value="completed">Užbaigti</option>
+                    <option value="in_progress">Vykdomi</option>
+                </select>
+                
+                <select id="gradeFilter" onchange="filterResults()" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 8px 12px; border-radius: 6px;">
+                    <option value="">Visi pažymiai</option>
+                    <option value="passed">Išlaikyta (≥5)</option>
+                    <option value="failed">Neišlaikyta (<5)</option>
+                </select>
+                
+                <input type="text" id="searchInput" placeholder="Ieškoti pagal testo pavadinimą..." onkeyup="filterResults()" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 8px 12px; border-radius: 6px; flex-grow: 1; min-width: 200px;">
+            </div>
+
+            <!-- Rezultatų kortelės -->
+            <div id="resultsContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px;">
+                {% for result in results %}
+                <div class="result-card" 
+                     data-status="{{ result.status }}" 
+                     data-grade="{{ result.calculate_grade() if result.status == 'completed' else 0 }}"
+                     data-title="{{ result.test.title.lower() }}"
+                     style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; border-left: 4px solid 
+                        {% if result.status == 'completed' %}
+                            {% if result.calculate_grade() >= 5 %}#44bb63{% else %}#e74c3c{% endif %}
+                        {% else %}#f39c12{% endif %}; 
+                        transition: transform 0.2s;">
+                    
+                    <!-- Testo pavadinimas ir modulis -->
+                    <div style="margin-bottom: 15px;">
+                        <h6 style="color: #fff; margin-bottom: 8px;">{{ result.test.title }}</h6>
+                        <small style="color: var(--accent); font-weight: 600;">
+                            📚 {% if result.test.assessment and result.test.assessment.module %}{{ result.test.assessment.module.name }}{% else %}Modulis nenurodytas{% endif %}
+                        </small>
+                    </div>
+
+                    <!-- Statusas ir rezultatas -->
+                    <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 15px;">
+                        <div style="flex-grow: 1;">
+                            {% if result.status == 'completed' %}
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                                    <span style="font-size: 1.8em; color: {% if result.calculate_grade() >= 5 %}#44bb63{% else %}#e74c3c{% endif %};">
+                                        {{ "%.1f"|format(result.percentage) }}%
+                                    </span>
+                                    <span style="background: {% if result.calculate_grade() >= 5 %}#44bb63{% else %}#e74c3c{% endif %}; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.8em; font-weight: bold;">
+                                        {{ result.calculate_grade() }}
+                                    </span>
+                                </div>
+                                <div style="color: rgba(255,255,255,0.8); font-size: 0.9em;">
+                                    {{ result.total_score }}/{{ result.max_possible_score }} taškai
+                                </div>
+                            {% else %}
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <span style="color: #f39c12; font-weight: bold;">VYKDOMAS</span>
+                                    <span class="badge bg-warning">{{ result.status }}</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Statuso ženkliukas -->
+                        <div style="font-size: 2em;">
+                            {% if result.status == 'completed' %}
+                                {% if result.calculate_grade() >= 8 %}🏆
+                                {% elif result.calculate_grade() >= 5 %}✅
+                                {% else %}❌
+                                {% endif %}
+                            {% else %}
+                                ⏳
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Data ir laikas -->
+                    <div style="color: rgba(255,255,255,0.7); font-size: 0.85em; margin-bottom: 15px;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <div>
+                                <strong>📅 Pradėta:</strong><br>
+                                {{ result.started_at.strftime('%Y-%m-%d %H:%M') }}
+                            </div>
+                            {% if result.completed_at %}
+                            <div>
+                                <strong>✅ Baigta:</strong><br>
+                                {{ result.completed_at.strftime('%Y-%m-%d %H:%M') }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        {% if result.time_taken %}
+                        <div style="margin-top: 8px;">
+                            <strong>⏱️ Trukmė:</strong> {{ (result.time_taken // 60) }}min {{ (result.time_taken % 60) }}s
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Veiksmų mygtukai -->
+                    <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+                        {% if result.status == 'completed' %}
+                            <a href="{{ url_for('student_tests.test_result', result_id=result.id) }}" 
+                               class="big-button" 
+                               style="width: 100%; text-align: center;">
+                                👁️ Peržiūrėti rezultatą
+                            </a>
+                        {% else %}
+                            <a href="{{ url_for('student_tests.take_test', result_id=result.id) }}" 
+                               class="big-button" 
+                               style="width: 100%; text-align: center; background: #f39c12;">
+                                ⏳ Tęsti testą
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Tuščias rezultatas -->
+            <div id="noResults" style="display: none; text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
+                <div style="font-size: 3em; margin-bottom: 15px; opacity: 0.5;">🔍</div>
+                <h5>Rezultatų nerasta</h5>
+                <p>Pabandykite pakeisti paieškos kriterijus.</p>
+            </div>
+        </div>
+
+    {% else %}
+        <!-- Nėra rezultatų -->
+        <div class="text-center" style="color: #fff; padding: 60px 20px;">
+            <div style="font-size: 4em; margin-bottom: 20px; opacity: 0.5;">📊</div>
+            <h4 style="margin-bottom: 15px;">Dar nėra testų rezultatų</h4>
+            <p style="opacity: 0.8; margin-bottom: 25px;">
+                Pradėkite spręsti testus, kad matytumėte savo rezultatus.
+            </p>
+            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                <a href="{{ url_for('student_tests.available_tests') }}" class="big-button">
+                    📝 Rasti testų
+                </a>
+                <a href="{{ url_for('student.student_dashboard') }}" class="glass-btn">
+                    🏠 Grįžti į skydelį
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+function filterResults() {
+    const statusFilter = document.getElementById('statusFilter').value;
+    const gradeFilter = document.getElementById('gradeFilter').value;
+    const searchInput = document.getElementById('searchInput').value.toLowerCase();
+    
+    const resultCards = document.querySelectorAll('.result-card');
+    const container = document.getElementById('resultsContainer');
+    const noResults = document.getElementById('noResults');
+    
+    let visibleCount = 0;
+    
+    resultCards.forEach(card => {
+        let show = true;
+        
+        // Statusas filtras
+        if (statusFilter && card.dataset.status !== statusFilter) {
+            show = false;
+        }
+        
+        // Pažymio filtras
+        if (gradeFilter) {
+            const grade = parseInt(card.dataset.grade);
+            if (gradeFilter === 'passed' && grade < 5) {
+                show = false;
+            } else if (gradeFilter === 'failed' && grade >= 5) {
+                show = false;
+            }
+        }
+        
+        // Paieška pagal pavadinimą
+        if (searchInput && !card.dataset.title.includes(searchInput)) {
+            show = false;
+        }
+        
+        if (show) {
+            card.style.display = 'block';
+            visibleCount++;
+        } else {
+            card.style.display = 'none';
+        }
+    });
+    
+    // Rodyti "nerasta" pranešimą
+    if (visibleCount === 0) {
+        noResults.style.display = 'block';
+        container.style.display = 'none';
+    } else {
+        noResults.style.display = 'none';
+        container.style.display = 'grid';
+    }
+}
+
+// Hover effects
+document.addEventListener('DOMContentLoaded', function() {
+    const resultCards = document.querySelectorAll('.result-card');
+    
+    resultCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+});
+</script>
+
+<style>
+@media (max-width: 768px) {
+    .wide-card {
+        padding: 15px 10px;
+    }
+    
+    .result-card {
+        margin-bottom: 15px !important;
+    }
+    
+    #resultsContainer {
+        grid-template-columns: 1fr !important;
+    }
+    
+    input, select {
+        font-size: 16px !important; /* Prevents zoom on iOS */
+    }
+}
+
+.badge {
+    font-size: 0.75em;
+    padding: 3px 6px;
+    border-radius: 4px;
+}
+
+/* Custom scrollbar for better UX */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(var(--accent-rgb), 0.5);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(var(--accent-rgb), 0.8);
+}
+</style>
+{% endblock %}

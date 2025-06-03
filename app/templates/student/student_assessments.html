@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% block title %}Mano atsiskaitymai{% endblock %}
+
+{% block content %}
+<!-- Navigacija viršuje -->
+<div class="mb-4">
+  <a href="{{ url_for('student.student_dashboard') }}" class="btn btn-secondary me-2">
+    ← Atgal į skydelį
+  </a>
+  <a href="{{ url_for('modules.list_modules') }}" class="btn btn-secondary me-2">
+    Modulių sąrašas
+  </a>
+  <a href="{{ url_for('main.profile') }}" class="btn btn-secondary">Profilis</a>
+</div>
+
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Mano atsiskaitymai</h2>
+    <div class="badge bg-primary fs-6">Iš viso: {{ total_count }}</div>
+  </div>
+
+  <!-- Artėjantys atsiskaitymai -->
+  <div class="card mb-4">
+    <div class="card-header bg-warning text-dark">
+      <h5 class="mb-0">📅 Artėjantys atsiskaitymai ({{ upcoming|length }})</h5>
+    </div>
+    <div class="card-body">
+      {% if upcoming %}
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead class="table-light">
+            <tr>
+              <th>Pavadinimas</th>
+              <th>Modulis</th>
+              <th>Tipas</th>
+              <th>Data</th>
+              <th>Balai</th>
+              <th>Liko laiko</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for assessment in upcoming %}
+            <tr>
+              <td>
+                <strong>{{ assessment.title }}</strong>
+                {% if assessment.description %}
+                <br><small class="text-muted">{{ assessment.description[:60] }}{% if assessment.description|length > 60 %}...{% endif %}</small>
+                {% endif %}
+              </td>
+              <td>{{ assessment.module.name }}</td>
+              <td>
+                <span class="badge 
+                  {% if assessment.assessment_type == 'egzaminas' %}bg-danger
+                  {% elif assessment.assessment_type == 'testas' %}bg-info
+                  {% elif assessment.assessment_type == 'uzduotis' %}bg-success
+                  {% else %}bg-secondary{% endif %}">
+                  {{ assessment.assessment_type.title() }}
+                </span>
+              </td>
+              <td>
+                {{ assessment.due_date.strftime('%Y-%m-%d') }}<br>
+                <small class="text-muted">{{ assessment.due_date.strftime('%H:%M') }}</small>
+              </td>
+              <td>{{ assessment.max_points }} balų</td>
+              <td>
+                {% set days_left = (assessment.due_date - moment.utcnow()).days %}
+                {% if days_left < 0 %}
+                  <span class="text-danger">Pasibaigė</span>
+                {% elif days_left == 0 %}
+                  <span class="text-warning"><strong>Šiandien!</strong></span>
+                {% elif days_left == 1 %}
+                  <span class="text-warning">Rytoj</span>
+                {% elif days_left <= 7 %}
+                  <span class="text-warning">{{ days_left }} d.</span>
+                {% else %}
+                  <span class="text-success">{{ days_left }} d.</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="alert alert-success text-center">
+        <h6>🎉 Puiku!</h6>
+        <p class="mb-0">Šiuo metu neturite artėjančių atsiskaitymų.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Praėję atsiskaitymai -->
+  <div class="card">
+    <div class="card-header bg-light">
+      <h5 class="mb-0">📋 Praėję atsiskaitymai ({{ past|length }})</h5>
+    </div>
+    <div class="card-body">
+      {% if past %}
+      <div class="table-responsive">
+        <table class="table table-sm">
+          <thead class="table-light">
+            <tr>
+              <th>Pavadinimas</th>
+              <th>Modulis</th>
+              <th>Tipas</th>
+              <th>Data</th>
+              <th>Balai</th>
+              <th>Statusas</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for assessment in past %}
+            <tr class="text-muted">
+              <td>{{ assessment.title }}</td>
+              <td>{{ assessment.module.name }}</td>
+              <td>{{ assessment.assessment_type.title() }}</td>
+              <td>{{ assessment.due_date.strftime('%Y-%m-%d %H:%M') }}</td>
+              <td>{{ assessment.max_points }} balų</td>
+              <td>
+                <span class="badge bg-secondary">Pabaigtas</span>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="alert alert-info text-center">
+        <p class="mb-0">Dar neturite užbaigtų atsiskaitymų.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Statistikos skydelis -->
+  {% if total_count > 0 %}
+  <div class="row mt-4">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-body">
+          <h6 class="card-title">📊 Statistika</h6>
+          <div class="row text-center">
+            <div class="col-md-3">
+              <h4 class="text-primary">{{ total_count }}</h4>
+              <small>Iš viso</small>
+            </div>
+            <div class="col-md-3">
+              <h4 class="text-warning">{{ upcoming|length }}</h4>
+              <small>Artėja</small>
+            </div>
+            <div class="col-md-3">
+              <h4 class="text-secondary">{{ past|length }}</h4>
+              <small>Pabaigti</small>
+            </div>
+            <div class="col-md-3">
+              <h4 class="text-danger">{{ upcoming|selectattr('assessment_type', 'eq', 'egzaminas')|list|length }}</h4>
+              <small>Egzaminai</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<script>
+// Papildomas JavaScript funkcionalumas
+document.addEventListener('DOMContentLoaded', function() {
+  // Highlight urgent assessments (< 3 days)
+  const rows = document.querySelectorAll('tbody tr');
+  rows.forEach(row => {
+    const timeCell = row.querySelector('td:last-child');
+    if (timeCell && (timeCell.textContent.includes('Šiandien') || timeCell.textContent.includes('Rytoj'))) {
+      row.classList.add('table-warning');
+    }
+  });
+});
+</script>
+{% endblock %}

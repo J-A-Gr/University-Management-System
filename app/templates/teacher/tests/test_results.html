@@ -2,6 +2,7 @@
 {% block title %}Testo rezultatai - {{ test.title }}{% endblock %}
 
 {% block content %}
+<!-- Navigacija viršuje -->
 <div class="mb-4">
   <a href="{{ url_for('teacher_tests.my_tests') }}" class="btn btn-secondary me-2">← Atgal į testus</a>
   <a href="{{ url_for('teacher_tests.edit_test', test_id=test.id) }}" class="btn btn-secondary me-2">Redaguoti testą</a>
@@ -9,208 +10,199 @@
   <a href="{{ url_for('main.profile') }}" class="btn btn-secondary">Profilis</a>
 </div>
 
-<div class="container mt-4">
+<div class="main-content extra-wide-card">
+  <!-- Header -->
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>{{ test.title }} - Rezultatai</h2>
+    <h2 style="color: #fff; margin: 0;">📊 {{ test.title }} - Rezultatai</h2>
     <span class="badge {% if test.is_active %}bg-success{% else %}bg-secondary{% endif %} fs-6">
       {{ 'Aktyvus' if test.is_active else 'Neaktyvus' }}
     </span>
   </div>
 
-  <!-- Testo informacija -->
-  <div class="row mb-4">
-    <div class="col-md-8">
-      <div class="card">
-        <div class="card-header">
-          <h5>Testo informacija</h5>
-        </div>
-        <div class="card-body">
-          <div class="row">
-            <div class="col-md-6">
-              <p><strong>Modulis:</strong> {{ test.module.name }}</p>
-              <p><strong>Maksimalus balų skaičius:</strong> {{ test.get_total_points() }}</p>
-              <p><strong>Klausimų skaičius:</strong> {{ test.test_questions|length }}</p>
-            </div>
-            <div class="col-md-6">
-              <p><strong>Maksimalus bandymų skaičius:</strong> {{ test.max_attempts }}</p>
-              <p><strong>Laiko limitas:</strong> {{ test.time_limit or 'Neribota' }} min</p>
-              <p><strong>Sukurta:</strong> {{ test.created_at.strftime('%Y-%m-%d') if test.created_at else 'Nežinoma' }}</p>
-            </div>
+  <!-- Testo informacija ir statistika -->
+  <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 30px;">
+    <!-- Testo informacija -->
+    <div class="glass-card">
+      <h5 style="color: #fff; margin-bottom: 20px;">📋 Testo informacija</h5>
+      <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 12px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; color: #fff;">
+          <div>
+            <p><strong>Atsiskaitymas:</strong> {{ test.assessment.title if test.assessment else 'Nenurodyta' }}</p>
+            <p><strong>Modulis:</strong> {{ test.assessment.module.name if test.assessment else 'Nenurodyta' }}</p>
+            <p><strong>Maksimalus balų skaičius:</strong> {{ test.get_total_points() }}</p>
+          </div>
+          <div>
+            <p><strong>Klausimų skaičius:</strong> {{ test.test_questions|length }}</p>
+            <p><strong>Maksimalus bandymų skaičius:</strong> {{ test.max_attempts }}</p>
+            <p><strong>Laiko limitas:</strong> {{ test.time_limit or 'Neribota' }} min</p>
           </div>
         </div>
       </div>
     </div>
-    
+
     <!-- Statistika -->
-    <div class="col-md-4">
-      <div class="card">
-        <div class="card-header">
-          <h6>Statistika</h6>
-        </div>
-        <div class="card-body">
-          {% if statistics %}
-          <p><strong>Iš viso bandymų:</strong> {{ statistics.total_attempts }}</p>
-          <p><strong>Vidurkis:</strong> {{ "%.1f"|format(statistics.average_score) }}%</p>
-          <p><strong>Aukščiausias:</strong> {{ "%.1f"|format(statistics.highest_score) }}%</p>
-          <p><strong>Žemiausias:</strong> {{ "%.1f"|format(statistics.lowest_score) }}%</p>
-          <p><strong>Išlaikymo dažnis:</strong> {{ "%.1f"|format(statistics.pass_rate) }}%</p>
-          {% else %}
-          <p class="text-muted">Nėra rezultatų</p>
-          {% endif %}
-        </div>
+    <div class="glass-card">
+      <h5 style="color: #fff; margin-bottom: 20px;">📈 Statistika</h5>
+      <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 12px; color: #fff;">
+        {% if statistics %}
+        <p><strong>Iš viso bandymų:</strong> {{ statistics.total_attempts }}</p>
+        <p><strong>Vidurkis:</strong> {{ "%.1f"|format(statistics.average_score) }}%</p>
+        <p><strong>Aukščiausias:</strong> {{ "%.1f"|format(statistics.highest_score) }}%</p>
+        <p><strong>Žemiausias:</strong> {{ "%.1f"|format(statistics.lowest_score) }}%</p>
+        <p><strong>Išlaikymo dažnis:</strong> {{ "%.1f"|format(statistics.pass_rate) }}%</p>
+        {% else %}
+        <p style="opacity: 0.7;">Nėra rezultatų</p>
+        {% endif %}
       </div>
     </div>
   </div>
 
   <!-- Rezultatų lentelė -->
-  <div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-      <h5>Studentų rezultatai</h5>
+  <div class="glass-card">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 style="color: #fff; margin: 0;">👥 Studentų rezultatai</h5>
       {% if results %}
-      <button class="btn btn-sm btn-outline-primary" onclick="exportResults()">
-        📊 Eksportuoti
+      <button class="table-button" onclick="exportResults()">
+        📊 Eksportuoti CSV
       </button>
       {% endif %}
     </div>
-    <div class="card-body">
-      {% if results %}
-      <div class="table-responsive">
-        <table class="table table-striped table-hover" id="resultsTable">
-          <thead class="table-light">
-            <tr>
-              <th>Studentas</th>
-              <th>Grupė</th>
-              <th>Bandymo data</th>
-              <th>Laikas</th>
-              <th>Taškai</th>
-              <th>Procentai</th>
-              <th>Pažymys</th>
-              <th>Statusas</th>
-              <th>Veiksmai</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for result in results %}
-            <tr>
-              <td>
-                <strong>{{ result.user.first_name }} {{ result.user.last_name }}</strong>
-                <br>
-                <small class="text-muted">{{ result.user.email }}</small>
-              </td>
-              <td>
-                {% if result.user.student_info and result.user.student_info.group %}
-                  {{ result.user.student_info.group.name }}
-                {% else %}
-                  <span class="text-muted">Nenurodyta</span>
-                {% endif %}
-              </td>
-              <td>
-                {% if result.completed_at %}
-                  {{ result.completed_at.strftime('%Y-%m-%d %H:%M') }}
-                {% else %}
-                  <span class="text-muted">Nebaigta</span>
-                {% endif %}
-              </td>
-              <td>
-                {% if result.time_taken %}
-                  {{ (result.time_taken // 60) }} min {{ (result.time_taken % 60) }} sek
-                {% else %}
-                  <span class="text-muted">—</span>
-                {% endif %}
-              </td>
-              <td>
-                <strong>{{ result.total_score }}</strong> / {{ result.max_possible_score }}
-              </td>
-              <td>
-                <span class="badge {% if result.percentage >= 60 %}bg-success{% elif result.percentage >= 40 %}bg-warning{% else %}bg-danger{% endif %}">
-                  {{ "%.1f"|format(result.percentage) }}%
-                </span>
-              </td>
-              <td>
-                <span class="badge {% if result.calculate_grade() >= 5 %}bg-success{% else %}bg-danger{% endif %}">
-                  {{ result.calculate_grade() }}
-                </span>
-              </td>
-              <td>
+
+    {% if results %}
+    <div class="table-scroll">
+      <table id="resultsTable" style="width: 100%; border-collapse: collapse; color: #fff;">
+        <thead>
+          <tr style="background: rgba(255,255,255,0.1);">
+            <th style="padding: 12px 8px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.2);">Studentas</th>
+            <th style="padding: 12px 8px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.2);">Grupė</th>
+            <th style="padding: 12px 8px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.2);">Data</th>
+            <th style="padding: 12px 8px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.2);">Laikas</th>
+            <th style="padding: 12px 8px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.2);">Taškai</th>
+            <th style="padding: 12px 8px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.2);">Procentai</th>
+            <th style="padding: 12px 8px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.2);">Pažymys</th>
+            <th style="padding: 12px 8px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.2);">Statusas</th>
+            <th style="padding: 12px 8px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.2);">Veiksmai</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for result in results %}
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <td style="padding: 12px 8px;">
+              <strong>{{ result.user.first_name }} {{ result.user.last_name }}</strong><br>
+              <small style="opacity: 0.7;">{{ result.user.email }}</small>
+            </td>
+            <td style="padding: 12px 8px;">
+              {% if result.user.student_info and result.user.student_info.group %}
+                {{ result.user.student_info.group.name }}
+              {% else %}
+                <span style="opacity: 0.7;">Nenurodyta</span>
+              {% endif %}
+            </td>
+            <td style="padding: 12px 8px;">
+              {% if result.completed_at %}
+                {{ result.completed_at.strftime('%Y-%m-%d') }}<br>
+                <small style="opacity: 0.7;">{{ result.completed_at.strftime('%H:%M') }}</small>
+              {% else %}
+                <span style="opacity: 0.7;">Nebaigta</span>
+              {% endif %}
+            </td>
+            <td style="padding: 12px 8px;">
+              {% if result.time_taken %}
+                {{ (result.time_taken // 60) }}m {{ (result.time_taken % 60) }}s
+              {% else %}
+                <span style="opacity: 0.7;">—</span>
+              {% endif %}
+            </td>
+            <td style="padding: 12px 8px;">
+              <strong>{{ result.total_score }}</strong> / {{ result.max_possible_score }}
+            </td>
+            <td style="padding: 12px 8px;">
+              <span class="badge {% if result.percentage >= 60 %}bg-success{% elif result.percentage >= 40 %}bg-warning{% else %}bg-danger{% endif %}">
+                {{ "%.1f"|format(result.percentage) }}%
+              </span>
+            </td>
+            <td style="padding: 12px 8px;">
+              <span class="badge {% if result.calculate_grade() >= 5 %}bg-success{% else %}bg-danger{% endif %}">
+                {{ result.calculate_grade() }}
+              </span>
+            </td>
+            <td style="padding: 12px 8px;">
+              {% if result.status == 'completed' %}
+                <span class="badge bg-success">Baigta</span>
+              {% elif result.status == 'in_progress' %}
+                <span class="badge bg-warning">Vykdoma</span>
+              {% else %}
+                <span class="badge bg-secondary">{{ result.status }}</span>
+              {% endif %}
+            </td>
+            <td style="padding: 12px 8px;">
+              <div style="display: flex; gap: 5px;">
+                <button class="table-button" onclick="viewDetails('{{ result.id }}')" title="Peržiūrėti atsakymus">
+                  👁️
+                </button>
                 {% if result.status == 'completed' %}
-                  <span class="badge bg-success">Baigta</span>
-                {% elif result.status == 'in_progress' %}
-                  <span class="badge bg-warning">Vykdoma</span>
-                {% else %}
-                  <span class="badge bg-secondary">{{ result.status }}</span>
+                <button class="table-button" onclick="downloadDetails('{{ result.id }}')" title="Išsami ataskaita">
+                  📄
+                </button>
                 {% endif %}
-              </td>
-              <td>
-                <div class="btn-group btn-group-sm">
-                  <button class="btn btn-outline-info" onclick="viewDetails('{{ result.id }}')" title="Peržiūrėti atsakymus">
-                    👁️
-                  </button>
-                  {% if result.status == 'completed' %}
-                  <button class="btn btn-outline-primary" onclick="downloadPDF('{{ result.id }}')" title="Atsisiųsti PDF">
-                    📄
-                  </button>
-                  {% endif %}
-                </div>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-      
-      <!-- Rezultatų suvestinė -->
-      <div class="mt-4 p-3 bg-light rounded">
-        <div class="row text-center">
-          <div class="col-md-3">
-            <h6>Iš viso bandymų</h6>
-            <span class="fs-4 text-primary">{{ results|length }}</span>
-          </div>
-          <div class="col-md-3">
-            <h6>Išlaikė</h6>
-            <span class="fs-4 text-success">{{ results|selectattr('percentage', 'ge', 60)|list|length }}</span>
-          </div>
-          <div class="col-md-3">
-            <h6>Neišlaikė</h6>
-            <span class="fs-4 text-danger">{{ results|selectattr('percentage', 'lt', 60)|list|length }}</span>
-          </div>
-          <div class="col-md-3">
-            <h6>Vidurkis</h6>
-            <span class="fs-4 text-info">
-              {% if statistics %}{{ "%.1f"|format(statistics.average_score) }}%{% else %}—{% endif %}
-            </span>
-          </div>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Rezultatų suvestinė -->
+    <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 12px; margin-top: 20px;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; text-align: center; color: #fff;">
+        <div>
+          <h4 style="color: var(--accent); margin-bottom: 5px;">{{ results|length }}</h4>
+          <small>Iš viso bandymų</small>
+        </div>
+        <div>
+          <h4 style="color: #44bb63; margin-bottom: 5px;">{{ results|selectattr('percentage', 'ge', 60)|list|length }}</h4>
+          <small>Išlaikė (≥60%)</small>
+        </div>
+        <div>
+          <h4 style="color: #e74c3c; margin-bottom: 5px;">{{ results|selectattr('percentage', 'lt', 60)|list|length }}</h4>
+          <small>Neišlaikė (<60%)</small>
+        </div>
+        <div>
+          <h4 style="color: #3498db; margin-bottom: 5px;">
+            {% if statistics %}{{ "%.1f"|format(statistics.average_score) }}%{% else %}—{% endif %}
+          </h4>
+          <small>Vidurkis</small>
         </div>
       </div>
-      
-      {% else %}
-      <div class="alert alert-info text-center">
-        <h5>Nėra rezultatų</h5>
-        <p>Dar nė vienas studentas nesprendė šio testo.</p>
-        {% if not test.is_active %}
-        <p><strong>Testas neaktyvus.</strong> Aktyvuokite testą, kad studentai galėtų jį spręsti.</p>
-        <a href="{{ url_for('teacher_tests.edit_test', test_id=test.id) }}" class="btn btn-primary">
-          Aktyvuoti testą
-        </a>
-        {% endif %}
-      </div>
+    </div>
+
+    {% else %}
+    <!-- Nėra rezultatų -->
+    <div style="background: rgba(255,193,7,0.2); padding: 30px; border-radius: 12px; text-align: center; color: #fff;">
+      <h5 style="color: #fff; margin-bottom: 15px;">📭 Nėra rezultatų</h5>
+      <p>Dar nė vienas studentas nesprendė šio testo.</p>
+      {% if not test.is_active %}
+      <p style="margin-top: 15px;"><strong>Testas neaktyvus.</strong> Aktyvuokite testą, kad studentai galėtų jį spręsti.</p>
+      <a href="{{ url_for('teacher_tests.edit_test', test_id=test.id) }}" class="big-button" style="margin-top: 15px;">
+        Aktyvuoti testą
+      </a>
       {% endif %}
     </div>
+    {% endif %}
   </div>
 </div>
 
 <script>
 function viewDetails(resultId) {
-  // Ateityje - peržiūrėti studento atsakymus
   alert('Studento atsakymų peržiūra bus implementuota vėliau. Rezultato ID: ' + resultId);
 }
 
-function downloadPDF(resultId) {
-  // Ateityje - atsisiųsti PDF
-  alert('PDF atsisiuntimas bus implementuotas vėliau. Rezultato ID: ' + resultId);
+function downloadDetails(resultId) {
+  alert('Išsamios ataskaitos atsisiuntimas bus implementuotas vėliau. Rezultato ID: ' + resultId);
 }
 
 function exportResults() {
-  // Paprastas CSV eksportas
   const table = document.getElementById('resultsTable');
   const rows = table.querySelectorAll('tr');
   let csv = [];
@@ -228,7 +220,7 @@ function exportResults() {
   for (let i = 1; i < rows.length; i++) {
     const row = [];
     const cells = rows[i].querySelectorAll('td');
-    for (let j = 0; j < cells.length - 1; j++) { // Paskutinis stulpelis - veiksmai
+    for (let j = 0; j < cells.length - 1; j++) {
       let cellText = cells[j].textContent.trim().replace(/\n/g, ' ').replace(/,/g, ';');
       row.push('"' + cellText + '"');
     }
@@ -237,7 +229,7 @@ function exportResults() {
   
   // Atsisiųsti
   const csvContent = csv.join('\n');
-  const blob = new Blob([csvContent], { type: 'text/csv' });
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
   const url = window.URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -246,36 +238,45 @@ function exportResults() {
   window.URL.revokeObjectURL(url);
 }
 
-// Lentelės rūšiavimas (paprastas)
+// Responsive table scroll hint
 document.addEventListener('DOMContentLoaded', function() {
-  const table = document.getElementById('resultsTable');
-  if (table) {
-    const headers = table.querySelectorAll('th');
-    headers.forEach((header, index) => {
-      if (index < headers.length - 1) { // Ne veiksmai stulpelis
-        header.style.cursor = 'pointer';
-        header.addEventListener('click', () => sortTable(index));
-      }
-    });
+  const tableScroll = document.querySelector('.table-scroll');
+  if (tableScroll && tableScroll.scrollWidth > tableScroll.clientWidth) {
+    // Add scroll hint for mobile
+    tableScroll.style.position = 'relative';
   }
 });
-
-function sortTable(columnIndex) {
-  // Paprastas lentelės rūšiavimas - galima praplėsti
-  console.log('Rūšiuojama pagal stulpelį:', columnIndex);
-}
 </script>
 
 <style>
-.table th {
-  border-top: none;
+@media (max-width: 768px) {
+  .extra-wide-card {
+    max-width: 99vw !important;
+    padding: 15px 10px;
+  }
+  
+  .table-scroll table {
+    font-size: 0.85em;
+    min-width: 800px;
+  }
+  
+  .table-scroll {
+    border-radius: 8px;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+  }
 }
-.table-hover tbody tr:hover {
-  background-color: rgba(217, 164, 65, 0.1);
+
+.badge {
+  font-size: 0.8em;
+  padding: 4px 8px;
 }
-.btn-group-sm .btn {
-  padding: 0.25rem 0.5rem;
-  font-size: 0.875rem;
+
+.table-button {
+  min-width: 35px;
+  height: 35px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>
 {% endblock %}

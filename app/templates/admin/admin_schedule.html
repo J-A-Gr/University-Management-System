@@ -6,12 +6,9 @@ block content %}
   <a
     href="{{ url_for('admin.admin_dashboard') }}"
     class="btn btn-secondary me-2"
-    >← Atgal į admin skydelį</a
   >
-  <a href="{{ url_for('admin.manage_users') }}" class="btn btn-secondary me-2"
-    >Vartotojų valdymas</a
-  >
-  <a href="{{ url_for('main.profile') }}" class="btn btn-secondary">Profilis</a>
+    ← Atgal į admin skydelį
+  </a>
 </div>
 
 <h2 class="my-4">Tvarkaraštis: {{ user.full_name }}</h2>

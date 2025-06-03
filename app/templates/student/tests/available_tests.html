@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+{% block title %}Prieinami testai{% endblock %}
+
+{% block content %}
+<!-- Navigacija viršuje -->
+<div class="mb-4">
+    <a href="{{ url_for('student.student_dashboard') }}" class="btn btn-secondary me-2">← Atgal į skydelį</a>
+    <a href="{{ url_for('student_tests.my_results') }}" class="btn btn-secondary me-2">Mano rezultatai</a>
+    <a href="{{ url_for('student.student_schedule') }}" class="btn btn-secondary me-2">Tvarkaraštis</a>
+    <a href="{{ url_for('main.profile') }}" class="btn btn-secondary">Profilis</a>
+</div>
+
+<div class="main-content wide-card">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 style="color: #fff; margin: 0;">📝 Prieinami testai</h2>
+        <a href="{{ url_for('student_tests.my_results') }}" class="big-button">
+            📊 Mano rezultatai
+        </a>
+    </div>
+    
+    {% if available_tests %}
+        <!-- Testų grid -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px;">
+            {% for test_info in available_tests %}
+                <div class="glass-card" style="transition: transform 0.2s; position: relative;">
+                    <!-- Modulio pavadinimas viršuje -->
+                    <div style="background: rgba(var(--accent-rgb), 0.2); padding: 8px 15px; margin: -20px -20px 15px -20px; border-radius: 12px 12px 0 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                        <small style="color: var(--accent); font-weight: 600;">📚 {{ test_info.module_name }}</small>
+                    </div>
+
+                    <!-- Testo informacija -->
+                    <div style="margin-bottom: 20px;">
+                        <h4 style="color: #fff; margin-bottom: 15px;">{{ test_info.test.title }}</h4>
+                        
+                        {% if test_info.test.description %}
+                        <p style="color: rgba(255,255,255,0.8); margin-bottom: 15px; font-size: 0.95em;">
+                            {{ test_info.test.description }}
+                        </p>
+                        {% endif %}
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; color: #fff; font-size: 0.9em;">
+                            <div>
+                                <p><strong>📝 Klausimų:</strong> {{ test_info.test.test_questions|length }}</p>
+                                <p><strong>⏱️ Laikas:</strong> 
+                                    {% if test_info.test.time_limit %}
+                                        {{ test_info.test.time_limit }} min.
+                                    {% else %}
+                                        Neribota
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div>
+                                <p><strong>🔄 Bandymai:</strong> {{ test_info.attempts_count }}/{{ test_info.max_attempts }}</p>
+                                <p><strong>🎯 Taškai:</strong> {{ test_info.test.get_total_points() }}</p>
+                            </div>
+                        </div>
+
+                        {% if test_info.best_result %}
+                        <div style="background: rgba(68, 187, 99, 0.2); padding: 12px; border-radius: 8px; margin-top: 15px; border-left: 4px solid #44bb63;">
+                            <small style="color: #44bb63; font-weight: 600;">
+                                🏆 Geriausias rezultatas: {{ "%.1f"|format(test_info.best_result.percentage) }}% 
+                                ({{ test_info.best_result.calculate_grade() }} balai)
+                            </small>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Statusas ir veiksmai -->
+                    <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; margin-top: 15px;">
+                        {% if test_info.can_take %}
+                            <div style="text-align: center;">
+                                <a href="{{ url_for('student_tests.start_test', test_id=test_info.test.id) }}" 
+                                   class="big-button" 
+                                   style="width: 100%; {% if test_info.attempts_count > 0 %}background: #f39c12;{% endif %}"
+                                   onclick="return confirm('Ar tikrai norite pradėti testą? Po pradžios turėsite jį užbaigti.')">
+                                    {% if test_info.attempts_count == 0 %}
+                                        🚀 Pradėti testą
+                                    {% else %}
+                                        🔄 Bandyti dar kartą
+                                    {% endif %}
+                                </a>
+                            </div>
+                        {% else %}
+                            <div style="background: rgba(231, 76, 60, 0.2); padding: 12px; border-radius: 8px; text-align: center; border-left: 4px solid #e74c3c;">
+                                <small style="color: #e74c3c; font-weight: 600;">
+                                    ❌ {{ test_info.message }}
+                                </small>
+                            </div>
+                        {% endif %}
+
+                        <!-- Bandymų informacija -->
+                        {% if test_info.attempts_count > 0 %}
+                        <div style="margin-top: 10px; text-align: center;">
+                            <small style="color: rgba(255,255,255,0.7);">
+                                Atlikta bandymų: {{ test_info.attempts_count }}/{{ test_info.max_attempts }}
+                            </small>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Testo statusas badge -->
+                    {% if not test_info.test.is_active %}
+                    <div style="position: absolute; top: 15px; right: 15px;">
+                        <span class="badge bg-secondary">Neaktyvus</span>
+                    </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Statistikos skyrius -->
+        <div class="glass-card" style="margin-top: 30px;">
+            <h5 style="color: #fff; margin-bottom: 15px;">📊 Jūsų testų statistika</h5>
+            
+            {% set completed_tests = available_tests | selectattr('best_result') | list %}
+            {% set passed_tests = completed_tests | selectattr('best_result.percentage', 'ge', 60) | list %}
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; text-align: center; color: #fff;">
+                <div>
+                    <h4 style="color: var(--accent); margin-bottom: 5px;">{{ available_tests|length }}</h4>
+                    <small>Iš viso testų</small>
+                </div>
+                <div>
+                    <h4 style="color: #44bb63; margin-bottom: 5px;">{{ completed_tests|length }}</h4>
+                    <small>Atlikta</small>
+                </div>
+                <div>
+                    <h4 style="color: #44bb63; margin-bottom: 5px;">{{ passed_tests|length }}</h4>
+                    <small>Išlaikė (≥60%)</small>
+                </div>
+                <div>
+                    <h4 style="color: #3498db; margin-bottom: 5px;">
+                        {% if completed_tests %}
+                            {% set avg = (completed_tests | sum(attribute='best_result.percentage')) / completed_tests|length %}
+                            {{ "%.1f"|format(avg) }}%
+                        {% else %}
+                            —
+                        {% endif %}
+                    </h4>
+                    <small>Vidurkis</small>
+                </div>
+            </div>
+        </div>
+
+    {% else %}
+        <!-- Nėra testų -->
+        <div class="text-center" style="color: #fff; padding: 60px 20px;">
+            <div style="font-size: 4em; margin-bottom: 20px; opacity: 0.5;">📝</div>
+            <h4 style="margin-bottom: 15px;">Šiuo metu nėra prieinamų testų</h4>
+            <p style="opacity: 0.8; margin-bottom: 25px;">
+                Testai atsiras, kai dėstytojai juos sukurs jūsų moduliams.
+            </p>
+            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                <a href="{{ url_for('student.student_dashboard') }}" class="big-button">
+                    🏠 Grįžti į skydelį
+                </a>
+                <a href="{{ url_for('student_tests.my_results') }}" class="glass-btn">
+                    📊 Peržiūrėti savo rezultatus
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+.test-card:hover {
+    transform: translateY(-5px);
+}
+
+@media (max-width: 768px) {
+    .wide-card {
+        padding: 15px 10px;
+    }
+    
+    .glass-card {
+        margin-bottom: 15px;
+    }
+}
+
+.badge {
+    font-size: 0.75em;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+</style>
+{% endblock %}
