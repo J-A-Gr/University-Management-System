@@ -30,4 +30,28 @@
 <div class="alert alert-warning">
   Šiame modulyje nėra užregistruotų studentų.
 </div>
-{% endif %} {% endblock %}
+{% endif %}
+
+<hr />
+<h3>Pažymėti lankomumą</h3>
+<form
+  method="POST"
+  action="{{ url_for('teacher.view_module_students', module_id=module.id) }}"
+>
+  {{ form.hidden_tag() }}
+
+  <div class="form-group">
+    {{ form.student_id.label }} {{ form.student_id(class="form-control") }}
+  </div>
+
+  <div class="form-group">
+    {{ form.date.label }} {{ form.date(class="form-control") }}
+  </div>
+
+  <div class="form-group">
+    {{ form.status.label }} {{ form.status(class="form-control") }}
+  </div>
+
+  {{ form.submit(class="btn btn-primary mt-2") }}
+</form>
+{% endblock %}
