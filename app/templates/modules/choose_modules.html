@@ -19,7 +19,11 @@
                 <strong>Laikas:</strong> {{ module.start_time.strftime('%H:%M') }} – {{ module.end_time.strftime('%H:%M') }}
               </p>
               <a href="{{ url_for('modules.view_module', module_id=module.id) }}" class="btn btn-sm btn-outline-primary">Plačiau</a>
-              <a href="{{ url_for('modules.select_module', module_id=module.id) }}" class="btn btn-sm btn-success ms-2">Registruotis</a>
+              <form method="POST" action="{{ url_for('modules.enroll_in_module') }}">
+                {{ form.hidden_tag() }}
+                {{ form.module_id(value=module.id) }}
+                <button type="submit" class="btn btn-sm btn-success ms-2">Registruotis</button>
+              </form>
             </div>
           </div>
         </div>

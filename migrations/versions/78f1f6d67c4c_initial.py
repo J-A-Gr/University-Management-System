@@ -1,8 +1,8 @@
 """Initial
 
-Revision ID: 69478f5c51b8
+Revision ID: 78f1f6d67c4c
 Revises: 
-Create Date: 2025-06-03 14:35:09.818105
+Create Date: 2025-06-03 18:21:49.265230
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '69478f5c51b8'
+revision = '78f1f6d67c4c'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -148,6 +148,17 @@ def upgrade():
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('assessment_id', 'student_id', name='unique_submission_per_student')
     )
+    op.create_table('attendance_records',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('module_id', sa.Integer(), nullable=False),
+    sa.Column('student_id', sa.Integer(), nullable=False),
+    sa.Column('date', sa.Date(), nullable=False),
+    sa.Column('status', sa.Enum('atvyko', 'pavėlavo', 'neatvyko', 'pateisinta', name='attendance_status'), nullable=False),
+    sa.ForeignKeyConstraint(['module_id'], ['modules.id'], ),
+    sa.ForeignKeyConstraint(['student_id'], ['student_info.id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('module_id', 'student_id', 'date', name='unique_attendance_per_day')
+    )
     op.create_table('module_enrollments',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('student_info_id', sa.Integer(), nullable=True),
@@ -233,6 +244,7 @@ def downgrade():
     op.drop_table('test_questions')
     op.drop_table('tests')
     op.drop_table('module_enrollments')
+    op.drop_table('attendance_records')
     op.drop_table('assessment_submissions')
     op.drop_table('student_info')
     op.drop_table('module_prerequisites')

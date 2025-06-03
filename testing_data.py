@@ -250,7 +250,7 @@ with app.app_context():
         is_student = True,
         #birthday = "2001-01-01"  # Pridėta gimimo data
     )
-    student1.set_password("Studentas123!")  # Stiprus slaptažodis
+    student1.set_password("1111")  # Stiprus slaptažodis
     #student1.ensure_student_info() # Šitas neveikia!!!
     db.session.add(student1)
     print("Studentas1 pridėtas")
@@ -262,10 +262,12 @@ with app.app_context():
         is_student = True,
         birthday = "2000-05-15"  # Pridėta gimimo data
     )
-    student2.set_password("PranasPetrauskas456!")  # Stiprus slaptažodis
+    student2.set_password("2222")  # Stiprus slaptažodis
     #student2.ensure_student_info() # Šitas neveikia!!!
     db.session.add(student2)
     print("Studentas2 pridėtas")
+
+    
 
     # # 5. StudentInfo objektai su grupės kodais
 

@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request,
 from flask_login import login_required, current_user
 from app.forms.module import ModuleForm, DeleteForm
 from app.forms.admin import EmptyForm
+# from app.forms.student import EnrollModuleForm
 from app.models import Module, StudyProgram, TeacherInfo, ModulePrerequisite, User, ModuleEnrollment
 from app.extensions import db
 

@@ -1,9 +1,33 @@
-from flask import Blueprint, render_template, redirect, url_for, session, abort, flash
+from flask import Blueprint, render_template, redirect, url_for, session, request, abort, flash
 from flask_login import login_required, current_user
-from app.models import ModuleEnrollment
+from app.models import ModuleEnrollment, Module
+from app.forms.student import EnrollModuleForm
+from app.extensions import db
 from collections import defaultdict
 
 bp = Blueprint('student', __name__)
+
+
+@bp.route('/select_module', methods=['POST'])
+@login_required
+def enroll_in_module():
+    form = EnrollModuleForm()
+    if form.validate_on_submit():
+        module_id = int(form.module_id.data)
+        module = Module.query.get_or_404(module_id)
+
+        # Patikrinimai (jei reikia): ar modulis jau pasirinktas, ar atitinka semestrą, ir pan.
+
+        enrollment = ModuleEnrollment(student_id=current_user.id, module_id=module.id)
+        db.session.add(enrollment)
+        db.session.commit()
+
+        flash('Modulis sėkmingai pasirinktas.', 'success')
+    else:
+        flash('Registracija nepavyko.', 'danger')
+
+    return redirect(url_for('modules.list_available_modules'))
+
 
 @bp.route('/dashboard')
 @login_required
