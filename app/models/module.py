@@ -70,7 +70,21 @@ class Module(db.Model):
     def get_modules_by_program(program_id):   # gaunam studiju programos aktyvius modulius, o studentas gali rinktis moduli is savo studiju programos modeliu.
         """Returns modules by study program"""
         return Module.query.filter_by(study_program_id=program_id, is_active=True).all()
-    
+
+    @staticmethod    # 
+    def get_student_available_modules(
+        program_id,
+        semester,
+        available_credits,
+        ):   # gaunam tik tuos modulius, kuriuos gali rinktis studentas.
+        """Returns modules by study program"""
+        return Module.query.filter(
+            Module.study_program_id == program_id,
+            Module.is_active == True,
+            Module.semester == semester,
+            Module.credits < available_credits 
+            ).all() # 
+
     def soft_delete(self):
         """Soft delete module - marks as inactive instead of permanent deletion"""
         self.is_active = False
