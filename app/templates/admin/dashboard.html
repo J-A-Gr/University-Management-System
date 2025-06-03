@@ -210,20 +210,30 @@
                 Super Admin
               </button>
               {% elif user.is_admin %}
-              <form
-                method="POST"
-                action="{{ url_for('admin.demote_user', user_id=user.id) }}"
-                style="display: inline"
-              >
-                {{ form.hidden_tag() }}
-                <button
-                  type="submit"
-                  class="button"
-                  style="background: #e07a29; color: #fff"
-                >
-                  Pašalinti Admin
-                </button>
-              </form>
+              {% if user.id != current_user.id %}
+                  <form
+                    method="POST"
+                    action="{{ url_for('admin.demote_user', user_id=user.id) }}"
+                    style="display: inline"
+                  >
+                    {{ form.hidden_tag() }}
+                    <button
+                      type="submit"
+                      class="button"
+                      style="background: #e07a29; color: #fff"
+                    >
+                      Pašalinti Admin
+                    </button>
+                  </form>
+                  {% else %}
+                  <button
+                    class="button"
+                    style="opacity: 0.6; cursor: not-allowed; background: #ccc"
+                    disabled
+                  >
+                    Negalima
+                  </button>
+                  {% endif %}
               {% else %}
               <form
                 method="POST"
