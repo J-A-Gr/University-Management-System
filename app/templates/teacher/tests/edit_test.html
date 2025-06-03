@@ -2,216 +2,221 @@
 {% block title %}Redaguoti testą - {{ test.title }}{% endblock %}
 
 {% block content %}
+<!-- Navigacija viršuje -->
 <div class="mb-4">
   <a href="{{ url_for('teacher_tests.my_tests') }}" class="btn btn-secondary me-2">← Atgal į testus</a>
   <a href="{{ url_for('teacher.teacher_dashboard') }}" class="btn btn-secondary me-2">Skydelis</a>
   <a href="{{ url_for('main.profile') }}" class="btn btn-secondary">Profilis</a>
 </div>
 
-<div class="container mt-4">
+<div class="main-content wide-card">
+  <!-- Header su testo pavadinimu -->
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>{{ test.title }} - Redagavimas</h2>
+    <h2 style="color: #fff;">{{ test.title }}</h2>
     <span class="badge {% if test.is_active %}bg-success{% else %}bg-secondary{% endif %} fs-6">
       {{ 'Aktyvus' if test.is_active else 'Neaktyvus' }}
     </span>
   </div>
 
   <!-- Testo informacija -->
-  <div class="row mb-4">
-    <div class="col-md-8">
-      <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <h5>Testo informacija</h5>
-          <button class="btn btn-sm btn-outline-primary" data-bs-toggle="collapse" data-bs-target="#editTestForm">
-            Redaguoti testą
-          </button>
-        </div>
-        <div class="card-body">
-          <p><strong>Aprašymas:</strong> {{ test.description or 'Nėra aprašymo' }}</p>
-          <p><strong>Modulis:</strong> {{ test.module.name }}</p>
-          <p><strong>Laiko limitas:</strong> {{ test.time_limit or 'Neribota' }} min</p>
-          <p><strong>Maks. bandymai:</strong> {{ test.max_attempts }}</p>
-          <p><strong>Rodyti rezultatus iš karto:</strong> {{ 'Taip' if test.show_results_immediately else 'Ne' }}</p>
-          <p><strong>Sustabdyti po išlaikymo:</strong> {{ 'Taip' if test.stop_after_pass else 'Ne' }}</p>
-        </div>
+  <div class="glass-card mb-4">
+    <h5 style="color: #fff; margin-bottom: 20px;">📋 Testo informacija</h5>
+    <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 12px;">
+      <p style="color: #fff;"><strong>Atsiskaitymas:</strong> {{ test.assessment.title if test.assessment else 'Nenurodyta' }}</p>
+      <p style="color: #fff;"><strong>Modulis:</strong> {{ test.assessment.module.name if test.assessment else 'Nenurodyta' }}</p>
+      <p style="color: #fff;"><strong>Aprašymas:</strong> {{ test.description or 'Nėra aprašymo' }}</p>
+      <p style="color: #fff;"><strong>Laiko limitas:</strong> {{ test.time_limit or 'Neribota' }} min</p>
+      <p style="color: #fff;"><strong>Maks. bandymai:</strong> {{ test.max_attempts }}</p>
+    </div>
+  </div>
+
+  <!-- Redagavimo forma -->
+  <div class="glass-card mb-4">
+    <h5 style="color: #fff; margin-bottom: 20px;">✏️ Redaguoti testo nustatymus</h5>
+    
+    <form method="POST" action="{{ url_for('teacher_tests.update_test', test_id=test.id) }}">
+      {{ edit_form.hidden_tag() }}
+      
+      <!-- Pavadinimas -->
+      <div class="floating-label">
+        <span class="input-icon"><i data-lucide="file-text"></i></span>
+        {{ edit_form.title(class="input", id="title", placeholder=" ", required=True, value=test.title) }}
+        <label for="title">Testo pavadinimas</label>
+        {% for error in edit_form.title.errors %}
+        <div class="invalid-feedback d-block">{{ error }}</div>
+        {% endfor %}
       </div>
       
-      <!-- Testo redagavimo forma -->
-      <div class="collapse mt-3" id="editTestForm">
-        <div class="card">
-          <div class="card-header">
-            <h6>Redaguoti testo nustatymus</h6>
+      <!-- Aprašymas -->
+      <div class="floating-label">
+        <span class="input-icon"><i data-lucide="edit-3"></i></span>
+        {{ edit_form.description(class="input", id="description", placeholder=" ", rows=3) }}
+        <label for="description">Aprašymas</label>
+        {% for error in edit_form.description.errors %}
+        <div class="invalid-feedback d-block">{{ error }}</div>
+        {% endfor %}
+      </div>
+      
+      <!-- Laiko limitas -->
+      <div class="floating-label">
+        <span class="input-icon"><i data-lucide="clock"></i></span>
+        {{ edit_form.time_limit(class="input", id="time_limit", placeholder=" ", min="1") }}
+        <label for="time_limit">Laiko limitas (minutės)</label>
+        {% for error in edit_form.time_limit.errors %}
+        <div class="invalid-feedback d-block">{{ error }}</div>
+        {% endfor %}
+      </div>
+      
+      <!-- Bandymų skaičius -->
+      <div class="floating-label">
+        <span class="input-icon"><i data-lucide="repeat"></i></span>
+        {{ edit_form.max_attempts(class="input", id="max_attempts", placeholder=" ", min="1", max="3", required=True) }}
+        <label for="max_attempts">Maksimalus bandymų skaičius</label>
+        {% for error in edit_form.max_attempts.errors %}
+        <div class="invalid-feedback d-block">{{ error }}</div>
+        {% endfor %}
+      </div>
+      
+      <button type="submit" class="big-button" style="margin-top: 20px;">
+        Išsaugoti pakeitimus
+      </button>
+    </form>
+  </div>
+
+  <!-- Klausimų skyrius -->
+  <div class="glass-card mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 style="color: #fff; margin: 0;">? Klausimai ({{ questions|length }})</h5>
+      <button class="table-button" onclick="toggleQuestionForm()" id="addQuestionBtn">
+        + Pridėti klausimą
+      </button>
+    </div>
+
+    <!-- Statistika -->
+    <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; margin-bottom: 20px;">
+      <div style="display: flex; gap: 30px; color: #fff;">
+        <span><strong>Klausimų:</strong> {{ questions|length }}</span>
+        <span><strong>Taškų iš viso:</strong> {{ test.get_total_points() }}</span>
+        <span><strong>Rezultatų:</strong> {{ test.test_results|length }}</span>
+      </div>
+    </div>
+
+    <!-- Klausimų sąrašas -->
+    {% if questions %}
+    <div style="margin-bottom: 20px;">
+      {% for question in questions %}
+      <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; margin-bottom: 15px;">
+        <div style="display: flex; justify-content-between; align-items-start;">
+          <div style="flex-grow: 1; color: #fff;">
+            <h6 style="color: #fff; margin-bottom: 10px;">{{ loop.index }}. {{ question.question }}</h6>
+            <div style="margin-bottom: 8px;">
+              <strong>A)</strong> {{ question.choice_a }}<br>
+              <strong>B)</strong> {{ question.choice_b }}<br>
+              <strong>C)</strong> {{ question.choice_c }}<br>
+              <strong>D)</strong> {{ question.choice_d }}
+            </div>
+            <div style="display: flex; gap: 20px; font-size: 0.9em; opacity: 0.9;">
+              <span><strong>Teisingas:</strong> {{ question.correct_answer }}</span>
+              <span><strong>Taškai:</strong> {{ question.points }}</span>
+            </div>
           </div>
-          <div class="card-body">
-            <form method="POST" action="{{ url_for('teacher_tests.edit_test', test_id=test.id) }}">
-              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-              
-              <div class="mb-3">
-                <label for="title" class="form-label">Pavadinimas</label>
-                <input type="text" class="form-control" id="title" name="title" value="{{ test.title }}" required>
-              </div>
-              
-              <div class="mb-3">
-                <label for="description" class="form-label">Aprašymas</label>
-                <textarea class="form-control" id="description" name="description" rows="3">{{ test.description or '' }}</textarea>
-              </div>
-              
-              <div class="row">
-                <div class="col-md-6 mb-3">
-                  <label for="time_limit" class="form-label">Laiko limitas (minutės)</label>
-                  <input type="number" class="form-control" id="time_limit" name="time_limit" value="{{ test.time_limit or '' }}" min="1">
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label for="max_attempts" class="form-label">Maksimalus bandymų skaičius</label>
-                  <input type="number" class="form-control" id="max_attempts" name="max_attempts" value="{{ test.max_attempts }}" min="1" max="10" required>
-                </div>
-              </div>
-              
-              <div class="row mb-3">
-                <div class="col-md-6">
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="show_results_immediately" name="show_results_immediately" {% if test.show_results_immediately %}checked{% endif %}>
-                    <label class="form-check-label" for="show_results_immediately">
-                      Rodyti rezultatus iš karto
-                    </label>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="stop_after_pass" name="stop_after_pass" {% if test.stop_after_pass %}checked{% endif %}>
-                    <label class="form-check-label" for="stop_after_pass">
-                      Sustabdyti po išlaikymo
-                    </label>
-                  </div>
-                </div>
-              </div>
-              
-              <button type="submit" name="action" value="update_test" class="btn btn-primary">Išsaugoti pakeitimus</button>
-              <button type="button" class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#editTestForm">
-                Atšaukti
-              </button>
+          <div style="display: flex; gap: 8px;">
+            <form method="POST" action="{{ url_for('teacher_tests.delete_question', question_id=question.id) }}" 
+                  class="d-inline" onsubmit="return confirm('Ar tikrai norite ištrinti šį klausimą?');">
+              {{ edit_form.hidden_tag() }}
+              <button type="submit" class="table-button red">Ištrinti</button>
             </form>
           </div>
         </div>
       </div>
+      {% endfor %}
     </div>
-    <div class="col-md-4">
-      <div class="card">
-        <div class="card-header">
-          <h6>Statistika</h6>
-        </div>
-        <div class="card-body">
-          <p>Klausimų: <strong>{{ questions|length }}</strong></p>
-          <p>Taškų iš viso: <strong>{{ test.get_total_points() }}</strong></p>
-          <p>Rezultatų: <strong>{{ test.test_results|length }}</strong></p>
-        </div>
-      </div>
+    {% else %}
+    <div style="background: rgba(255,193,7,0.2); padding: 20px; border-radius: 12px; text-align: center; color: #fff;">
+      <h6 style="color: #fff;">⚠️ Testas neturi klausimų</h6>
+      <p>Pridėkite bent vieną klausimą, kad testas veiktų.</p>
     </div>
-  </div>
+    {% endif %}
 
-  <!-- Klausimų sąrašas -->
-  <div class="card mb-4">
-    <div class="card-header d-flex justify-content-between align-items-center">
-      <h5>Klausimai</h5>
-      <button class="btn btn-sm btn-success" data-bs-toggle="collapse" data-bs-target="#addQuestionForm">
-        + Pridėti klausimą
-      </button>
-    </div>
-    <div class="card-body">
-      {% if questions %}
-      <div class="list-group">
-        {% for question in questions %}
-        <div class="list-group-item">
-          <div class="d-flex justify-content-between align-items-start">
-            <div class="flex-grow-1">
-              <h6>{{ loop.index }}. {{ question.question }}</h6>
-              <p class="mb-1"><strong>Teisingas atsakymas:</strong> {{ question.correct_answer }}</p>
-              <small>Taškai: {{ question.points }} | Tipas: {{ question.question_type }}</small>
-            </div>
-            <div class="btn-group">
-              <button class="btn btn-sm btn-warning" onclick="editQuestion('{{ question.id }}')">
-                Redaguoti
-              </button>
-              <form method="POST" action="{{ url_for('teacher_tests.delete_question', question_id=question.id) }}" 
-                    class="d-inline" onsubmit="return confirm('Ar tikrai norite ištrinti šį klausimą?');">
-                <button type="submit" class="btn btn-sm btn-danger">Ištrinti</button>
-              </form>
-            </div>
-          </div>
+    <!-- Klausimo pridėjimo forma -->
+    <div id="questionForm" style="display: none; margin-top: 20px;">
+      <h6 style="color: #fff; margin-bottom: 15px;">Pridėti naują klausimą</h6>
+      
+      <form method="POST" action="{{ url_for('teacher_tests.add_question', test_id=test.id) }}">
+        {{ question_form.hidden_tag() }}
+        
+        <!-- Klausimas -->
+        <div class="floating-label">
+          <span class="input-icon"><i data-lucide="help-circle"></i></span>
+          {{ question_form.question(class="input", id="question", placeholder=" ", rows=3, required=True) }}
+          <label for="question">Klausimas</label>
+          {% for error in question_form.question.errors %}
+          <div class="invalid-feedback d-block">{{ error }}</div>
+          {% endfor %}
         </div>
-        {% endfor %}
-      </div>
-      {% else %}
-      <div class="alert alert-warning">
-        <h6>Testas neturi klausimų</h6>
-        <p>Pridėkite bent vieną klausimą, kad testas veiktų.</p>
-      </div>
-      {% endif %}
-    </div>
-  </div>
-
-  <!-- Naujų klausimų forma -->
-  <div class="collapse" id="addQuestionForm">
-    <div class="card mb-4">
-      <div class="card-header">
-        <h6>Pridėti naują klausimą</h6>
-      </div>
-      <div class="card-body">
-        <form method="POST" action="{{ url_for('teacher_tests.add_question', test_id=test.id) }}">
-          {{ question_form.hidden_tag() }}
-          
-          <div class="mb-3">
-            {{ question_form.question.label(class="form-label") }}
-            {{ question_form.question(class="form-control") }}
-            {% for error in question_form.question.errors %}
-              <div class="text-danger">{{ error }}</div>
-            {% endfor %}
-          </div>
-          
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              {{ question_form.question_type.label(class="form-label") }}
-              {{ question_form.question_type(class="form-select") }}
-              {% for error in question_form.question_type.errors %}
-                <div class="text-danger">{{ error }}</div>
-              {% endfor %}
-            </div>
-            <div class="col-md-6 mb-3">
-              {{ question_form.points.label(class="form-label") }}
-              {{ question_form.points(class="form-control") }}
-              {% for error in question_form.points.errors %}
-                <div class="text-danger">{{ error }}</div>
-              {% endfor %}
-            </div>
-          </div>
-          
-          <div class="mb-3">
-            {{ question_form.correct_answer.label(class="form-label") }}
-            {{ question_form.correct_answer(class="form-control") }}
-            {% for error in question_form.correct_answer.errors %}
-              <div class="text-danger">{{ error }}</div>
-            {% endfor %}
-          </div>
-          
-          <button type="submit" class="btn btn-primary">{{ question_form.submit.label.text }}</button>
-          <button type="button" class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#addQuestionForm">
-            Atšaukti
-          </button>
-        </form>
-      </div>
+        
+        <!-- Taškai -->
+        <div class="floating-label">
+          <span class="input-icon"><i data-lucide="award"></i></span>
+          {{ question_form.points(class="input", id="points", placeholder=" ", min="1", max="5", required=True) }}
+          <label for="points">Taškai už teisingą atsakymą</label>
+          {% for error in question_form.points.errors %}
+          <div class="invalid-feedback d-block">{{ error }}</div>
+          {% endfor %}
+        </div>
+        
+        <!-- Atsakymų variantai -->
+        <div class="floating-label">
+          <span class="input-icon"><i data-lucide="circle"></i></span>
+          {{ question_form.choice_a(class="input", id="choice_a", placeholder=" ", required=True) }}
+          <label for="choice_a">A) Pirmas variantas</label>
+        </div>
+        
+        <div class="floating-label">
+          <span class="input-icon"><i data-lucide="circle"></i></span>
+          {{ question_form.choice_b(class="input", id="choice_b", placeholder=" ", required=True) }}
+          <label for="choice_b">B) Antras variantas</label>
+        </div>
+        
+        <div class="floating-label">
+          <span class="input-icon"><i data-lucide="circle"></i></span>
+          {{ question_form.choice_c(class="input", id="choice_c", placeholder=" ", required=True) }}
+          <label for="choice_c">C) Trečias variantas</label>
+        </div>
+        
+        <div class="floating-label">
+          <span class="input-icon"><i data-lucide="circle"></i></span>
+          {{ question_form.choice_d(class="input", id="choice_d", placeholder=" ", required=True) }}
+          <label for="choice_d">D) Ketvirtas variantas</label>
+        </div>
+        
+        <!-- Teisingas atsakymas -->
+        <div class="floating-label">
+          <span class="input-icon"><i data-lucide="check-circle"></i></span>
+          {{ question_form.correct_answer(class="input", id="correct_answer", required=True) }}
+          <label for="correct_answer">Teisingas atsakymas</label>
+        </div>
+        
+        <div style="display: flex; gap: 12px; margin-top: 20px;">
+          <button type="submit" class="big-button">Pridėti klausimą</button>
+          <button type="button" class="glass-btn" onclick="toggleQuestionForm()">Atšaukti</button>
+        </div>
+      </form>
     </div>
   </div>
 
   <!-- Testo valdymo mygtukai -->
-  <div class="card">
-    <div class="card-body text-center">
+  <div class="glass-card">
+    <h5 style="color: #fff; margin-bottom: 20px;">⚙️ Testo valdymas</h5>
+    <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
       <form method="POST" action="{{ url_for('teacher_tests.toggle_test_status', test_id=test.id) }}" class="d-inline">
-        <button type="submit" class="btn {% if test.is_active %}btn-warning{% else %}btn-success{% endif %} me-2">
+        {{ edit_form.hidden_tag() }}
+        <button type="submit" class="big-button {% if test.is_active %}yellow{% else %}'' bg-success{% endif %}">
           {{ 'Deaktyvuoti testą' if test.is_active else 'Aktyvuoti testą' }}
         </button>
       </form>
       
-      <a href="{{ url_for('teacher_tests.test_results', test_id=test.id) }}" class="btn btn-info me-2">
+      <a href="{{ url_for('teacher_tests.test_results', test_id=test.id) }}" class="big-button" style="background: #2980b9;">
         Peržiūrėti rezultatus
       </a>
       
@@ -219,7 +224,8 @@
       <form method="POST" action="{{ url_for('teacher_tests.delete_test', test_id=test.id) }}" 
             class="d-inline" 
             onsubmit="return confirm('Ar tikrai norite ištrinti šį testą? Šis veiksmas negrįžtamas.');">
-        <button type="submit" class="btn btn-danger">Ištrinti testą</button>
+        {{ edit_form.hidden_tag() }}
+        <button type="submit" class="big-button" style="background: #e74c3c;">Ištrinti testą</button>
       </form>
       {% endif %}
     </div>
@@ -228,25 +234,22 @@
 </div>
 
 <script>
-function editQuestion(questionId) {
-  // Būsimam funkcionalumui
-  alert('Klausimo redagavimas bus implementuotas vėliau');
+function toggleQuestionForm() {
+  const form = document.getElementById('questionForm');
+  const btn = document.getElementById('addQuestionBtn');
+  
+  if (form.style.display === 'none') {
+    form.style.display = 'block';
+    btn.textContent = '✕ Atšaukti';
+  } else {
+    form.style.display = 'none';
+    btn.textContent = '+ Pridėti klausimą';
+  }
 }
 
-// Bootstrap collapse funkcionalumas
+// Lucide icons
 document.addEventListener('DOMContentLoaded', function() {
-  // Inicializuoti Bootstrap collapse
-  const collapseElements = document.querySelectorAll('[data-bs-toggle="collapse"]');
-  collapseElements.forEach(function(element) {
-    element.addEventListener('click', function() {
-      const target = document.querySelector(this.getAttribute('data-bs-target'));
-      if (target.classList.contains('show')) {
-        target.classList.remove('show');
-      } else {
-        target.classList.add('show');
-      }
-    });
-  });
+  if (window.lucide) lucide.createIcons();
 });
 </script>
 {% endblock %}

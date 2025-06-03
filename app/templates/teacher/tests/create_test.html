@@ -2,105 +2,90 @@
 {% block title %}Sukurti testą{% endblock %}
 
 {% block content %}
+<!-- Navigacija viršuje -->
 <div class="mb-4">
   <a href="{{ url_for('teacher_tests.my_tests') }}" class="btn btn-secondary me-2">← Atgal į testus</a>
   <a href="{{ url_for('teacher.teacher_dashboard') }}" class="btn btn-secondary me-2">Skydelis</a>
   <a href="{{ url_for('main.profile') }}" class="btn btn-secondary">Profilis</a>
 </div>
 
-<div class="container mt-4">
-  <h2 class="mb-4">Naujo testo kūrimas</h2>
+<div class="center-wrapper">
+  <div class="main-content glass-card" style="max-width: 520px;">
+    <h2 class="center-text mb-4">Sukurti naują testą</h2>
 
-  <form method="POST" class="needs-validation" novalidate>
-    {{ form.hidden_tag() }}
+    <form method="POST" novalidate>
+      {{ form.hidden_tag() }}
 
-    <div class="mb-3">
-      {{ form.title.label(class="form-label") }}
-      {{ form.title(class="form-control") }}
-      {% for error in form.title.errors %}
-        <div class="text-danger">{{ error }}</div>
-      {% endfor %}
-    </div>
-
-    <div class="mb-3">
-      {{ form.description.label(class="form-label") }}
-      {{ form.description(class="form-control", rows=3) }}
-      {% for error in form.description.errors %}
-        <div class="text-danger">{{ error }}</div>
-      {% endfor %}
-    </div>
-
-    <div class="row">
-      <div class="col-md-6 mb-3">
-        {{ form.module_id.label(class="form-label") }}
-        {{ form.module_id(class="form-select", id="module_select") }}
-        {% for error in form.module_id.errors %}
-          <div class="text-danger">{{ error }}</div>
+      <!-- Pavadinimas -->
+      <div class="floating-label">
+        <span class="input-icon"><i data-lucide="file-text"></i></span>
+        {{ form.title(class="input", id="title", placeholder=" ", required=True) }}
+        <label for="title">Testo pavadinimas</label>
+        {% for error in form.title.errors %}
+        <div class="invalid-feedback d-block">{{ error }}</div>
         {% endfor %}
       </div>
-      <div class="col-md-6 mb-3">
-        {{ form.assessment_id.label(class="form-label") }}
-        {{ form.assessment_id(class="form-select") }}
-        <small class="form-text text-muted">Jei nesirinksite, testas bus papildomas</small>
+
+      <!-- Aprašymas -->
+      <div class="floating-label">
+        <span class="input-icon"><i data-lucide="edit-3"></i></span>
+        {{ form.description(class="input", id="description", placeholder=" ", rows=3) }}
+        <label for="description">Aprašymas (neprivaloma)</label>
+        {% for error in form.description.errors %}
+        <div class="invalid-feedback d-block">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <!-- Atsiskaitymas -->
+      <div class="floating-label">
+        <span class="input-icon"><i data-lucide="clipboard-list"></i></span>
+        {{ form.assessment_id(class="input", id="assessment_id", required=True) }}
+        <label for="assessment_id">Atsiskaitymas</label>
         {% for error in form.assessment_id.errors %}
-          <div class="text-danger">{{ error }}</div>
+        <div class="invalid-feedback d-block">{{ error }}</div>
         {% endfor %}
       </div>
-    </div>
-
-    <div class="row">
-      <div class="col-md-4 mb-3">
-        {{ form.time_limit.label(class="form-label") }}
-        {{ form.time_limit(class="form-control") }}
-        <small class="form-text text-muted">Palikite tuščią, jei nenorite laiko limito</small>
+      <!-- Laiko limitas -->
+      <div class="floating-label">
+        <span class="input-icon"><i data-lucide="clock"></i></span>
+        {{ form.time_limit(class="input", id="time_limit", placeholder=" ", min="1") }}
+        <label for="time_limit">Laiko limitas (minutės)</label>
         {% for error in form.time_limit.errors %}
-          <div class="text-danger">{{ error }}</div>
+        <div class="invalid-feedback d-block">{{ error }}</div>
         {% endfor %}
       </div>
-      <div class="col-md-4 mb-3">
-        {{ form.max_attempts.label(class="form-label") }}
-        {{ form.max_attempts(class="form-control") }}
+
+      <!-- Bandymų skaičius -->
+      <div class="floating-label">
+        <span class="input-icon"><i data-lucide="repeat"></i></span>
+        {{ form.max_attempts(class="input", id="max_attempts", placeholder=" ", min="1", max="3", required=True) }}
+        <label for="max_attempts">Maksimalus bandymų skaičius</label>
         {% for error in form.max_attempts.errors %}
-          <div class="text-danger">{{ error }}</div>
+        <div class="invalid-feedback d-block">{{ error }}</div>
         {% endfor %}
       </div>
-    </div>
 
-    <div class="row">
-      <div class="col-md-6 mb-3">
-        <div class="form-check">
-          {{ form.show_results_immediately(class="form-check-input") }}
-          {{ form.show_results_immediately.label(class="form-check-label") }}
-        </div>
-        <small class="form-text text-muted">Studentai iš karto matys rezultatus ir teisingus atsakymus</small>
-      </div>
-      <div class="col-md-6 mb-3">
-        <div class="form-check">
-          {{ form.stop_after_pass(class="form-check-input") }}
-          {{ form.stop_after_pass.label(class="form-check-label") }}
-        </div>
-        <small class="form-text text-muted">Studentas negalės kartoti testo gavęs teigiamą pažymį</small>
-      </div>
-    </div>
+      <button type="submit" class="big-button w-100 mt-3">
+        {{ form.submit.label.text }}
+      </button>
+    </form>
 
-    <div class="d-flex gap-2">
-      <button type="submit" class="btn btn-primary">{{ form.submit.label.text }}</button>
-      <a href="{{ url_for('teacher_tests.my_tests') }}" class="btn btn-secondary">Atšaukti</a>
+    <div class="mt-3 center-text">
+      <span style="font-size: 0.9em; color: var(--accent)">
+        Nenorite kurti? 
+        <a href="{{ url_for('teacher_tests.my_tests') }}" 
+           style="color: var(--accent); text-decoration: underline">
+          Atgal į testų sąrašą
+        </a>
+      </span>
     </div>
-  </form>
+  </div>
 </div>
 
 <script>
-// Galima pridėti JavaScript modulių ir egzaminų dinaminio krovno
+// Lucide icons
 document.addEventListener('DOMContentLoaded', function() {
-    const moduleSelect = document.getElementById('module_select');
-    
-    // Galite pridėti AJAX funkciją egzaminų krovimui pagal pasirinktą modulį
-    if (moduleSelect) {
-        moduleSelect.addEventListener('change', function() {
-            // TODO: Implementuoti AJAX egzaminų krovimą
-        });
-    }
+  if (window.lucide) lucide.createIcons();
 });
 </script>
 {% endblock %}

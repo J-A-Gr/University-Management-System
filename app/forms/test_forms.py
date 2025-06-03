@@ -1,94 +1,91 @@
+# app/forms/test_forms.py
+
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, IntegerField, BooleanField, SelectField, SubmitField, HiddenField
-from wtforms.validators import DataRequired, Length, NumberRange, Optional
-from app.models import Module, Assessment
+from wtforms import StringField, TextAreaField, IntegerField, BooleanField, SelectField, SubmitField
+from wtforms.validators import DataRequired, Optional, NumberRange
+from app.models import Assessment, Module
 
 class TestForm(FlaskForm):
-    title = StringField('Test title', validators=[
-        DataRequired(message='Test title is required'), 
-        Length(min=3, max=200, message='Test title must be 3-200 characters long'   )
-    ])
-    description = TextAreaField('Description', validators=[Optional()])
-    time_limit = IntegerField('Time limit (minutes)', validators=[
-        Optional(), 
-        NumberRange(min=1, max=300, message='Time limit must be between 1 and 300 minutes')
-    ])
-    max_attempts = IntegerField('Maximum number of attempts', validators=[
-        DataRequired(message='Attempt count is mandatory'), 
-        NumberRange(min=1, max=10, message='Number of attempts must be 1-10')
-    ], default=1)
-    show_results_immediately = BooleanField('Display results instantly', default=True)
-    stop_after_pass = BooleanField('Stop after positive assessment', default=True)
+    """Testo kūrimo forma - tik atsiskaitymams"""
     
-    module_id = SelectField('Module', 
-                            validators=[DataRequired(message='Module is required')],
-                            coerce=int)
-        
-    assessment_id = SelectField('Exam (optional)', 
-                           validate_choice=False)
-
-
-    submit = SubmitField('Create test')
-
+    title = StringField('Testo pavadinimas', validators=[DataRequired()])
+    description = TextAreaField('Aprašymas (neprivaloma)')
+    time_limit = IntegerField('Laiko limitas minutėmis (palikite tuščią jei nenorite)', 
+                             validators=[Optional(), NumberRange(min=1)])
+    max_attempts = IntegerField('Maksimalus bandymų skaičius', 
+                               validators=[DataRequired(), NumberRange(min=1, max=3)], 
+                               default=1)
+    
+    assessment_id = SelectField('Pasirinkite atsiskaitymą', 
+                               coerce=int, 
+                               validators=[DataRequired()])
+    
+    submit = SubmitField('Sukurti testą')
 
     def __init__(self, teacher_id=None, *args, **kwargs):
         super(TestForm, self).__init__(*args, **kwargs)
         
         if teacher_id:
-                # Užpildyti modulių pasirinkimus
-            modules = Module.query.filter_by(teacher_id=teacher_id, is_active=True).all()
-            self.module_id.choices = [(m.id, m.name) for m in modules]
-                
-                # Užpildyti egzaminų pasirinkimus
-            module_ids = [m.id for m in modules]
-            assessments = Assessment.query.filter(
-                Assessment.module_id.in_(module_ids),
-                Assessment.assessment_type == 'egzaminas',
-                Assessment.is_active == True
+            assessments = Assessment.query.join(Module).outerjoin(
+                Assessment.tests
+            ).filter(
+                Module.teacher_id == teacher_id,
+                Assessment.is_active == True,
+                Assessment.tests == None
             ).all()
-                
-                # Pridėti egzaminus prie choices
-            assessment_choices = [('', 'Select exam...')]
-            assessment_choices.extend([(a.id, a.title) for a in assessments])
-            self.assessment_id.choices = assessment_choices
-        
+            
+            if assessments:
+                self.assessment_id.choices = [
+                    (a.id, f"{a.title} - {a.module.name}")
+                    for a in assessments
+                ]
+            else:
+                self.assessment_id.choices = []
         else:
-                # Default choices - JEI NĖRA teacher_id
-            self.module_id.choices = []
-            self.assessment_id.choices = [('', 'Select exam...')]
+            self.assessment_id.choices = []
 
 
-class TestQuestionForm(FlaskForm):
-    question = TextAreaField('Question', validators=[
-        DataRequired(message='Question text is required'), 
-        Length(min=5, max=1000, message='Question must be between 5 and 1000 characters')
-    ])
-    question_type = SelectField('Question type', 
-                               choices=[('open', 'Open question')],
-                               validators=[DataRequired()],
-                               default='open')
-    points = IntegerField('Points', validators=[
-        DataRequired(message='Points count is required'), 
-        NumberRange(min=1, max=10, message='Points count must be 1-10')
-    ], default=1)
-    correct_answer = StringField('Correct answer', validators=[
-        DataRequired(message='Correct answer is required for open questions'),
-        Length(min=1, max=500, message='Answer must be 1-500 characters')
-    ])
-    submit = SubmitField('Add question')
+class QuestionForm(FlaskForm):
+    """Klausimo forma - tik multiple choice"""
+    
+    question = TextAreaField('Klausimas', validators=[DataRequired()])
+    points = IntegerField('Kiek taškų už teisingą atsakymą', 
+                         validators=[DataRequired(), NumberRange(min=1, max=5)], 
+                         default=1)
+    
+    # 4 atsakymų variantai
+    choice_a = StringField('A) Pirmas variantas', validators=[DataRequired()])
+    choice_b = StringField('B) Antras variantas', validators=[DataRequired()])
+    choice_c = StringField('C) Trečias variantas', validators=[DataRequired()])
+    choice_d = StringField('D) Ketvirtas variantas', validators=[DataRequired()])
+    
+    # Teisingas atsakymas - tik vienas iš A, B, C, D
+    correct_answer = SelectField('Teisingas atsakymas', 
+                                choices=[
+                                    ('A', 'A) Pirmas variantas'),
+                                    ('B', 'B) Antras variantas'), 
+                                    ('C', 'C) Trečias variantas'),
+                                    ('D', 'D) Ketvirtas variantas')
+                                ],
+                                validators=[DataRequired()])
+    
+    submit = SubmitField('Pridėti klausimą')
 
 
-class EditTestQuestionForm(FlaskForm):
-    question_id = HiddenField()
-    question = TextAreaField('Question', validators=[DataRequired(), Length(min=5, max=1000)])
-    points = IntegerField('Points', validators=[DataRequired(), NumberRange(min=1, max=10)])
-    correct_answer = StringField('Correct answer', validators=[DataRequired(), Length(min=1, max=500)])
-    submit = SubmitField('Update question')
+class TestEditForm(FlaskForm):
+    """Testo redagavimo forma"""
+    
+    title = StringField('Testo pavadinimas', validators=[DataRequired()])
+    description = TextAreaField('Aprašymas')
+    time_limit = IntegerField('Laiko limitas (minutės)', 
+                             validators=[Optional(), NumberRange(min=1)])
+    max_attempts = IntegerField('Maksimalus bandymų skaičius', 
+                               validators=[DataRequired(), NumberRange(min=1, max=3)], 
+                               default=1)
+    
+    submit = SubmitField('Išsaugoti pakeitimus')
 
-class StudentAnswerForm(FlaskForm):
-    """Form for student to submit answers"""
-    pass  # Dinamiškai sukuriama view'e
 
 class TestCompletionForm(FlaskForm):
-    """Form for completing test"""
-    submit = SubmitField('Complete test')
+    """Testo baigimo forma"""
+    submit = SubmitField('Baigti testą')
