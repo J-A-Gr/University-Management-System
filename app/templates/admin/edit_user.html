@@ -1,9 +1,11 @@
-{% extends "base.html" %}
+<!-- BUG NEBEREIKALINGAS FAILAS KAIP IR MANAGE_USERS.html, DĖL VISA KO BŪNA TEGU-->
+
+<!-- {% extends "base.html" %}
 {% block title %}Redaguoti vartotoją{% endblock %}
-{% block content %}
+{% block content %} -->
 
 <!-- Navigacija viršuje -->
-<div class="mb-4">
+<!-- <div class="mb-4">
   <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-secondary me-2">← Atgal į admin skydelį</a>
   <a href="{{ url_for('admin.manage_users') }}" class="btn btn-secondary me-2">Vartotojų valdymas</a>
   <a href="{{ url_for('main.profile') }}" class="btn btn-secondary">Profilis</a>
@@ -15,27 +17,27 @@
       Redaguoti: {{ user.full_name }}
     </h2>
     <form method="POST">
-      {{ form.hidden_tag() }}
+      {{ form.hidden_tag() }} -->
 
-      <!-- Rolė pasirinkimas -->
+<!-- Rolė pasirinkimas
       <div class="floating-label" style="margin-bottom: 22px;">
         <select name="role" id="role" class="input" style="background: #fff; color: var(--card-bg);" required>
           <option value="student" {% if user.is_student %}selected{% endif %}>Studentas</option>
           <option value="teacher" {% if user.is_teacher %}selected{% endif %}>Dėstytojas</option>
         </select>
         <label for="role">Rolė</label>
-      </div>
+      </div> -->
 
-      <!-- Aktyvumo žymė -->
+<!-- Aktyvumo žymė
       <div style="margin-bottom: 22px; display: flex; align-items: center; gap: 10px;">
         <input type="checkbox" name="is_active" id="is_active" style="width: 20px; height: 20px;" {% if user.is_active %}checked{% endif %}>
         <label for="is_active" style="color: #111; font-size: 1.08em; font-weight: 700; margin: 0;">
           Aktyvus
         </label>
-      </div>
+      </div> -->
 
-      <!-- Studijų programa tik studentui -->
-      {% if user.is_student %}
+<!-- Studijų programa tik studentui -->
+<!-- {% if user.is_student %}
       <div class="floating-label" style="margin-bottom: 22px;">
         <select name="program_id" id="program_id" class="input" style="background: #fff; color: var(--card-bg);">
           {% for program in programs %}
@@ -57,4 +59,4 @@
     </form>
   </div>
 </div>
-{% endblock %}
+{% endblock %} -->
