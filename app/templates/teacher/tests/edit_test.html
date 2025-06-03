@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+{% block title %}Redaguoti testą - {{ test.title }}{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+  <a href="{{ url_for('teacher_tests.my_tests') }}" class="btn btn-secondary me-2">← Atgal į testus</a>
+  <a href="{{ url_for('teacher.teacher_dashboard') }}" class="btn btn-secondary me-2">Skydelis</a>
+  <a href="{{ url_for('main.profile') }}" class="btn btn-secondary">Profilis</a>
+</div>
+
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>{{ test.title }} - Redagavimas</h2>
+    <span class="badge {% if test.is_active %}bg-success{% else %}bg-secondary{% endif %} fs-6">
+      {{ 'Aktyvus' if test.is_active else 'Neaktyvus' }}
+    </span>
+  </div>
+
+  <!-- Testo informacija -->
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5>Testo informacija</h5>
+          <button class="btn btn-sm btn-outline-primary" data-bs-toggle="collapse" data-bs-target="#editTestForm">
+            Redaguoti testą
+          </button>
+        </div>
+        <div class="card-body">
+          <p><strong>Aprašymas:</strong> {{ test.description or 'Nėra aprašymo' }}</p>
+          <p><strong>Modulis:</strong> {{ test.module.name }}</p>
+          <p><strong>Laiko limitas:</strong> {{ test.time_limit or 'Neribota' }} min</p>
+          <p><strong>Maks. bandymai:</strong> {{ test.max_attempts }}</p>
+          <p><strong>Rodyti rezultatus iš karto:</strong> {{ 'Taip' if test.show_results_immediately else 'Ne' }}</p>
+          <p><strong>Sustabdyti po išlaikymo:</strong> {{ 'Taip' if test.stop_after_pass else 'Ne' }}</p>
+        </div>
+      </div>
+      
+      <!-- Testo redagavimo forma -->
+      <div class="collapse mt-3" id="editTestForm">
+        <div class="card">
+          <div class="card-header">
+            <h6>Redaguoti testo nustatymus</h6>
+          </div>
+          <div class="card-body">
+            <form method="POST" action="{{ url_for('teacher_tests.edit_test', test_id=test.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+              
+              <div class="mb-3">
+                <label for="title" class="form-label">Pavadinimas</label>
+                <input type="text" class="form-control" id="title" name="title" value="{{ test.title }}" required>
+              </div>
+              
+              <div class="mb-3">
+                <label for="description" class="form-label">Aprašymas</label>
+                <textarea class="form-control" id="description" name="description" rows="3">{{ test.description or '' }}</textarea>
+              </div>
+              
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="time_limit" class="form-label">Laiko limitas (minutės)</label>
+                  <input type="number" class="form-control" id="time_limit" name="time_limit" value="{{ test.time_limit or '' }}" min="1">
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="max_attempts" class="form-label">Maksimalus bandymų skaičius</label>
+                  <input type="number" class="form-control" id="max_attempts" name="max_attempts" value="{{ test.max_attempts }}" min="1" max="10" required>
+                </div>
+              </div>
+              
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="show_results_immediately" name="show_results_immediately" {% if test.show_results_immediately %}checked{% endif %}>
+                    <label class="form-check-label" for="show_results_immediately">
+                      Rodyti rezultatus iš karto
+                    </label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="stop_after_pass" name="stop_after_pass" {% if test.stop_after_pass %}checked{% endif %}>
+                    <label class="form-check-label" for="stop_after_pass">
+                      Sustabdyti po išlaikymo
+                    </label>
+                  </div>
+                </div>
+              </div>
+              
+              <button type="submit" name="action" value="update_test" class="btn btn-primary">Išsaugoti pakeitimus</button>
+              <button type="button" class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#editTestForm">
+                Atšaukti
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header">
+          <h6>Statistika</h6>
+        </div>
+        <div class="card-body">
+          <p>Klausimų: <strong>{{ questions|length }}</strong></p>
+          <p>Taškų iš viso: <strong>{{ test.get_total_points() }}</strong></p>
+          <p>Rezultatų: <strong>{{ test.test_results|length }}</strong></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Klausimų sąrašas -->
+  <div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5>Klausimai</h5>
+      <button class="btn btn-sm btn-success" data-bs-toggle="collapse" data-bs-target="#addQuestionForm">
+        + Pridėti klausimą
+      </button>
+    </div>
+    <div class="card-body">
+      {% if questions %}
+      <div class="list-group">
+        {% for question in questions %}
+        <div class="list-group-item">
+          <div class="d-flex justify-content-between align-items-start">
+            <div class="flex-grow-1">
+              <h6>{{ loop.index }}. {{ question.question }}</h6>
+              <p class="mb-1"><strong>Teisingas atsakymas:</strong> {{ question.correct_answer }}</p>
+              <small>Taškai: {{ question.points }} | Tipas: {{ question.question_type }}</small>
+            </div>
+            <div class="btn-group">
+              <button class="btn btn-sm btn-warning" onclick="editQuestion('{{ question.id }}')">
+                Redaguoti
+              </button>
+              <form method="POST" action="{{ url_for('teacher_tests.delete_question', question_id=question.id) }}" 
+                    class="d-inline" onsubmit="return confirm('Ar tikrai norite ištrinti šį klausimą?');">
+                <button type="submit" class="btn btn-sm btn-danger">Ištrinti</button>
+              </form>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="alert alert-warning">
+        <h6>Testas neturi klausimų</h6>
+        <p>Pridėkite bent vieną klausimą, kad testas veiktų.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Naujų klausimų forma -->
+  <div class="collapse" id="addQuestionForm">
+    <div class="card mb-4">
+      <div class="card-header">
+        <h6>Pridėti naują klausimą</h6>
+      </div>
+      <div class="card-body">
+        <form method="POST" action="{{ url_for('teacher_tests.add_question', test_id=test.id) }}">
+          {{ question_form.hidden_tag() }}
+          
+          <div class="mb-3">
+            {{ question_form.question.label(class="form-label") }}
+            {{ question_form.question(class="form-control") }}
+            {% for error in question_form.question.errors %}
+              <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              {{ question_form.question_type.label(class="form-label") }}
+              {{ question_form.question_type(class="form-select") }}
+              {% for error in question_form.question_type.errors %}
+                <div class="text-danger">{{ error }}</div>
+              {% endfor %}
+            </div>
+            <div class="col-md-6 mb-3">
+              {{ question_form.points.label(class="form-label") }}
+              {{ question_form.points(class="form-control") }}
+              {% for error in question_form.points.errors %}
+                <div class="text-danger">{{ error }}</div>
+              {% endfor %}
+            </div>
+          </div>
+          
+          <div class="mb-3">
+            {{ question_form.correct_answer.label(class="form-label") }}
+            {{ question_form.correct_answer(class="form-control") }}
+            {% for error in question_form.correct_answer.errors %}
+              <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+          
+          <button type="submit" class="btn btn-primary">{{ question_form.submit.label.text }}</button>
+          <button type="button" class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#addQuestionForm">
+            Atšaukti
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Testo valdymo mygtukai -->
+  <div class="card">
+    <div class="card-body text-center">
+      <form method="POST" action="{{ url_for('teacher_tests.toggle_test_status', test_id=test.id) }}" class="d-inline">
+        <button type="submit" class="btn {% if test.is_active %}btn-warning{% else %}btn-success{% endif %} me-2">
+          {{ 'Deaktyvuoti testą' if test.is_active else 'Aktyvuoti testą' }}
+        </button>
+      </form>
+      
+      <a href="{{ url_for('teacher_tests.test_results', test_id=test.id) }}" class="btn btn-info me-2">
+        Peržiūrėti rezultatus
+      </a>
+      
+      {% if test.test_results|length == 0 %}
+      <form method="POST" action="{{ url_for('teacher_tests.delete_test', test_id=test.id) }}" 
+            class="d-inline" 
+            onsubmit="return confirm('Ar tikrai norite ištrinti šį testą? Šis veiksmas negrįžtamas.');">
+        <button type="submit" class="btn btn-danger">Ištrinti testą</button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+
+<script>
+function editQuestion(questionId) {
+  // Būsimam funkcionalumui
+  alert('Klausimo redagavimas bus implementuotas vėliau');
+}
+
+// Bootstrap collapse funkcionalumas
+document.addEventListener('DOMContentLoaded', function() {
+  // Inicializuoti Bootstrap collapse
+  const collapseElements = document.querySelectorAll('[data-bs-toggle="collapse"]');
+  collapseElements.forEach(function(element) {
+    element.addEventListener('click', function() {
+      const target = document.querySelector(this.getAttribute('data-bs-target'));
+      if (target.classList.contains('show')) {
+        target.classList.remove('show');
+      } else {
+        target.classList.add('show');
+      }
+    });
+  });
+});
+</script>
+{% endblock %}
