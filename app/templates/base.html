@@ -139,7 +139,7 @@
       #} {% elif current_user.role == 'student' %}
       <a
         href="{{ url_for('student.student_dashboard') }}"
-        class="nav-btn {% if ep == 'student.student_dashboard' or ep.startswith('student.') %}active{% endif %}"
+        class="nav-btn {% if ep == 'student.dashboard' or ep.startswith('student.') %}active{% endif %}"
       >
         Studento Panelė
       </a>

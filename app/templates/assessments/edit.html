@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block title %}Redaguoti atsiskaitymą{% endblock %}
+
+{% block content %}
+<!-- Navigacija viršuje -->
+<div class="mb-4">
+  <a href="{{ url_for('assessments.list_assessments') }}" class="btn btn-secondary me-2">
+    ← Atgal į sąrašą
+  </a>
+  <a href="{{ url_for('teacher.teacher_dashboard') }}" class="btn btn-secondary me-2">
+    Dėstytojo skydelis
+  </a>
+  <a href="{{ url_for('main.profile') }}" class="btn btn-secondary">Profilis</a>
+</div>
+
+<div class="center-wrapper">
+  <div class="main-content glass-card" style="max-width: 480px;">
+    <h2 class="center-text mb-4">Redaguoti atsiskaitymą</h2>
+    
+    <!-- Dabartinės informacijos rodymas -->
+    <div style="background: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 12px; margin-bottom: 25px;">
+      <h6 style="margin-bottom: 10px; color: var(--accent);">Dabartinė informacija:</h6>
+      <div style="font-size: 0.9em; opacity: 0.9;">
+        <strong>{{ assessment.title }}</strong><br>
+        <span>{{ assessment.assessment_type.title() }} • {{ assessment.module.name }}</span><br>
+        <span>{{ assessment.due_date.strftime('%Y-%m-%d %H:%M') }} • {{ assessment.max_points }} balai</span>
+      </div>
+    </div>
+
+    <form method="POST" novalidate>
+      {{ form.hidden_tag() }}
+
+      <!-- Pavadinimas -->
+      <div class="floating-label">
+        <span class="input-icon"><i data-lucide="file-text"></i></span>
+        {{ form.title(class="input", id="title", placeholder=" ", required=True) }}
+        <label for="title">Pavadinimas</label>
+        {% for error in form.title.errors %}
+        <div class="invalid-feedback d-block">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <!-- Aprašymas -->
+      <div class="floating-label">
+        <span class="input-icon"><i data-lucide="edit-3"></i></span>
+        {{ form.description(class="input", id="description", placeholder=" ", rows=3) }}
+        <label for="description">Aprašymas (neprivaloma)</label>
+        {% for error in form.description.errors %}
+        <div class="invalid-feedback d-block">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <!-- Modulis -->
+      <div class="floating-label">
+        <span class="input-icon"><i data-lucide="book-open"></i></span>
+        {{ form.module_id(class="input", id="module_id", required=True) }}
+        <label for="module_id">Modulis</label>
+        {% for error in form.module_id.errors %}
+        <div class="invalid-feedback d-block">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <!-- Tipas -->
+      <div class="floating-label">
+        <span class="input-icon"><i data-lucide="tag"></i></span>
+        {{ form.assessment_type(class="input", id="assessment_type", required=True) }}
+        <label for="assessment_type">Atsiskaitymo tipas</label>
+        {% for error in form.assessment_type.errors %}
+        <div class="invalid-feedback d-block">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <!-- Data ir laikas -->
+      <div class="floating-label">
+        <span class="input-icon"><i data-lucide="calendar"></i></span>
+        {{ form.due_date(class="input", id="due_date", type="datetime-local", required=True) }}
+        <label for="due_date">Data ir laikas</label>
+        {% for error in form.due_date.errors %}
+        <div class="invalid-feedback d-block">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <!-- Maksimalūs balai -->
+      <div class="floating-label">
+        <span class="input-icon"><i data-lucide="award"></i></span>
+        {{ form.max_points(class="input", id="max_points", placeholder=" ", min="1", max="100", required=True) }}
+        <label for="max_points">Maksimalūs balai</label>
+        {% for error in form.max_points.errors %}
+        <div class="invalid-feedback d-block">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <button type="submit" class="big-button w-100 mt-3">
+        Atnaujinti atsiskaitymą
+      </button>
+    </form>
+
+    <div class="mt-3 center-text">
+      <span style="font-size: 0.9em; color: var(--accent)">
+        Nenorite keisti? 
+        <a href="{{ url_for('assessments.list_assessments') }}" 
+           style="color: var(--accent); text-decoration: underline">
+          Atgal į sąrašą
+        </a>
+      </span>
+    </div>
+
+    <!-- Papildomi veiksmai -->
+    <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.2);">
+      <div style="display: flex; gap: 10px; justify-content: center;">
+        <!-- Aktyvumo perjungimas -->
+        <form method="POST" action="{{ url_for('assessments.toggle_assessment', assessment_id=assessment.id) }}" style="display: inline;">
+          {{ form.hidden_tag() }}
+          <button type="submit" 
+                  class="glass-btn" 
+                  style="padding: 8px 16px; font-size: 0.9em;">
+            {% if assessment.is_active %}
+              <i data-lucide="pause-circle"></i> Atšaukti
+            {% else %}
+              <i data-lucide="play-circle"></i> Aktyvuoti
+            {% endif %}
+          </button>
+        </form>
+
+        <!-- Statuso rodymas -->
+        <div style="display: flex; align-items: center; gap: 5px; font-size: 0.9em;">
+          {% if assessment.is_active %}
+            <i data-lucide="check-circle" style="color: #44bb63; width: 16px; height: 16px;"></i>
+            <span style="color: #44bb63;">Aktyvus</span>
+          {% else %}
+            <i data-lucide="x-circle" style="color: #6c757d; width: 16px; height: 16px;"></i>
+            <span style="color: #6c757d;">Atšauktas</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Konvertuoti datetime į datetime-local formatą
+  const dateInput = document.querySelector('input[type="datetime-local"]');
+  if (dateInput && dateInput.value) {
+    // Jei data jau užpildyta Python'e, tiesiog konvertuojame formatą
+    const dateValue = new Date(dateInput.value);
+    if (!isNaN(dateValue.getTime())) {
+      const year = dateValue.getFullYear();
+      const month = String(dateValue.getMonth() + 1).padStart(2, '0');
+      const day = String(dateValue.getDate()).padStart(2, '0');
+      const hours = String(dateValue.getHours()).padStart(2, '0');
+      const minutes = String(dateValue.getMinutes()).padStart(2, '0');
+      
+      dateInput.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
+  }
+  
+  // Lucide icons
+  if (window.lucide) lucide.createIcons();
+});
+</script>
+{% endblock %}

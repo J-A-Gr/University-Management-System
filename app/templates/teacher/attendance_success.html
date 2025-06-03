@@ -1,0 +1,30 @@
+{% extends "base.html" %} {% block title %}Lankomumas pažymėtas{% endblock %} {%
+block content %}
+<div class="alert alert-success mt-4">
+  <h3>Lankomumas pažymėtas sėkmingai!</h3>
+  <ul>
+    <li>
+      <strong>Studento ID:</strong>
+      {{ student_id }}
+    </li>
+    <li>
+      <strong>Modulis:</strong>
+      {{ module.name }}
+    </li>
+    <li>
+      <strong>Data:</strong>
+      {{ date }}
+    </li>
+    <li>
+      <strong>Statusas:</strong>
+      {{ status }}
+    </li>
+  </ul>
+  <a
+    href="{{ url_for('teacher.view_module_students', module_id=module.id) }}"
+    class="btn btn-primary"
+  >
+    Grįžti atgal
+  </a>
+</div>
+{% endblock %}

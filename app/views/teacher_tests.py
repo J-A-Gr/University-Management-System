@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, abort, flash, request
 from flask_login import login_required, current_user
 from app.models import Test, TestQuestion, Module, Assessment, TestResult
-from app.forms.test_forms import TestForm, TestQuestionForm, EditTestQuestionForm
+from app.forms.test_forms import TestForm, QuestionForm, TestEditForm, TestCompletionForm
 from app.extensions import db
 
 bp = Blueprint('teacher_tests', __name__, url_prefix='/teacher/tests')
@@ -23,37 +23,43 @@ def my_tests():
 @bp.route('/create', methods=['GET', 'POST'])
 @login_required
 def create_test():
-    """New test creation"""
+    """New test creation - PATAISYTA"""
     if not current_user.is_teacher:
         abort(403)
     
     form = TestForm(teacher_id=current_user.teacher_info.id)
     
+    # Tikrinam, ar yra atsiskaitymu, kuriems galima sukurti testus
+    if not form.assessment_id.choices:
+        flash('Nėra atsiskaitymų, kuriems galima sukurti testus. Pirmiausia sukurkite atsiskaitymus.', 'info')
+        return redirect(url_for('assessments.list_assessments'))
+    
     if form.validate_on_submit():
-        module = Module.query.get(form.module_id.data)
-        if not module or module.teacher_id != current_user.teacher_info.id:
+        assessment = Assessment.query.get(form.assessment_id.data)
+        if not assessment or assessment.module.teacher_id != current_user.teacher_info.id:
             abort(403)
         
-        assessment_id = None
-        if form.assessment_id.data and form.assessment_id.data != '':
-            assessment_id = form.assessment_id.data
-
+        # Tikrinam ar nėra testo atsiskaitymui
+        if assessment.tests:
+            flash('Šis atsiskaitymas jau turi testą!', 'error')
+            return redirect(url_for('teacher_tests.my_tests'))
         
         test = Test(
             title=form.title.data,
             description=form.description.data,
             time_limit=form.time_limit.data,
             max_attempts=form.max_attempts.data,
-            show_results_immediately=form.show_results_immediately.data,
-            stop_after_pass=form.stop_after_pass.data,
-            module_id=form.module_id.data,  
-            assessment_id=assessment_id,    
+            show_results_immediately=True,
+            stop_after_pass=True,
+            assessment_id=form.assessment_id.data, 
+            module_id=assessment.module_id,
             created_by_teacher_id=current_user.teacher_info.id
         )
         
         db.session.add(test)
         db.session.commit()
         
+        flash(f'Testas sukurtas atsiskaitymui "{assessment.title}"!', 'success')
         return redirect(url_for('teacher_tests.edit_test', test_id=test.id))
     
     return render_template('teacher/tests/create_test.html', form=form)
@@ -71,8 +77,8 @@ def edit_test(test_id):
         abort(403)
     
     questions = TestQuestion.get_questions_by_position(test_id)
-    question_form = TestQuestionForm()
-    edit_form = EditTestQuestionForm()
+    question_form = QuestionForm()
+    edit_form = TestEditForm(obj=test)
     
     return render_template('teacher/tests/edit_test.html', 
                          test=test, 
@@ -83,7 +89,7 @@ def edit_test(test_id):
 @bp.route('/<int:test_id>/add_question', methods=['POST'])
 @login_required
 def add_question(test_id):
-    """Question addition to a test"""
+    """SUPAPRASTINTA klausimo pridėjimas - tik multiple choice"""
     if not current_user.is_teacher:
         abort(403)
     
@@ -92,45 +98,61 @@ def add_question(test_id):
     if test.created_by_teacher_id != current_user.teacher_info.id:
         abort(403)
     
-    form = TestQuestionForm()
+    form = QuestionForm()
     
     if form.validate_on_submit():
-        question = TestQuestion(
-            question=form.question.data,
-            question_type=form.question_type.data,
-            points=form.points.data,
-            correct_answer=form.correct_answer.data,
-            test_id=test_id,
-            position=TestQuestion.get_next_position(test_id)
-        )
-        
-        db.session.add(question)
-        db.session.commit()
+        try:
+            question = TestQuestion(
+                question=form.question.data,
+                points=form.points.data,
+                choice_a=form.choice_a.data,
+                choice_b=form.choice_b.data,
+                choice_c=form.choice_c.data,
+                choice_d=form.choice_d.data,
+                correct_answer=form.correct_answer.data,
+                test_id=test_id,
+                position=TestQuestion.get_next_position(test_id)
+            )
+            
+            db.session.add(question)
+            db.session.commit()
+            
+            flash('Klausimas sėkmingai pridėtas!', 'success')
+            
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Klaida pridedant klausimą: {str(e)}', 'error')
+    else:
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f'{field}: {error}', 'error')
     
     return redirect(url_for('teacher_tests.edit_test', test_id=test_id))
 
-@bp.route('/question/<int:question_id>/edit', methods=['POST'])
+@bp.route('/<int:test_id>/update', methods=['POST'])
 @login_required
-def edit_question(question_id):
-    """Question editing"""
+def update_test(test_id):
+    """Test update"""
     if not current_user.is_teacher:
         abort(403)
     
-    question = TestQuestion.query.get_or_404(question_id)
+    test = Test.query.get_or_404(test_id)
     
-    if question.test.created_by_teacher_id != current_user.teacher_info.id:
+    if test.created_by_teacher_id != current_user.teacher_info.id:
         abort(403)
     
-    form = EditTestQuestionForm()
+    form = TestEditForm()
     
     if form.validate_on_submit():
-        question.question = form.question.data
-        question.points = form.points.data
-        question.correct_answer = form.correct_answer.data
+        test.title = form.title.data
+        test.description = form.description.data
+        test.time_limit = form.time_limit.data
+        test.max_attempts = form.max_attempts.data
         
         db.session.commit()
+        flash('Testas atnaujintas!', 'success')
     
-    return redirect(url_for('teacher_tests.edit_test', test_id=question.test_id))
+    return redirect(url_for('teacher_tests.edit_test', test_id=test_id))
 
 @bp.route('/question/<int:question_id>/delete', methods=['POST'])
 @login_required
@@ -148,6 +170,7 @@ def delete_question(question_id):
     db.session.delete(question)
     db.session.commit()
     
+    flash('Klausimas ištrintas', 'info')
     return redirect(url_for('teacher_tests.edit_test', test_id=test_id))
 
 @bp.route('/<int:test_id>/toggle_status', methods=['POST'])
@@ -164,6 +187,9 @@ def toggle_test_status(test_id):
     
     test.is_active = not test.is_active
     db.session.commit()
+    
+    status = 'aktyvus' if test.is_active else 'neaktyvus'
+    flash(f'Testas dabar {status}', 'info')
     
     return redirect(url_for('teacher_tests.my_tests'))
 
@@ -203,12 +229,14 @@ def delete_test(test_id):
     if test.created_by_teacher_id != current_user.teacher_info.id:
         abort(403)
     
-    # Check if test has student results
+         # tikrinam ar yra studentų rezultatų
     results_count = TestResult.query.filter_by(test_id=test_id).count()
     if results_count > 0:
-        return "Cannot delete", 403
+        flash('Negalima ištrinti testo su studentų rezultatais', 'error')
+        return redirect(url_for('teacher_tests.my_tests'))
     
     db.session.delete(test)
     db.session.commit()
     
+    flash('Testas ištrintas', 'info')
     return redirect(url_for('teacher_tests.my_tests'))

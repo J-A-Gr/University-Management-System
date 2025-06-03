@@ -59,6 +59,3 @@ class Faculty(db.Model):
     def get_active_faculties():
         """Get all active faculties"""
         return Faculty.query.filter_by(is_active=True).all()
-    
-
-

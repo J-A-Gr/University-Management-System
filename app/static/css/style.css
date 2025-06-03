@@ -698,3 +698,95 @@ select.input:not([value=""]) + label {
   z-index: 4;
   max-width: 80px;
 }
+
+/* Visų dashboard lentelių vienodinimas: admin, student, teacher */
+.table-scroll {
+  overflow-x: auto;
+  width: 100%;
+  position: relative;
+  margin-bottom: 22px;
+}
+
+.table-scroll table {
+  min-width: 900px;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-scroll th,
+.table-scroll td {
+  padding: 7px 10px;
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 1em;
+  color: #fff;
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.08);
+}
+
+.table-scroll th {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  background: rgba(0, 0, 0, 0.07);
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(40, 50, 60, 0.13), 0 1px 0 rgba(0, 0, 0, 0.13);
+}
+
+.table-scroll tbody tr:nth-child(odd) td {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.table-scroll tbody tr:hover td {
+  background: rgba(216, 164, 65, 0.08); /* švelnus paryškinimas užvedus */
+}
+
+/* Jei reikia, stulpelių plotį galima valdyti klasėmis (jei naudoji) */
+.table-scroll th.day,
+.table-scroll td.day {
+  width: 90px;
+}
+.table-scroll th.module,
+.table-scroll td.module {
+  width: 120px;
+}
+.table-scroll th.time,
+.table-scroll td.time {
+  width: 90px;
+}
+.table-scroll th.room,
+.table-scroll td.room {
+  width: 80px;
+}
+.table-scroll th.teacher,
+.table-scroll td.teacher {
+  width: 120px;
+}
+.table-scroll th.assessments,
+.table-scroll td.assessments {
+  width: 180px;
+}
+
+/* Atsiskaitymų sąrašo stilius */
+.table-scroll ul {
+  margin: 0;
+  padding-left: 14px;
+}
+.table-scroll ul li {
+  font-size: 0.97em;
+  color: #fff;
+  margin-bottom: 2px;
+}
+
+/* Responsyvumas */
+@media (max-width: 900px) {
+  .table-scroll table {
+    font-size: 0.91em;
+    min-width: 420px;
+  }
+  .table-scroll th,
+  .table-scroll td {
+    padding: 5px 4px;
+  }
+}

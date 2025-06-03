@@ -4,7 +4,7 @@ content %}
 <!-- Navigacija viršuje -->
 <div class="mb-4">
   {% if current_user.is_authenticated %} {% if current_user.role == 'student' %}
-  <a href="{{ url_for('student.dashboard') }}" class="btn btn-secondary me-2">
+  <a href="{{ url_for('student.student_dashboard') }}" class="btn btn-secondary me-2">
     ← Atgal į skydelį
   </a>
   {% elif current_user.role == 'teacher' %}
@@ -44,7 +44,8 @@ content %}
         <th>Diena</th>
         <th>Laikas</th>
         <th>Dėstytojas</th>
-        <th>Veiksmai</th>
+        <th>Peržiūrėti</th>
+        <th>Pasirinkti</th>
       </tr>
     </thead>
     <tbody>
@@ -78,17 +79,33 @@ content %}
           >
             Redaguoti
           </a>
-          <form
-            method="POST"
-            action="{{ url_for('modules.delete_module', module_id=module.id) }}"
-            class="d-inline"
-            onsubmit="return confirm('Ar tikrai norite ištrinti šį modulį?');"
-          >
-            {{ form.hidden_tag() }}
-            <button type="submit" class="btn btn-sm btn-danger">
-              Ištrinti
-            </button>
-          </form>
+          <td>
+            {% if current_user.is_authenticated and (current_user.is_teacher or current_user.is_admin) %}
+              <form
+                method="POST"
+                action="{{ url_for('modules.delete_module', module_id=module.id) }}"
+                class="d-inline"
+                onsubmit="return confirm('Ar tikrai norite ištrinti šį modulį?');"
+              >
+                {{ form.hidden_tag() }}
+                <button type="submit" class="btn btn-sm btn-danger">
+                  Ištrinti
+                </button>
+              </form>
+            {% elif current_user.is_authenticated and current_user.is_student %}
+              {% if module.id in selected_modules %}
+                <span class="text-success">✓ Pasirinktas</span>
+              {% elif total_credits + module.credits <= max_credits %}
+                <form method="POST" action="{{ url_for('modules.select_module', module_id=module.id) }}">
+                  {{ form.hidden_tag() }}
+                  <button type="submit" class="btn btn-sm btn-success">Pasirinkti</button>
+                </form>
+              {% else %}
+                <span class="text-muted">Limitas pasiektas</span>
+              {% endif %}
+            {% endif %}
+          </td>
+          {% else %}
           {% endif %}
         </td>
       </tr>

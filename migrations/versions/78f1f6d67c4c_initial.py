@@ -1,8 +1,8 @@
-"""initial
+"""Initial
 
-Revision ID: 2f63bfe5a567
+Revision ID: 78f1f6d67c4c
 Revises: 
-Create Date: 2025-05-30 15:51:43.179356
+Create Date: 2025-06-03 18:21:49.265230
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '2f63bfe5a567'
+revision = '78f1f6d67c4c'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -91,7 +91,7 @@ def upgrade():
     sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.Column('study_program_id', sa.Integer(), nullable=False),
     sa.Column('created_by_id', sa.Integer(), nullable=False),
-    sa.Column('teacher_id', sa.Integer(), nullable=True),
+    sa.Column('teacher_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['created_by_id'], ['users.id'], ),
     sa.ForeignKeyConstraint(['study_program_id'], ['study_programs.id'], ),
     sa.ForeignKeyConstraint(['teacher_id'], ['teacher_info.id'], ),
@@ -148,6 +148,17 @@ def upgrade():
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('assessment_id', 'student_id', name='unique_submission_per_student')
     )
+    op.create_table('attendance_records',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('module_id', sa.Integer(), nullable=False),
+    sa.Column('student_id', sa.Integer(), nullable=False),
+    sa.Column('date', sa.Date(), nullable=False),
+    sa.Column('status', sa.Enum('atvyko', 'pavėlavo', 'neatvyko', 'pateisinta', name='attendance_status'), nullable=False),
+    sa.ForeignKeyConstraint(['module_id'], ['modules.id'], ),
+    sa.ForeignKeyConstraint(['student_id'], ['student_info.id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('module_id', 'student_id', 'date', name='unique_attendance_per_day')
+    )
     op.create_table('module_enrollments',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('student_info_id', sa.Integer(), nullable=True),
@@ -163,12 +174,77 @@ def upgrade():
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('student_info_id', 'module_id', name='unique_student_module')
     )
+    op.create_table('tests',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('title', sa.String(length=200), nullable=False),
+    sa.Column('description', sa.Text(), nullable=True),
+    sa.Column('max_attempts', sa.Integer(), nullable=True),
+    sa.Column('show_results_immediately', sa.Boolean(), nullable=True),
+    sa.Column('time_limit', sa.Integer(), nullable=True),
+    sa.Column('stop_after_pass', sa.Boolean(), nullable=True),
+    sa.Column('module_id', sa.Integer(), nullable=False),
+    sa.Column('assessment_id', sa.Integer(), nullable=True),
+    sa.Column('created_by_teacher_id', sa.Integer(), nullable=False),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.Column('is_active', sa.Boolean(), nullable=True),
+    sa.ForeignKeyConstraint(['assessment_id'], ['assessments.id'], ),
+    sa.ForeignKeyConstraint(['created_by_teacher_id'], ['teacher_info.id'], ),
+    sa.ForeignKeyConstraint(['module_id'], ['modules.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('test_questions',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('question', sa.Text(), nullable=False),
+    sa.Column('question_type', sa.Enum('open', 'multiple_choice'), nullable=False),
+    sa.Column('points', sa.Integer(), nullable=False),
+    sa.Column('position', sa.Integer(), nullable=True),
+    sa.Column('correct_answer', sa.Text(), nullable=True),
+    sa.Column('test_id', sa.Integer(), nullable=False),
+    sa.CheckConstraint('points > 0', name='positive_points'),
+    sa.ForeignKeyConstraint(['test_id'], ['tests.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('test_results',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('total_score', sa.Integer(), nullable=False),
+    sa.Column('max_possible_score', sa.Integer(), nullable=False),
+    sa.Column('percentage', sa.Float(), nullable=False),
+    sa.Column('status', sa.Enum('in_progress', 'completed', 'submitted'), nullable=False),
+    sa.Column('started_at', sa.DateTime(), nullable=False),
+    sa.Column('completed_at', sa.DateTime(), nullable=True),
+    sa.Column('time_taken', sa.Integer(), nullable=True),
+    sa.Column('test_id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.CheckConstraint('max_possible_score > 0', name='positive_max_score'),
+    sa.CheckConstraint('percentage >= 0 AND percentage <= 100', name='valid_percentage'),
+    sa.CheckConstraint('total_score >= 0', name='non_negative_score'),
+    sa.ForeignKeyConstraint(['test_id'], ['tests.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('test_answers',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('answer_text', sa.Text(), nullable=False),
+    sa.Column('is_correct', sa.Boolean(), nullable=False),
+    sa.Column('answered_at', sa.DateTime(), nullable=False),
+    sa.Column('test_result_id', sa.Integer(), nullable=False),
+    sa.Column('question_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['question_id'], ['test_questions.id'], ),
+    sa.ForeignKeyConstraint(['test_result_id'], ['test_results.id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('test_result_id', 'question_id', name='unique_answer_per_question')
+    )
     # ### end Alembic commands ###
 
 
 def downgrade():
     # ### commands auto generated by Alembic - please adjust! ###
+    op.drop_table('test_answers')
+    op.drop_table('test_results')
+    op.drop_table('test_questions')
+    op.drop_table('tests')
     op.drop_table('module_enrollments')
+    op.drop_table('attendance_records')
     op.drop_table('assessment_submissions')
     op.drop_table('student_info')
     op.drop_table('module_prerequisites')

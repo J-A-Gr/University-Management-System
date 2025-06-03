@@ -59,9 +59,9 @@ def select_subjects():
     """Select subjects page"""
     # Nukreipti pagal vartotojo tipą
     if current_user.is_student:
-        return redirect(url_for('student_tests.available_tests'))
+        return redirect(url_for('modules.list_modules'))
     elif current_user.is_teacher:
-        return redirect(url_for('teacher_tests.my_tests'))
+        return redirect(url_for('modules.list_modules'))
     else:
         return redirect(url_for('main.dashboard'))
     

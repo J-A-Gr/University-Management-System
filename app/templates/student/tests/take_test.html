@@ -1,0 +1,320 @@
+{% extends "base.html" %}
+{% block title %}{{ test_result.test.title }} - Sprendžiamas testas{% endblock %}
+
+{% block content %}
+<!-- Header su testo informacija -->
+<div class="fixed-header" style="background: rgba(31, 41, 55, 0.95); backdrop-filter: blur(10px); padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px;">
+    <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+            <div>
+                <h4 style="color: #fff; margin: 0; margin-bottom: 5px;">{{ test_result.test.title }}</h4>
+                <small style="color: rgba(255,255,255,0.7);">
+                    📚 {{ test_result.test.assessment.module.name if test_result.test.assessment else 'Testas' }}
+                </small>
+            </div>
+            
+            <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+                <!-- Laiko skaičiuotuvas -->
+                {% if test_result.test.time_limit %}
+                <div style="text-align: center;">
+                    <div id="timer" style="color: var(--accent); font-size: 1.5em; font-weight: bold; margin-bottom: 2px;">
+                        {{ test_result.test.time_limit }}:00
+                    </div>
+                    <small style="color: rgba(255,255,255,0.7);">Liko laiko</small>
+                </div>
+                {% endif %}
+                
+                <!-- Progreso indikatorius -->
+                <div style="text-align: center;">
+                    <div id="progress" style="color: #44bb63; font-size: 1.2em; font-weight: bold; margin-bottom: 2px;">
+                        0/{{ questions|length }}
+                    </div>
+                    <small style="color: rgba(255,255,255,0.7);">Atsakyta</small>
+                </div>
+                
+                <!-- Pabaigos mygtukas -->
+                <form method="POST" action="{{ url_for('student_tests.complete_test', result_id=test_result.id) }}" id="completeForm">
+                    {{ completion_form.hidden_tag() }}
+                    <button type="button" id="completeBtn" class="big-button" style="background: #e74c3c;" onclick="completeTest()">
+                         Baigti testą
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="main-content extra-wide-card" style="margin-top: 100px;">
+    <!-- Klausimų sąrašas -->
+    <div id="questions-container">
+        {% for question in questions %}
+        <div class="question-card glass-card" data-question-id="{{ question.id }}" style="margin-bottom: 25px;">
+            <!-- Klausimo antraštė -->
+            <div style="display: flex; justify-content: between; align-items: flex-start; margin-bottom: 20px;">
+                <div style="flex-grow: 1;">
+                    <h5 style="color: #fff; margin-bottom: 10px;">
+                        <span style="color: var(--accent); font-weight: bold;">{{ loop.index }}.</span>
+                        {{ question.question }}
+                    </h5>
+                    <div style="display: flex; gap: 20px; font-size: 0.9em; color: rgba(255,255,255,0.7);">
+                        <span>🎯 {{ question.points }} {{ 'taškas' if question.points == 1 else 'taškai' }}</span>
+                        <span>📝 {{ loop.index }}/{{ questions|length }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Atsakymų variantai -->
+            <div class="choices-container" style="margin-top: 20px;">
+                {% for choice in question.get_choices_list() %}
+                <div class="choice-option" 
+                     data-choice="{{ choice.letter }}"
+                     onclick="selectAnswer({{ question.id }}, '{{ choice.letter }}')"
+                     style="background: rgba(255,255,255,0.1); margin-bottom: 12px; padding: 15px; border-radius: 10px; cursor: pointer; transition: all 0.3s; border: 2px solid transparent; {% if existing_answers.get(question.id) == choice.letter %}border-color: var(--accent); background: rgba(var(--accent-rgb), 0.2);{% endif %}">
+                    
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div class="choice-letter" 
+                             style="background: {% if existing_answers.get(question.id) == choice.letter %}var(--accent){% else %}rgba(255,255,255,0.2){% endif %}; color: {% if existing_answers.get(question.id) == choice.letter %}#fff{% else %}rgba(255,255,255,0.8){% endif %}; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; transition: all 0.3s;">
+                            {{ choice.letter }}
+                        </div>
+                        <div style="color: #fff; flex-grow: 1;">
+                            {{ choice.text }}
+                        </div>
+                        {% if existing_answers.get(question.id) == choice.letter %}
+                        <div style="color: var(--accent);">
+                            <i data-lucide="check-circle"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Navigacijos mygtukai -->
+    <div class="glass-card" style="text-align: center; margin-top: 30px;">
+        <h6 style="color: #fff; margin-bottom: 20px;">🎯 Testo baigimas</h6>
+        <p style="color: rgba(255,255,255,0.8); margin-bottom: 20px;">
+            Patikrinkite savo atsakymus ir baikite testą, kada būsite pasiruošę.
+        </p>
+        
+        <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+            <button onclick="scrollToTop()" class="glass-btn">
+                ⬆️ Grįžti į viršų
+            </button>
+            <button onclick="scrollToUnanswered()" class="glass-btn">
+                🔍 Rasti neatsakytus
+            </button>
+            <button onclick="completeTest()" class="big-button" style="background: #44bb63;">
+                 Baigti ir pateikti testą
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Sukūrimo pranešimas -->
+<div id="saveNotification" style="position: fixed; bottom: 20px; right: 20px; background: rgba(68, 187, 99, 0.9); color: white; padding: 12px 20px; border-radius: 8px; display: none; z-index: 1000;">
+     Atsakymas išsaugotas
+</div>
+
+<script>
+let timeLimit = {{ test_result.test.time_limit or 0 }};
+let startTime = new Date('{{ test_result.started_at.isoformat() }}');
+let timerInterval;
+
+// Laiko skaičiuotuvas
+function updateTimer() {
+    if (timeLimit <= 0) return;
+    
+    let now = new Date();
+    let elapsed = Math.floor((now - startTime) / 1000 / 60); // minutės
+    let remaining = timeLimit - elapsed;
+    
+    if (remaining <= 0) {
+        document.getElementById('timer').textContent = '0:00';
+        document.getElementById('timer').style.color = '#e74c3c';
+        alert('Laikas baigėsi! Testas bus automatiškai pateiktas.');
+        document.getElementById('completeForm').submit();
+        return;
+    }
+    
+    let minutes = Math.floor(remaining);
+    let seconds = Math.floor((remaining - minutes) * 60);
+    document.getElementById('timer').textContent = minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
+    
+    // Spalvos keitimas pagal likusį laiką
+    if (remaining <= 5) {
+        document.getElementById('timer').style.color = '#e74c3c';
+    } else if (remaining <= 10) {
+        document.getElementById('timer').style.color = '#f39c12';
+    }
+}
+
+// Atsakymo pažymėjimas
+function selectAnswer(questionId, choice) {
+    // UI atnaujinimas
+    const questionCard = document.querySelector(`[data-question-id="${questionId}"]`);
+    const choices = questionCard.querySelectorAll('.choice-option');
+    
+    choices.forEach(option => {
+        const letter = option.getAttribute('data-choice');
+        const letterDiv = option.querySelector('.choice-letter');
+        const checkIcon = option.querySelector('[data-lucide="check-circle"]');
+        
+        if (letter === choice) {
+            option.style.borderColor = 'var(--accent)';
+            option.style.background = 'rgba(var(--accent-rgb), 0.2)';
+            letterDiv.style.background = 'var(--accent)';
+            letterDiv.style.color = '#fff';
+            if (!checkIcon) {
+                option.innerHTML += '<div style="color: var(--accent);"><i data-lucide="check-circle"></i></div>';
+            }
+        } else {
+            option.style.borderColor = 'transparent';
+            option.style.background = 'rgba(255,255,255,0.1)';
+            letterDiv.style.background = 'rgba(255,255,255,0.2)';
+            letterDiv.style.color = 'rgba(255,255,255,0.8)';
+            if (checkIcon) {
+                checkIcon.remove();
+            }
+        }
+    });
+    
+    // AJAX išsaugojimas
+    fetch('{{ url_for("student_tests.submit_answer") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            result_id: {{ test_result.id }},
+            question_id: questionId,
+            answer_text: choice
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Atsakymas išsaugotas');
+            updateProgress();
+        } else {
+            showNotification('Klaida išsaugant', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Klaida išsaugant', 'error');
+    });
+    
+    // Atnaujinti icons
+    if (window.lucide) lucide.createIcons();
+}
+
+// Progreso atnaujinimas
+function updateProgress() {
+    const answered = document.querySelectorAll('.choice-option[style*="border-color: var(--accent)"]').length;
+    const total = {{ questions|length }};
+    document.getElementById('progress').textContent = answered + '/' + total;
+    
+    if (answered === total) {
+        document.getElementById('progress').style.color = '#44bb63';
+    }
+}
+
+// Pranešimų rodymas
+function showNotification(message, type = 'success') {
+    const notification = document.getElementById('saveNotification');
+    notification.textContent = message;
+    notification.style.background = type === 'error' ? 'rgba(231, 76, 60, 0.9)' : 'rgba(68, 187, 99, 0.9)';
+    notification.style.display = 'block';
+    
+    setTimeout(() => {
+        notification.style.display = 'none';
+    }, 3000);
+}
+
+// Testo baigimas
+function completeTest() {
+    const answered = document.querySelectorAll('.choice-option[style*="border-color: var(--accent)"]').length;
+    const total = {{ questions|length }};
+    
+    let message = `Ar tikrai norite baigti testą?\n\nAtsakyta: ${answered}/${total} klausimų`;
+    
+    if (answered < total) {
+        message += `\nNeAtsakyta: ${total - answered} klausimų\n\nUž neatsakytus klausimus gausite 0 taškų.`;
+    }
+    
+    if (confirm(message)) {
+        document.getElementById('completeForm').submit();
+    }
+}
+
+// Navigacijos funkcijos
+function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function scrollToUnanswered() {
+    const unanswered = document.querySelector('.choice-option:not([style*="border-color: var(--accent)"])');
+    if (unanswered) {
+        unanswered.closest('.question-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else {
+        alert('Visi klausimai atsakyti!');
+    }
+}
+
+// Inicializacija
+document.addEventListener('DOMContentLoaded', function() {
+    if (window.lucide) lucide.createIcons();
+    
+    // Pradėti laiko skaičiuotuvą
+    if (timeLimit > 0) {
+        updateTimer();
+        timerInterval = setInterval(updateTimer, 1000);
+    }
+    
+    // Atnaujinti progresą
+    updateProgress();
+    
+    // Auto-save prevention neišėjus iš puslapio
+    window.addEventListener('beforeunload', function(e) {
+        const answered = document.querySelectorAll('.choice-option[style*="border-color: var(--accent)"]').length;
+        if (answered > 0) {
+            e.preventDefault();
+            e.returnValue = '';
+        }
+    });
+});
+
+// CSS for hover effects
+document.head.insertAdjacentHTML('beforeend', `
+<style>
+.choice-option:hover {
+    background: rgba(255,255,255,0.15) !important;
+    transform: translateX(5px);
+}
+
+.choice-option[style*="border-color: var(--accent)"]:hover {
+    background: rgba(var(--accent-rgb), 0.3) !important;
+}
+
+@media (max-width: 768px) {
+    .fixed-header > div {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+    
+    .main-content {
+        margin-top: 140px;
+    }
+    
+    .choice-option {
+        padding: 12px !important;
+    }
+}
+</style>
+`);
+</script>
+{% endblock %}

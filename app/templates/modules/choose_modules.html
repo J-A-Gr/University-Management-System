@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Modulių pasirinkimas{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Pasirinkite modulius</h2>
+
+  {% if modules %}
+    <div class="row">
+      {% for module in modules %}
+        <div class="col-md-6 mb-3">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title">{{ module.name }}</h5>
+              <p class="card-text">{{ module.description or "Aprašymo nėra" }}</p>
+              <p>
+                <strong>ECTS:</strong> {{ module.credits }}<br>
+                <strong>Diena:</strong> {{ module.day_of_week.title() }}<br>
+                <strong>Laikas:</strong> {{ module.start_time.strftime('%H:%M') }} – {{ module.end_time.strftime('%H:%M') }}
+              </p>
+              <a href="{{ url_for('modules.view_module', module_id=module.id) }}" class="btn btn-sm btn-outline-primary">Plačiau</a>
+              <form method="POST" action="{{ url_for('modules.enroll_in_module') }}">
+                {{ form.hidden_tag() }}
+                {{ form.module_id(value=module.id) }}
+                <button type="submit" class="btn btn-sm btn-success ms-2">Registruotis</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-warning">
+      Nėra galimų modulių, kurie atitiktų jūsų programą arba jie visi jau pasirinkti.
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
