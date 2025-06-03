@@ -5,6 +5,7 @@ from datetime import date
 from app import db
 from app.forms.attendance import AttendanceForm
 
+
 bp = Blueprint('teacher', __name__)
 
 @bp.route('/dashboard')
@@ -14,6 +15,12 @@ def teacher_dashboard():
         abort(403)
 
     teacher_info = current_user.teacher_info
+
+    if not teacher_info:
+        current_user.ensure_teacher_info()
+        db.session.commit()
+        teacher_info = current_user.teacher_info
+
     return render_template(
         'teacher/dashboard.html',
         teacher=current_user,
