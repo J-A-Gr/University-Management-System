@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, session, abort, flash
 from flask_login import login_required, current_user
-from app.models import ModuleEnrollment
+from app.models import ModuleEnrollment, Assessment, Module
 from collections import defaultdict
 
 bp = Blueprint('student', __name__)
@@ -21,6 +21,40 @@ def student_dashboard():
         module_count=len(student_info.module_enrollments)
     )
 
+@bp.route('/my_assessments')
+@login_required
+def my_assessments():
+    """Studento atsiskaitymų peržiūra"""
+    if not current_user.is_student:
+        abort(403)
+    
+    if not current_user.student_info:
+        flash('Studentas nerastas', 'error')
+        return redirect(url_for('main.index'))
+    
+    try:
+        # Gauti studento atsiskaitymus per modulių registracijas
+        assessments = Assessment.query.join(Module).join(ModuleEnrollment).filter(
+            ModuleEnrollment.student_info_id == current_user.student_info.id,
+            ModuleEnrollment.status == 'active',
+            Assessment.is_active == True
+        ).order_by(Assessment.due_date.asc()).all()
+        
+        # Grupuoti pagal artimiausią datą
+        from datetime import datetime
+        now = datetime.now()
+        
+        upcoming = [a for a in assessments if a.due_date > now]
+        past = [a for a in assessments if a.due_date <= now]
+        
+        return render_template('student/my_assessments.html', 
+                             upcoming=upcoming, 
+                             past=past,
+                             total_count=len(assessments))
+                             
+    except Exception as e:
+        flash(f'Klaida gaunant atsiskaitymus: {str(e)}', 'error')
+        return redirect(url_for('student.student_dashboard'))
 
 @bp.route('/schedule')
 @login_required
