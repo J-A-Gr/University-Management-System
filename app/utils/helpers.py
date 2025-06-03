@@ -28,6 +28,9 @@ def format_datetime(dt, format='%Y-%m-%d %H:%M'):
         return dt.strftime(format)
     return ''
 
+def is_time_overlap (start1, end1, start2, end2):
+    """Check if two time intervals overlap"""
+    return start1 < end2 and start2 < end1
 
 def truncate_text(text, length=100, suffix='...'):
     """Truncate text to specified length"""

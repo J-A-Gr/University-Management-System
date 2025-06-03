@@ -7,6 +7,17 @@ from app.extensions import db
 
 bp = Blueprint('modules', __name__, url_prefix='/modules')
 
+# modulių pasirinkimas
+@bp.route('/choose-modules', methods=['GET', 'POST'])   # TODO: pridėti mygtuką studentams, kuris čia nukreiptų.
+@login_required
+def choose_modules():
+    if current_user.is_student:
+        available_modules = Module.get_modules_by_program(current_user.study_id)
+    else:
+        abort(403)
+
+    return render_template('choose_modules.html', modules=available_modules)
+
 
 @bp.route('/')
 @login_required
@@ -159,9 +170,9 @@ def edit_module(module_id):
     return render_template("modules/edit_module.html", form=form, module=module)
 
 
-@bp.route('/<int:module_id>/choose', methods=['GET', 'POST'])
+@bp.route('/<int:module_id>/select', methods=['GET', 'POST'])
 @login_required
-def choose_module(module_id):
+def select_module(module_id):
     module = Module.query.get_or_404(module_id)
 
     if not current_user.is_student:
@@ -189,7 +200,7 @@ def choose_module(module_id):
             flash('Formos validacija nepavyko.', 'danger')
 
     return render_template(
-        'modules/choose_module.html',
+        'modules/select_module.html',
         module=module,
         form=form,
         already_enrolled=already_enrolled

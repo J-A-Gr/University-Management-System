@@ -10,7 +10,7 @@
   {% endif %}
 
   {% if form %}
-    <form method="POST" action="{{ url_for('student.choose_module') }}">
+    <form method="POST" action="{{ url_for('student.select_module') }}">
       {{ form.hidden_tag() }}
 
       <div class="mb-3">

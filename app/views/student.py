@@ -8,11 +8,14 @@ bp = Blueprint('student', __name__)
 @bp.route('/dashboard')
 @login_required
 def student_dashboard():
-    if not current_user.role == 'student':
-        abort(403)
-
-    student_info = current_user.student_info
-    schedule = student_info.get_schedule()
+    try:
+        if not current_user.is_student:
+            abort(403)
+        student_info = current_user.student_info
+        schedule = student_info.get_schedule()
+    except AttributeError:
+        # Jei current_user neturi is_student atributo, tai reiškia, kad vartotojas nėra prisijungęs
+        return redirect(url_for('auth.login'))
 
     return render_template(
         'student/dashboard.html',
