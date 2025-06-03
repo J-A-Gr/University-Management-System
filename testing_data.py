@@ -194,26 +194,6 @@ with app.app_context():
         db.session.add(geometry_module)
 
 
-    
-    # # NEVEIKIANTIS modulis
-    # module3 = Module(
-    #     name = "Algebros pagrindai",
-    #     description = "Modulis skirtas supažindinti su pagrindinėmis matematikos sąvokomis ir metodais.",
-    #     credits = 5,
-    #     day_of_week = 'antradienis',
-    #     semester = 'rudens',
-    #     start_time = '10:00',
-    #     end_time = '11:30',
-    #     room = "A101",
-    #     study_program = program1,  # čia programa1 turi būti jau pridėta prie DB
-    #     created_by = teacher1,  # čia mokytojas1 turi būti jau pridėtas prie DB
-    #     teacher = teacher1,  # čia mokytojas1 turi būti jau pridėtas prie DB
-    #     prerequisite_records = [],  # Pradinė reikšmė, jei nėra privalomų modulių
-    # )
-    # db.session.add(module2)
-    # print("Modulis2 pridėtas")
-
-
     # # 4. Studentai
 
     # pažiūrėti kaip elgiasi programa su vartotoju kuris nepriklauso nei vienai grupei (studentas, mokytojas, administratorius)
@@ -250,8 +230,19 @@ with app.app_context():
         is_student = True,
         #birthday = "2001-01-01"  # Pridėta gimimo data
     )
-    student1.set_password("Studentas123!")  # Stiprus slaptažodis
-    #student1.ensure_student_info() # Šitas neveikia!!!
+    student1.set_password("1111")  # Stiprus slaptažodis
+
+    student1_info = StudentInfo(
+        admission_year=2023,
+        current_semester=1,
+        completed_credits=0,
+        user_id=student1.id,
+        study_program_id=program1.id,
+        group_id=None  # Grupė bus priskirta vėliau
+    )
+    student1_info.generate_study_groupe_code()  # Generuoja grupės kodą
+    db.session.add(student1_info)
+
     db.session.add(student1)
     print("Studentas1 pridėtas")
 
@@ -262,13 +253,17 @@ with app.app_context():
         is_student = True,
         birthday = "2000-05-15"  # Pridėta gimimo data
     )
-    student2.set_password("PranasPetrauskas456!")  # Stiprus slaptažodis
-    #student2.ensure_student_info() # Šitas neveikia!!!
+    student2.set_password("2222")  # Stiprus slaptažodis
     db.session.add(student2)
     print("Studentas2 pridėtas")
 
     # # 5. StudentInfo objektai su grupės kodais
 
     # 6. Duomenų įrašymas į duomenų bazę
-    db.session.commit()
 
+    db.session.commit()
+    print ("Visi duomenys įrašyti į duomenų bazę")
+
+
+    # student1.ensure_student_info() # Šitas neveikia!!!
+    # student2.ensure_student_info() # Šitas neveikia!!!
