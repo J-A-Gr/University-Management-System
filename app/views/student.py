@@ -12,8 +12,7 @@ def student_dashboard():
         if not current_user.is_student:
             abort(403)
         student_info = current_user.student_info
-        student_info = current_user.student_info
-        chedule = student_info.get_schedule()
+        schedule = student_info.get_schedule()
     except AttributeError:
         # Jei current_user neturi is_student atributo, tai reiškia, kad vartotojas nėra prisijungęs
         return redirect(url_for('auth.login'))
