@@ -24,6 +24,7 @@ class StudentInfo(db.Model):
 
     module_enrollments = db.relationship('ModuleEnrollment', back_populates='student_info')
  
+    attendance_records = db.relationship('AttendanceRecord', back_populates='student', cascade='all, delete-orphan')
     
         # Studijų grupės kodo sugeneravimas (studijų programos kodo ir įstojimo metų derinys)
     def generate_study_groupe_code(self):

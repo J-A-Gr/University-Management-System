@@ -13,5 +13,6 @@ from app.models.test import Test
 from app.models.test_question import TestQuestion
 from app.models.test_answer import TestAnswer   
 from app.models.test_result import TestResult
+from app.models.attendance_record import AttendanceRecord
 
-__all__ = ['User', 'StudentInfo', 'TeacherInfo', 'StudyProgram', 'Group', 'Faculty', 'Module', 'Assessment', 'AssessmentSubmission', 'ModuleEnrollment', 'ModulePrerequisite', 'Test', 'TestQuestion', 'TestAnswer', 'TestResult']
+__all__ = ['User', 'StudentInfo', 'TeacherInfo', 'StudyProgram', 'Group', 'Faculty', 'Module', 'Assessment', 'AssessmentSubmission', 'ModuleEnrollment', 'ModulePrerequisite', 'Test', 'TestQuestion', 'TestAnswer', 'TestResult', 'AttendanceRecord']

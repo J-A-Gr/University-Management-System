@@ -49,6 +49,38 @@ style="
     </ul>
   </div>
 
+  <div class="modules" style="margin-bottom: 30px">
+    <h2>Mano Moduliai</h2>
+    <ul class="list-group">
+      {% for module in teacher.teacher_info.taught_modules %}
+      <li
+        class="list-group-item"
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 10px 0;
+        "
+      >
+        <span>{{ module.name }}</span>
+        <a
+          href="{{ url_for('teacher.view_module_students', module_id=module.id) }}"
+          class="btn btn-sm btn-primary"
+          style="
+            text-decoration: none;
+            padding: 6px 12px;
+            background: #3498db;
+            color: white;
+            border-radius: 6px;
+          "
+        >
+          Studentai
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+
   <div class="table-scroll">
     <h2>Tvarkaraštis</h2>
     <table>
