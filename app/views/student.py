@@ -11,11 +11,35 @@ def student_dashboard():
     if not current_user.role == 'student':
         abort(403)
 
-    return render_template('student/dashboard.html', student=current_user) # student=student_info, modules=modules, gpa=gpa)
+    student_info = current_user.student_info
+    schedule = student_info.get_schedule()
+
+    return render_template(
+        'student/dashboard.html',
+        student=current_user,
+        schedule=schedule,
+        module_count=len(student_info.module_enrollments)
+    )
+
 
 @bp.route('/schedule')
 @login_required
 def student_schedule():
+    if not current_user.is_student:
+        return "Unauthorized", 403
+
+    student_info = current_user.student_info
+    if not student_info:
+        return render_template("student/student_schedule.html", schedule=None, error="Student profile not found")
+
+    return render_template("student/student_schedule.html", schedule=student_info.get_schedule())
+
+
+
+
+@bp.route('/modules')
+@login_required
+def student_module():
     if not current_user.is_student:
         return "Unauthorized", 403
 
@@ -51,4 +75,4 @@ def student_schedule():
             "assessments": assessments_data
         })
 
-    return render_template('student/student_schedule.html', schedule=dict(schedule))
+    return render_template('student/modules.html', schedule=dict(schedule)) # TODO reik sukurti student/modules.html

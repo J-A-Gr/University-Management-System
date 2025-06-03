@@ -20,4 +20,20 @@ def admin_required(f):
         if not current_user.is_authenticated or not getattr(current_user, 'is_admin', False):
             return jsonify({'error': 'Admin privileges required'}), 403
         return f(*args, **kwargs)
+    return decorated_function 
+
+def teacher_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated or not getattr(current_user, 'is_teacher', False):
+            return jsonify({'error': 'Access denied - teacher privileges required'}), 403
+        return f(*args, **kwargs)
+    return decorated_function
+
+def student_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated or not getattr(current_user, 'is_student', False):
+            return jsonify({'error': 'Access denied - student privileges required'}), 403
+        return f(*args, **kwargs)
     return decorated_function

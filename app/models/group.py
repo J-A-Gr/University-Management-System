@@ -23,12 +23,8 @@ class Group(db.Model):
     def is_full(self):    #grupės formavimui. jeigu virš 30, naujos grupės reikia?
         """Check if group is full (assuming max 30 students per group)"""
         return self.student_count >= 30
-    
-    
-    
-    ##########
-    
-    
+
+     
     def add_student(self, student):
         """Add student to this group"""  
         try:

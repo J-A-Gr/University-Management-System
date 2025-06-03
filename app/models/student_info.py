@@ -1,5 +1,6 @@
 from datetime import datetime
 from app.extensions import db
+from collections import defaultdict
 
 class StudentInfo(db.Model):
     """Student information"""
@@ -25,16 +26,14 @@ class StudentInfo(db.Model):
  
     
         # Studijų grupės kodo sugeneravimas (studijų programos kodo ir įstojimo metų derinys)
-    @property #Nežinau ar čia  reikia property, bet palieku, kad būtų galima naudoti kaip atributą (Copilotas pasiūlė ;))
     def generate_study_groupe_code(self):
         try:
             #kažkaip reikia pasiimti studijų programos kodą, kad būtų galima sukurti grupės kodą, nežinu ar taip veiks...
-            
-            base = self.study_program.code #Pirmos trys didžiosios raidės iš programos pavadinimo
-            year = self.admission_year # Įstojimo metai
-            if not base or not year:
-                raise ValueError("Study program code or admission year is missing")
-            self.group = base + "-" + year
+            if not self.study_program or not self.admission_year:
+                raise ValueError("Study program or admission year is not set")
+            if not self.study_program.code:
+                self.study_program.generate_code()
+            self.group = self.study_program.code + "-" + str(self.admission_year)  # Grupės kodas sudarytas iš studijų programos kodo ir įstojimo metų   
             return self.group
         except Exception as e:
             raise Exception(f"Failed to generate study group code: {str(e)}")
@@ -126,3 +125,34 @@ class StudentInfo(db.Model):
     
     def __repr__(self):
         return f'<StudentInfo ID:{self.id} - {self.user.full_name if self.user else "Unknown"}>'
+    
+
+    def get_schedule(self):
+        schedule = defaultdict(list)  # Tai bus žodynas, kur raktai yra dienos (pvz. 'Monday'), o reikšmės – sąrašai modulių, kurie vyksta tą dieną.
+
+        for enrollment in self.module_enrollments: # sąrašas modulių
+            module = enrollment.module  # modulio informacija, .name, .day_of_week t.t
+            teacher_name = (
+                f"{module.teacher.user.first_name} {module.teacher.user.last_name}"
+                if module.teacher and module.teacher.user else "Nenurodyta"
+            )
+            # surenkam aktyvius atsiskaitymus
+            assessments_data = [
+                {
+                    "title": a.title,
+                    "type": a.assessment_type,
+                    "due_date": a.due_date.strftime("%Y-%m-%d")
+                }
+                for a in module.assessments if a.is_active
+            ]
+             # sudedam viską į tvarkaraštį
+            schedule[module.day_of_week].append({
+                "module_name": module.name,
+                "start_time": module.start_time.strftime("%H:%M"),
+                "end_time": module.end_time.strftime("%H:%M"),
+                "room": module.room,
+                "teacher": teacher_name,
+                "assessments": assessments_data
+            })
+
+        return dict(schedule)

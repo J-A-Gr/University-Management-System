@@ -113,7 +113,6 @@
       >
         Pagrindinis
       </a>
-
       {% if current_user.is_authenticated %} {% if current_user.role == 'admin'
       %}
       <a
@@ -122,6 +121,7 @@
       >
         Administratoriaus skydelis
       </a>
+
       {% elif current_user.role == 'teacher' %}
       <a
         href="{{ url_for('teacher.teacher_dashboard') }}"
@@ -129,14 +129,28 @@
       >
         Mokytojo Panelė
       </a>
-      {% elif current_user.role == 'student' %}
+      {# Papildomos nuorodos mokytojui, jei tokios egzistuoja tavo projekte: #}
+      {#
+      <a href="{{ url_for('modules.teacher_modules') }}" class="nav-btn">
+        Dėstomi moduliai
+      </a>
+      #} {#
+      <a href="{{ url_for('main.timetable') }}" class="nav-btn">Tvarkaraštis</a>
+      #} {% elif current_user.role == 'student' %}
       <a
         href="{{ url_for('student.student_dashboard') }}"
         class="nav-btn {% if ep == 'student.student_dashboard' or ep.startswith('student.') %}active{% endif %}"
       >
         Studento Panelė
       </a>
-      {% endif %}
+      {# Papildomos nuorodos studentui, jei tokios egzistuoja tavo projekte: #}
+      {#
+      <a href="{{ url_for('main.timetable') }}" class="nav-btn">Tvarkaraštis</a>
+      #} {#
+      <a href="{{ url_for('modules.student_modules') }}" class="nav-btn">
+        Mano dalykai
+      </a>
+      #} {% endif %}
       <a
         href="{{ url_for('main.profile') }}"
         class="nav-btn {% if ep == 'main.profile' %}active{% endif %}"

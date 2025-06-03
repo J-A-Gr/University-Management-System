@@ -22,11 +22,12 @@ content %}
       >
         Jūs esate prisijungęs kaip
         <span style="font-weight: 800; color: #181818">
-          <em
-            >{{ current_user.first_name or '' }} {{ current_user.last_name or ''
-            }}</em
-          > </span
-        >.
+          <em></em>
+            {{ current_user.first_name or '' }} {{ current_user.last_name or ''
+            }}
+          </em>
+        </span>
+        .
       </p>
       <p
         style="
@@ -53,17 +54,17 @@ content %}
         "
       >
         {% if current_user.role == 'student' %}
-        <a href="{{ url_for('main.select_subjects') }}" class="big-button"
-          >Pasirinkti dalykus</a
-        >
+        <a href="{{ url_for('main.select_subjects') }}" class="big-button">
+          Pasirinkti dalykus
+        </a>
         {% elif current_user.role == 'teacher' %}
-        <a href="{{ url_for('main.add_module') }}" class="big-button"
-          >Kurti naują dalyką</a
-        >
+        <a href="{{ url_for('modules.create_module') }}" class="big-button">
+          Kurti naują dalyką
+        </a>
         {% endif %}
-        <a href="{{ url_for('main.profile') }}" class="big-button"
-          >Eiti į profilį</a
-        >
+        <a href="{{ url_for('main.profile') }}" class="big-button">
+          Eiti į profilį
+        </a>
       </div>
       {% else %}
       <p
@@ -82,9 +83,9 @@ content %}
         "
       >
         <a href="{{ url_for('auth.login') }}" class="big-button">Prisijungti</a>
-        <a href="{{ url_for('auth.register') }}" class="big-button"
-          >Registracija</a
-        >
+        <a href="{{ url_for('auth.register') }}" class="big-button">
+          Registracija
+        </a>
       </div>
       {% endif %}
     </div>
