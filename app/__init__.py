@@ -56,6 +56,9 @@ def create_app(config_class=Config):
 
     from app.views.modules import bp as modules_bp
     app.register_blueprint(modules_bp, url_prefix='/modules')
+
+    from app.views.assessments import bp as assessments_bp
+    app.register_blueprint(assessments_bp)
     
 
     # hardcoded admin
