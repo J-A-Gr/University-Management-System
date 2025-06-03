@@ -1,8 +1,8 @@
 """Initial
 
-Revision ID: 78f1f6d67c4c
+Revision ID: b971c306c230
 Revises: 
-Create Date: 2025-06-03 18:21:49.265230
+Create Date: 2025-06-03 22:17:22.267051
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '78f1f6d67c4c'
+revision = 'b971c306c230'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -195,12 +195,17 @@ def upgrade():
     op.create_table('test_questions',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('question', sa.Text(), nullable=False),
-    sa.Column('question_type', sa.Enum('open', 'multiple_choice'), nullable=False),
     sa.Column('points', sa.Integer(), nullable=False),
-    sa.Column('position', sa.Integer(), nullable=True),
-    sa.Column('correct_answer', sa.Text(), nullable=True),
+    sa.Column('position', sa.Integer(), nullable=False),
+    sa.Column('choice_a', sa.String(length=500), nullable=False),
+    sa.Column('choice_b', sa.String(length=500), nullable=False),
+    sa.Column('choice_c', sa.String(length=500), nullable=False),
+    sa.Column('choice_d', sa.String(length=500), nullable=False),
+    sa.Column('correct_answer', sa.String(length=1), nullable=False),
     sa.Column('test_id', sa.Integer(), nullable=False),
+    sa.CheckConstraint("correct_answer IN ('A', 'B', 'C', 'D')", name='valid_correct_answer'),
     sa.CheckConstraint('points > 0', name='positive_points'),
+    sa.CheckConstraint('position > 0', name='positive_position'),
     sa.ForeignKeyConstraint(['test_id'], ['tests.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -224,11 +229,12 @@ def upgrade():
     )
     op.create_table('test_answers',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('answer_text', sa.Text(), nullable=False),
+    sa.Column('answer_text', sa.String(length=1), nullable=False),
     sa.Column('is_correct', sa.Boolean(), nullable=False),
     sa.Column('answered_at', sa.DateTime(), nullable=False),
     sa.Column('test_result_id', sa.Integer(), nullable=False),
     sa.Column('question_id', sa.Integer(), nullable=False),
+    sa.CheckConstraint("answer_text IN ('A', 'B', 'C', 'D')", name='valid_answer_choice'),
     sa.ForeignKeyConstraint(['question_id'], ['test_questions.id'], ),
     sa.ForeignKeyConstraint(['test_result_id'], ['test_results.id'], ),
     sa.PrimaryKeyConstraint('id'),

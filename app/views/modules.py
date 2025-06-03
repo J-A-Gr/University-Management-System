@@ -9,15 +9,22 @@ from app.extensions import db
 bp = Blueprint('modules', __name__, url_prefix='/modules')
 
 # modulių pasirinkimas
-@bp.route('/choose-modules', methods=['GET', 'POST'])   # TODO: pridėti mygtuką studentams, kuris čia nukreiptų.
-@login_required
-def choose_modules():
-    if current_user.is_student:
-        available_modules = Module.get_modules_by_program(current_user.study_id)
-    else:
-        abort(403)
-
-    return render_template('choose_modules.html', modules=available_modules)
+# @bp.route('/choose_modules', methods=['GET', 'POST'])   # TODO: pridėti mygtuką studentams, kuris čia nukreiptų.
+# @login_required
+# def choose_modules():
+#     try:
+#         if current_user.is_student:
+#             current_user.ensure_student_info()
+#             available_modules = Module.get_student_available_modules(
+#                 current_user.student_info.study_program_id,
+#                 current_user.student_info.current_semester,
+#                 current_user.student_info.free_credits,
+#             )
+            
+#         else:
+#             abort(403)
+#     except Exception as e:
+#     return render_template('choose_modules.html', modules=available_modules)
 
 
 @bp.route('/')
@@ -106,10 +113,13 @@ def view_module(module_id):
         .all()
 
     form = DeleteForm()
-    return render_template('modules/view_module.html', module=module,
-                           prerequisites=prerequisites,
-                           enrolled_students=enrolled_students,
-                           form=form)  # būtina, nes šablonas naudoja form.hidden_tag()
+    return render_template(
+        'modules/view_module.html',
+        module=module,
+        prerequisites=prerequisites,
+        enrolled_students=enrolled_students,
+        form=form
+        )  # būtina, nes šablonas naudoja form.hidden_tag()
 
 
 
@@ -182,10 +192,17 @@ def select_module(module_id):
 
     form = EmptyForm()
 
-    already_enrolled = ModuleEnrollment.query.filter_by(
-        student_info_id=current_user.id,
-        module_id=module.id
-    ).first()
+    already_enrolled = Module.get_student_available_modules(
+        current_user.student_info.study_program_id,
+        current_user.student_info.current_semester,
+        current_user.student_info.free_credits,
+    )
+
+
+    # ModuleEnrollment.query.filter_by(
+    #     student_info_id=current_user.id,
+    #     module_id=module.id
+    # ).first()
 
     if request.method == 'POST':
         if form.validate_on_submit():
@@ -195,7 +212,9 @@ def select_module(module_id):
                 enrollment = ModuleEnrollment(student_info_id=current_user.id, module_id=module.id)
                 db.session.add(enrollment)
                 db.session.commit()
+                current_user.student_info.free_credits -= module.credits
                 flash('Sėkmingai užsiregistravote į modulį.', 'success')
+
             return redirect(url_for('modules.view_module', module_id=module.id))
         else:
             flash('Formos validacija nepavyko.', 'danger')

@@ -10,6 +10,7 @@ class StudentInfo(db.Model):
     admission_year = db.Column(db.Integer, nullable=False)  # Įstojimo metai
     current_semester = db.Column(db.Integer, default=1)    # Dabartinis semestras
     completed_credits = db.Column(db.Integer, default=0)   # Surinkti kreditai
+    free_credits = db.Column(db.Integer, default=20)    # Kreditai modulių pasirinkimui
     
     # Ryšiai su kitais modeliais
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
