@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, abort
 from flask_login import login_required, current_user
 from app.models.module import Module
+from app.extensions import db
 
 bp = Blueprint('teacher', __name__)
 
@@ -11,6 +12,12 @@ def teacher_dashboard():
         abort(403)
 
     teacher_info = current_user.teacher_info
+
+    if not teacher_info:
+        current_user.ensure_teacher_info()
+        db.session.commit()
+        teacher_info = current_user.teacher_info
+
     return render_template(
         'teacher/dashboard.html',
         teacher=current_user,

@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}Mano atsiskaitymai{% endblock %}
+
+{% block content %}
+<!-- Navigacija viršuje -->
+<div class="mb-4">
+  <a href="{{ url_for('teacher.teacher_dashboard') }}" class="btn btn-secondary me-2">
+    ← Atgal į skydelį
+  </a>
+  <a href="{{ url_for('modules.list_modules') }}" class="btn btn-secondary me-2">
+    Modulių sąrašas
+  </a>
+  <a href="{{ url_for('main.profile') }}" class="btn btn-secondary">Profilis</a>
+</div>
+
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Mano atsiskaitymai</h2>
+    <a href="{{ url_for('assessments.create_assessment') }}" class="btn btn-success">
+      + Naujas atsiskaitymas
+    </a>
+  </div>
+
+  {% if assessments %}
+  <div class="table-responsive">
+    <table class="table table-bordered table-hover">
+      <thead class="table-light">
+        <tr>
+          <th>Pavadinimas</th>
+          <th>Modulis</th>
+          <th>Tipas</th>
+          <th>Data</th>
+          <th>Balai</th>
+          <th>Statusas</th>
+          <th>Veiksmai</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for assessment in assessments %}
+        <tr>
+          <td>
+            <strong>{{ assessment.title }}</strong>
+            {% if assessment.description %}
+            <br><small class="text-muted">{{ assessment.description[:50] }}{% if assessment.description|length > 50 %}...{% endif %}</small>
+            {% endif %}
+          </td>
+          <td>{{ assessment.module.name }}</td>
+          <td>{{ assessment.assessment_type.title() }}</td>
+          <td>
+            {{ assessment.due_date.strftime('%Y-%m-%d') }}<br>
+            <small class="text-muted">{{ assessment.due_date.strftime('%H:%M') }}</small>
+          </td>
+          <td>{{ assessment.max_points }}</td>
+          <td>
+            {% if assessment.is_active %}
+              <span class="badge bg-success">Aktyvus</span>
+            {% else %}
+              <span class="badge bg-secondary">Atšauktas</span>
+            {% endif %}
+          </td>
+          <td>
+            <div class="btn-group" role="group">
+              <a href="{{ url_for('assessments.edit_assessment', assessment_id=assessment.id) }}" 
+                 class="btn btn-sm btn-warning">
+                Redaguoti
+              </a>
+              
+              <form method="POST" action="{{ url_for('assessments.toggle_assessment', assessment_id=assessment.id) }}" class="d-inline">
+                {{ form.hidden_tag() }}
+                <button type="submit" 
+                        class="btn btn-sm {% if assessment.is_active %}btn-secondary{% else %}btn-success{% endif %}">
+                  {% if assessment.is_active %}Atšaukti{% else %}Aktyvuoti{% endif %}
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  
+  <!-- Statistikos informacija -->
+  <div class="row mt-4">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Statistika</h5>
+          <div class="row">
+            <div class="col-md-2">
+              <strong>Iš viso:</strong> {{ assessments|length }}
+            </div>
+            <div class="col-md-2">
+              <strong>Aktyvūs:</strong> {{ assessments|selectattr('is_active')|list|length }}
+            </div>
+            <div class="col-md-2">
+              <strong>Atšaukti:</strong> {{ assessments|rejectattr('is_active')|list|length }}
+            </div>
+            <div class="col-md-3">
+              <strong>Egzaminai:</strong> {{ assessments|selectattr('assessment_type', 'eq', 'egzaminas')|list|length }}
+            </div>
+            <div class="col-md-3">
+              <strong>Testai:</strong> {{ assessments|selectattr('assessment_type', 'eq', 'testas')|list|length }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="alert alert-info text-center">
+    <h4>Atsiskaitymų nėra</h4>
+    <p>Dar nesukūrėte jokių atsiskaitymų savo moduliams.</p>
+    <a href="{{ url_for('assessments.create_assessment') }}" class="btn btn-success">
+      Sukurti pirmą atsiskaitymą
+    </a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
