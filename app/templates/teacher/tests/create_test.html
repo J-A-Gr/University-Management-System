@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}Sukurti testą{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+  <a href="{{ url_for('teacher_tests.my_tests') }}" class="btn btn-secondary me-2">← Atgal į testus</a>
+  <a href="{{ url_for('teacher.teacher_dashboard') }}" class="btn btn-secondary me-2">Skydelis</a>
+  <a href="{{ url_for('main.profile') }}" class="btn btn-secondary">Profilis</a>
+</div>
+
+<div class="container mt-4">
+  <h2 class="mb-4">Naujo testo kūrimas</h2>
+
+  <form method="POST" class="needs-validation" novalidate>
+    {{ form.hidden_tag() }}
+
+    <div class="mb-3">
+      {{ form.title.label(class="form-label") }}
+      {{ form.title(class="form-control") }}
+      {% for error in form.title.errors %}
+        <div class="text-danger">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="mb-3">
+      {{ form.description.label(class="form-label") }}
+      {{ form.description(class="form-control", rows=3) }}
+      {% for error in form.description.errors %}
+        <div class="text-danger">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        {{ form.module_id.label(class="form-label") }}
+        {{ form.module_id(class="form-select", id="module_select") }}
+        {% for error in form.module_id.errors %}
+          <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+      </div>
+      <div class="col-md-6 mb-3">
+        {{ form.assessment_id.label(class="form-label") }}
+        {{ form.assessment_id(class="form-select") }}
+        <small class="form-text text-muted">Jei nesirinksite, testas bus papildomas</small>
+        {% for error in form.assessment_id.errors %}
+          <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        {{ form.time_limit.label(class="form-label") }}
+        {{ form.time_limit(class="form-control") }}
+        <small class="form-text text-muted">Palikite tuščią, jei nenorite laiko limito</small>
+        {% for error in form.time_limit.errors %}
+          <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+      </div>
+      <div class="col-md-4 mb-3">
+        {{ form.max_attempts.label(class="form-label") }}
+        {{ form.max_attempts(class="form-control") }}
+        {% for error in form.max_attempts.errors %}
+          <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <div class="form-check">
+          {{ form.show_results_immediately(class="form-check-input") }}
+          {{ form.show_results_immediately.label(class="form-check-label") }}
+        </div>
+        <small class="form-text text-muted">Studentai iš karto matys rezultatus ir teisingus atsakymus</small>
+      </div>
+      <div class="col-md-6 mb-3">
+        <div class="form-check">
+          {{ form.stop_after_pass(class="form-check-input") }}
+          {{ form.stop_after_pass.label(class="form-check-label") }}
+        </div>
+        <small class="form-text text-muted">Studentas negalės kartoti testo gavęs teigiamą pažymį</small>
+      </div>
+    </div>
+
+    <div class="d-flex gap-2">
+      <button type="submit" class="btn btn-primary">{{ form.submit.label.text }}</button>
+      <a href="{{ url_for('teacher_tests.my_tests') }}" class="btn btn-secondary">Atšaukti</a>
+    </div>
+  </form>
+</div>
+
+<script>
+// Galima pridėti JavaScript modulių ir egzaminų dinaminio krovno
+document.addEventListener('DOMContentLoaded', function() {
+    const moduleSelect = document.getElementById('module_select');
+    
+    // Galite pridėti AJAX funkciją egzaminų krovimui pagal pasirinktą modulį
+    if (moduleSelect) {
+        moduleSelect.addEventListener('change', function() {
+            // TODO: Implementuoti AJAX egzaminų krovimą
+        });
+    }
+});
+</script>
+{% endblock %}

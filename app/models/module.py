@@ -31,6 +31,8 @@ class Module(db.Model):
     required_for_records = db.relationship('ModulePrerequisite', foreign_keys='ModulePrerequisite.prerequisite_id', back_populates='prerequisite_module')
     tests = db.relationship('Test', back_populates='module')
 
+    attendance_records = db.relationship('AttendanceRecord', back_populates='module', cascade='all, delete-orphan')
+
     def __repr__(self):
         return f'<Module {self.name}>'
     

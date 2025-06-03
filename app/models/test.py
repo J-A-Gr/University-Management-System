@@ -32,6 +32,38 @@ class Test(db.Model):
 
     def __repr__(self):
         return f'<Test {self.title}>'
+    
+
+    def validate_test_settings(self):
+            """Validate test configuration - CORE REQUIREMENT"""
+            errors = []
+            
+            if not self.title or len(self.title.strip()) < 3:
+                errors.append("Test title must be at least 3 characters long")
+            
+            if self.time_limit is not None and self.time_limit < 1:
+                errors.append("Time limit must be at least 1 minute")
+            
+            if self.max_attempts < 1:
+                errors.append("Maximum attempts must be at least 1")
+            
+            if not self.test_questions:
+                errors.append("Test must have at least one question")
+            else:
+                total_points = sum(q.points for q in self.test_questions)
+                if total_points == 0:
+                    errors.append("Test must have points assigned to questions")
+            
+            if not self.module_id:
+                errors.append("Test must be assigned to a module")
+            
+            return errors
+
+    def is_ready_for_students(self):
+        """Check if test is ready - CORE REQUIREMENT"""
+        return self.is_active and len(self.validate_test_settings()) == 0
+
+
 
     def to_dict(self):
         """Convert to dictionary"""
@@ -61,27 +93,12 @@ class Test(db.Model):
             return 0
         
 
-    def validate_test_data(self):
-        """Validate test data"""
-        errors = []
-        
-        if not self.title or len(self.title.strip()) < 3:
-            errors.append("Test title must be at least 3 characters long")
-        
-        if self.max_attempts <= 0:
-            errors.append("Max attempts must be positive")
-        
-        if not self.module_id:
-            errors.append("Module is required")
-        
-        return errors
-
 
     def can_student_take_test(self, student_id):
         """Check if student can take the test with comprehensive validation"""
         try:
-            if not self.is_active:
-                return False, "Test is not active"
+            if not self.is_ready_for_students():  # Tikrinam ar testas yra paruoštas studentams
+                return False, "Test is not ready for students"
             
             from app.models.module_enrollment import ModuleEnrollment # Tikrinam ar studentas užsiregistravęs į modulį
             from app.models.student_info import StudentInfo
@@ -105,9 +122,10 @@ class Test(db.Model):
                 if not attempt.is_completed():
                     return False, "You have an active attempt for this test. Please complete it before starting a new one."
             
-            for attempt in attempts: # tikrinam ar studentas jau turi teigiamą pažymį
-                if attempt.is_completed() and attempt.calculate_grade() >= 5:  # >= 5 = teigiamas
-                    return False, "You already have a passing grade for this test"
+            if self.stop_after_pass:  # jei testas baigiasi kai studentas gauna teigiamą pažymį
+                for attempt in attempts: # tikrinam ar studentas jau turi teigiamą pažymį
+                    if attempt.is_completed() and attempt.calculate_grade() >= 5:  # >= 5 = teigiamas
+                        return False, "You already have a passing grade for this test"
             
             if len(attempts) >= self.max_attempts: # tikrinam ar studentas nepasiekė maksimalus bandymų skaičiaus
                 return False, f"Maximum number of attempts reached ({self.max_attempts})"
