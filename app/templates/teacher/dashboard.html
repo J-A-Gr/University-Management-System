@@ -1,5 +1,5 @@
 {% extends "base.html" %} {% block content %}
-<div class="main-content" style="max-width: none; width: 98%;">
+<div class="main-content" style="max-width: none; width: 98%">
   <h1>Dėstytojo Skydelis</h1>
 
   <div
@@ -11,38 +11,37 @@
     "
   >
     <h2 style="margin: 0">Mano Statistika</h2>
-<div style="display: flex; gap: 10px;">
-<a
-href="{{ url_for('modules.list_modules') }}"
-class="button"
-style="
- padding: 10px 16px;
- border-radius: 8px;
- background: #2c3e50;
- color: white;
- text-decoration: none;
- font-weight: 500;
- "
->
- Visi moduliai
-</a>
-<a
-href="{{ url_for('assessments.list_assessments') }}"
-class="button"
-style="
- padding: 10px 16px;
- border-radius: 8px;
- background: #d9a441;
- color: white;
- text-decoration: none;
- font-weight: 500;
- "
->
- Atsiskaitymų valdymas
- 
-</a>
-</div>
-</div> 
+    <div style="display: flex; gap: 10px">
+      <a
+        href="{{ url_for('modules.list_modules') }}"
+        class="button"
+        style="
+          padding: 10px 16px;
+          border-radius: 8px;
+          background: #2c3e50;
+          color: white;
+          text-decoration: none;
+          font-weight: 500;
+        "
+      >
+        Visi moduliai
+      </a>
+      <a
+        href="{{ url_for('assessments.list_assessments') }}"
+        class="button"
+        style="
+          padding: 10px 16px;
+          border-radius: 8px;
+          background: #d9a441;
+          color: white;
+          text-decoration: none;
+          font-weight: 500;
+        "
+      >
+        Atsiskaitymų valdymas
+      </a>
+    </div>
+  </div>
   <div class="stats" style="margin-bottom: 20px">
     <ul>
       <li>Dėstomi moduliai: {{ module_count }}</li>
@@ -60,16 +59,17 @@ style="
           justify-content: space-between;
           align-items: center;
           padding: 10px 0;
+          background: var(--card-bg);
         "
       >
-        <span>{{ module.name }}</span>
+        <span style="color: white">{{ module.name }}</span>
         <a
           href="{{ url_for('teacher.view_module_students', module_id=module.id) }}"
           class="btn btn-sm btn-primary"
           style="
             text-decoration: none;
             padding: 6px 12px;
-            background: #3498db;
+            background: #2c3e50;
             color: white;
             border-radius: 6px;
           "
@@ -112,28 +112,29 @@ style="
           </td>
         </tr>
         <style>
-        /* Desktop lentelės stiliai */
-        table {
+          /* Desktop lentelės stiliai */
+          table {
             width: 100%;
             table-layout: auto;
             border-collapse: collapse;
-        }
+          }
 
-        /* Mobile responsive */
-        @media (max-width: 768px) {
-            .main-content { 
-                width: 98% !important; 
-                padding: 10px; 
-                max-width: none !important;
+          /* Mobile responsive */
+          @media (max-width: 768px) {
+            .main-content {
+              width: 98% !important;
+              padding: 10px;
+              max-width: none !important;
             }
-            table { 
-                font-size: 0.9em; 
-                width: 100%;
+            table {
+              font-size: 0.9em;
+              width: 100%;
             }
-            th, td {
-                padding: 8px 4px;
+            th,
+            td {
+              padding: 8px 4px;
             }
-        }
+          }
         </style>
         {% endfor %} {% endfor %}
       </tbody>
