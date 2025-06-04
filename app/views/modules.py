@@ -32,7 +32,23 @@ bp = Blueprint('modules', __name__, url_prefix='/modules')
 def list_modules():
     form = DeleteForm() # CSRF hiddeng_tag()
     modules = Module.query.order_by(Module.name).all()
+    available_modules = []
+    if current_user.is_authenticated and current_user.is_student:
+        available_modules = Module.get_student_available_modules(
+            current_user.student_info.study_program_id
+            # current_user.student_info.current_semester,
+            # current_user.student_info.free_credits
+        )
+    return render_template(
+        'modules/list_modules.html',
+        modules=modules,
+        form=form,
+        available_modules=available_modules
+    )
     return render_template('modules/list_modules.html', modules=modules, form=form)
+
+
+
 
 @bp.route('/create', methods=['GET', 'POST'])
 @login_required

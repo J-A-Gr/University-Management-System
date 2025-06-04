@@ -71,19 +71,19 @@ class Module(db.Model):
         """Returns modules by study program"""
         return Module.query.filter_by(study_program_id=program_id, is_active=True).all()
 
-    @staticmethod    # 
+    @staticmethod    # gaunam tik tuos modulius, kuriuos gali rinktis studentas.
     def get_student_available_modules(
-        program_id,
-        semester,
-        available_credits,
-        ):   # gaunam tik tuos modulius, kuriuos gali rinktis studentas.
-        """Returns modules by study program"""
+        program_id
+        # semester,
+        # available_credits,
+        ):
+
         return Module.query.filter(
             Module.study_program_id == program_id,
             Module.is_active == True,
-            Module.semester == semester,
-            Module.credits < available_credits 
-            ).all() # 
+            # Module.semester == semester,
+            # Module.credits < available_credits 
+            ).first() # 
 
     def soft_delete(self):
         """Soft delete module - marks as inactive instead of permanent deletion"""

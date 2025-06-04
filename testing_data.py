@@ -3,6 +3,8 @@ from app.models import User, Faculty, StudyProgram, Module, StudentInfo
 from app.utils.seed import create_hardcoded_admin
 from datetime import time
 
+
+
 # Užsikomentuokite ko nenorite testuoti ;)
 app = create_app()
 
@@ -94,7 +96,7 @@ with app.app_context():
             start_time=time(9, 0),
             end_time=time(10, 30),
             room="302",
-            study_program_id = program1.id,
+            study_program_id = 1,
             created_by_id = teacher1.id,
             teacher_id = teacher1.id
         )
@@ -110,7 +112,7 @@ with app.app_context():
             start_time=time(13, 0),
             end_time=time(14, 30),
             room="204",
-            study_program_id = program1.id,
+            study_program_id = 2,
             created_by_id = teacher2.id,
             teacher_id = teacher1.id
         )
@@ -273,4 +275,34 @@ with app.app_context():
 
     # 6. Duomenų įrašymas į duomenų bazę
     db.session.commit()
+
+    get_available_modules = Module.get_active_modules()
+    print("Aktyvūs moduliai:", get_available_modules)
+
+    get_available_modules0 = Module.get_student_available_modules(0)
+    print("Aktyvūs moduliai 0:", get_available_modules0)
+    get_available_modules1 = Module.get_student_available_modules(1)
+    print("Aktyvūs moduliai 1:", get_available_modules1)
+    get_available_modules2 = Module.get_student_available_modules(2)
+    print("Aktyvūs moduliai 2:", get_available_modules2)
+    get_available_modules3 = Module.get_student_available_modules(3)
+    print("Aktyvūs moduliai 3:", get_available_modules3)
+    get_available_modules4 = Module.get_student_available_modules(4)
+    print("Aktyvūs moduliai 4:", get_available_modules4)
+    get_available_modules5 = Module.get_student_available_modules(5)
+    print("Aktyvūs moduliai 5:", get_available_modules5)
+
+    module1 = Module.get_modules_by_program(1)
+    print("Moduliai pagal programą 1:", module1)
+    module2 = Module.get_modules_by_program(2)
+    print("Moduliai pagal programą 2:", module2)
+    module3 = Module.get_modules_by_program(3)
+    print("Moduliai pagal programą 3:", module3)
+    module4 = Module.get_modules_by_program(4)
+    print("Moduliai pagal programą 4:", module4)
+    module5 = Module.get_modules_by_program(5)
+    print("Moduliai pagal programą 5:", module5)
+
+
+    
 
